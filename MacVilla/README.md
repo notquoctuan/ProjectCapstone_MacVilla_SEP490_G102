@@ -1,4 +1,4 @@
-## To run this project, setup .env in project root (Ebay.Admin). Please check .env.example!
+## To run this project, setup .env in project root. Please check .env.example!
 
 ## Git commit conventions
 
