@@ -45,4 +45,33 @@ public class CategoryService : ICategoryService
     {
         return await _categoryRepository.DeleteAsync(id);
     }
+
+    public async Task<Category?> GetCategoryByIdAsync2(long id)
+    {
+        return await _categoryRepository.GetByIdAsync(id);
+    }
+
+    public async Task<Category> CreateCategoryAsync2(Category category)
+    {
+        return await _categoryRepository.CreateAsync(category);
+    }
+
+    public async Task<Category?> UpdateCategoryAsync2(long id, Category category)
+    {
+        var existingCategory = await _categoryRepository.GetByIdAsync(id);
+        if (existingCategory == null)
+        {
+            return null;
+        }
+
+        existingCategory.CategoryName = category.CategoryName;
+        existingCategory.ParentCategoryId = category.ParentCategoryId;
+
+        return await _categoryRepository.UpdateAsync(existingCategory);
+    }
+
+    public async Task<bool> DeleteCategoryAsync2(long id)
+    {
+        return await _categoryRepository.DeleteAsync(id);
+    }
 }

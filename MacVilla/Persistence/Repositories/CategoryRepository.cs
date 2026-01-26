@@ -53,4 +53,32 @@ public class CategoryRepository : ICategoryRepository
         await _dbContext.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> ExistsAsync(long id)
+    {
+        return await _dbContext.Categories
+            .AnyAsync(c => c.CategoryId == id && c.DeletedAt == null);
+    }
+    
+    public async Task<bool> IsNameUniqueAsync(string categoryName, long? excludeId = null)
+    {
+        return !await _dbContext.Categories
+            .AnyAsync(c => c.CategoryName == categoryName 
+                           && c.DeletedAt == null 
+                           && (excludeId == null || c.CategoryId != excludeId));
+    }
+
+    public async Task<IEnumerable<Category>> GetByParentIdAsync(long parentId)
+    {
+        return await _dbContext.Categories
+            .Where(c => c.ParentCategoryId == parentId && c.DeletedAt == null)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<int> CountAsync()
+    {
+        return await _dbContext.Categories
+            .CountAsync(c => c.DeletedAt == null);
+    }
 }
