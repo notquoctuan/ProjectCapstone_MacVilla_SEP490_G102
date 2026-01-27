@@ -1,7 +1,14 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\MacVilla",
+    "\\MacVilla\\Application",
+    "\\MacVilla\\Domain",
+    "\\MacVilla\\Infrustucture",
+    "\\MacVilla\\Persistence",
+    "\\MacVilla\\Presentation",
+    "\\MacVilla\\Presentation\\Controllers",
+    "\\MacVilla\\Presentation\\Properties"
   ],
-  "SelectedNode": "\\MacVilla.slnx",
   "PreviewInSolutionExplorer": false
 }
