@@ -3,7 +3,6 @@ using Persistence.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Lấy Connection String từ file appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<MacvilladbContext>(options =>
