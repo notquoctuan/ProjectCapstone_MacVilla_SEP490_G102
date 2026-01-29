@@ -1,4 +1,13 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+using Persistence.Context; 
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Lấy Connection String từ file appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<MacvilladbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddControllers();
 
