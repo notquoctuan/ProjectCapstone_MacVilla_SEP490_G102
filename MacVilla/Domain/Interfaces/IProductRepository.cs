@@ -8,3 +8,7 @@ namespace Domain.Interfaces
 
         Task<Product?> GetByIdAsync(long id);
 
+        Task UpdateAsync(Product product);
+        Task SaveChangesAsync();
+    }
+}

@@ -38,3 +38,36 @@ namespace Application.Services
                 CreatedAt = product.CreatedAt
             };
         }
+        
+        public async Task<bool> UpdateProductAsync(long id, UpdateProductRequest request)
+        {
+            var product = await _productRepo.GetByIdAsync(id);
+            if (product == null) return false;
+
+            product.Name = request.Name;
+            product.Price = request.Price;
+            product.Status = request.Status;
+            product.CategoryId = request.CategoryId;
+
+            await _productRepo.UpdateAsync(product);
+            await _productRepo.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> DisableProductAsync(long id)
+        {
+            // 1. Tìm sản phẩm theo ID
+            var product = await _productRepo.GetByIdAsync(id);
+            if (product == null) return false;
+
+            // 2. Cập nhật trạng thái thành Disabled
+            product.Status = "Disabled";
+
+            // 3. Lưu thay đổi
+            await _productRepo.UpdateAsync(product);
+            await _productRepo.SaveChangesAsync();
+
+            return true;
+        }
+    }
+}
