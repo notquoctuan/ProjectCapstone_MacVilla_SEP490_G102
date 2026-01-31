@@ -7,3 +7,10 @@
             if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
             if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
             if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
+        public async Task<Product?> GetByIdAsync(long id)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+        }
+

@@ -22,3 +22,19 @@ namespace Application.Services
                 CreatedAt = p.CreatedAt
             });
         }
+        public async Task<ProductAdminResponse?> GetProductDetailsAsync(long id)
+        {
+            var product = await _productRepo.GetByIdAsync(id);
+
+            if (product == null) return null;
+
+            return new ProductAdminResponse
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                CategoryName = product.Category?.CategoryName,
+                Price = product.Price ?? 0,
+                Status = product.Status,
+                CreatedAt = product.CreatedAt
+            };
+        }
