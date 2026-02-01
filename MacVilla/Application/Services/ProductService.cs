@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+using Domain.Interfaces;
 using Application.DTOs;
 
 namespace Application.Services
@@ -56,14 +56,24 @@ namespace Application.Services
         }
         public async Task<bool> DisableProductAsync(long id)
         {
-            // 1. Tìm sản phẩm theo ID
             var product = await _productRepo.GetByIdAsync(id);
             if (product == null) return false;
 
-            // 2. Cập nhật trạng thái thành Disabled
             product.Status = "Disabled";
 
-            // 3. Lưu thay đổi
+            await _productRepo.UpdateAsync(product);
+            await _productRepo.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> EnableProductAsync(long id)
+        {
+            var product = await _productRepo.GetByIdAsync(id);
+            if (product == null) return false;
+
+            product.Status = "Active";
+
             await _productRepo.UpdateAsync(product);
             await _productRepo.SaveChangesAsync();
 

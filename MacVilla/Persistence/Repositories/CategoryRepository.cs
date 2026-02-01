@@ -81,4 +81,18 @@ public class CategoryRepository : ICategoryRepository
         return await _dbContext.Categories
             .CountAsync(c => c.DeletedAt == null);
     }
+
+    public async Task<bool> SetIsActiveAsync(long id, bool isActive)
+    {
+        var category = await _dbContext.Categories
+            .FirstOrDefaultAsync(c => c.CategoryId == id && c.DeletedAt == null);
+        if (category == null)
+        {
+            return false;
+        }
+
+        category.IsActive = isActive;
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

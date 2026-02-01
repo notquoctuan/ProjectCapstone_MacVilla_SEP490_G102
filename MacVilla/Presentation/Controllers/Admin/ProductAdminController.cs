@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+using Application.DTOs;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +59,19 @@ namespace Presentation.Controllers.Admin
             }
 
             return Ok(new { message = "Đã vô hiệu hóa sản phẩm thành công." });
+        }
+
+        [HttpPatch("{id}/enable")]
+        public async Task<IActionResult> EnableProduct(long id)
+        {
+            var result = await _productService.EnableProductAsync(id);
+
+            if (!result)
+            {
+                return NotFound(new { message = $"Không tìm thấy sản phẩm có ID: {id}" });
+            }
+
+            return Ok(new { message = "Đã kích hoạt sản phẩm thành công." });
         }
     }
 }

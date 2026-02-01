@@ -4,3 +4,48 @@ GET {{Presentation_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+# Category APIs
+GET {{Presentation_HostAddress}}/api/category
+Accept: application/json
+
+###
+GET {{Presentation_HostAddress}}/api/category/1
+Accept: application/json
+
+###
+POST {{Presentation_HostAddress}}/api/category
+Content-Type: application/json
+
+{
+  "categoryName": "Electronics",
+  "parentCategoryId": null
+}
+
+###
+PUT {{Presentation_HostAddress}}/api/category/1
+Content-Type: application/json
+
+{
+  "categoryName": "Electronics Updated",
+  "parentCategoryId": null
+}
+
+###
+PATCH {{Presentation_HostAddress}}/api/category/1/activate
+Accept: application/json
+
+###
+PATCH {{Presentation_HostAddress}}/api/category/1/deactivate
+Accept: application/json
+
+###
+DELETE {{Presentation_HostAddress}}/api/category/1
+
+###
+# Product Admin APIs (require Auth)
+PATCH {{Presentation_HostAddress}}/api/admin/products/1/disable
+
+###
+PATCH {{Presentation_HostAddress}}/api/admin/products/1/enable
+
+###

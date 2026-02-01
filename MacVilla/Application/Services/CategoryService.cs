@@ -1,3 +1,4 @@
+using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 
@@ -22,12 +23,18 @@ public class CategoryService : ICategoryService
         return await _categoryRepository.GetByIdAsync(id);
     }
 
-    public async Task<Category> CreateCategoryAsync(Category category)
+    public async Task<Category> CreateCategoryAsync(CreateCategoryRequest request)
     {
+        var category = new Category
+        {
+            CategoryName = request.CategoryName,
+            ParentCategoryId = request.ParentCategoryId,
+            IsActive = true
+        };
         return await _categoryRepository.CreateAsync(category);
     }
 
-    public async Task<Category?> UpdateCategoryAsync(long id, Category category)
+    public async Task<Category?> UpdateCategoryAsync(long id, UpdateCategoryRequest request)
     {
         var existingCategory = await _categoryRepository.GetByIdAsync(id);
         if (existingCategory == null)
@@ -35,8 +42,8 @@ public class CategoryService : ICategoryService
             return null;
         }
 
-        existingCategory.CategoryName = category.CategoryName;
-        existingCategory.ParentCategoryId = category.ParentCategoryId;
+        existingCategory.CategoryName = request.CategoryName;
+        existingCategory.ParentCategoryId = request.ParentCategoryId;
 
         return await _categoryRepository.UpdateAsync(existingCategory);
     }
@@ -46,32 +53,13 @@ public class CategoryService : ICategoryService
         return await _categoryRepository.DeleteAsync(id);
     }
 
-    public async Task<Category?> GetCategoryByIdAsync2(long id)
+    public async Task<bool> ActivateCategoryAsync(long id)
     {
-        return await _categoryRepository.GetByIdAsync(id);
+        return await _categoryRepository.SetIsActiveAsync(id, true);
     }
 
-    public async Task<Category> CreateCategoryAsync2(Category category)
+    public async Task<bool> DeactivateCategoryAsync(long id)
     {
-        return await _categoryRepository.CreateAsync(category);
-    }
-
-    public async Task<Category?> UpdateCategoryAsync2(long id, Category category)
-    {
-        var existingCategory = await _categoryRepository.GetByIdAsync(id);
-        if (existingCategory == null)
-        {
-            return null;
-        }
-
-        existingCategory.CategoryName = category.CategoryName;
-        existingCategory.ParentCategoryId = category.ParentCategoryId;
-
-        return await _categoryRepository.UpdateAsync(existingCategory);
-    }
-
-    public async Task<bool> DeleteCategoryAsync2(long id)
-    {
-        return await _categoryRepository.DeleteAsync(id);
+        return await _categoryRepository.SetIsActiveAsync(id, false);
     }
 }

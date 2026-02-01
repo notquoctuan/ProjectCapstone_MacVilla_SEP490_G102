@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
@@ -12,6 +12,8 @@ public partial class Category
     public long? ParentCategoryId { get; set; }
 
     public bool? IsActive { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
 
     public virtual ICollection<Category> InverseParentCategory { get; set; } = new List<Category>();
 
