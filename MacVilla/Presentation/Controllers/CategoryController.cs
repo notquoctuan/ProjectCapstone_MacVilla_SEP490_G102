@@ -1,6 +1,6 @@
 using Application.DTOs;
-using Application.Interfaces;
 using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -50,7 +50,7 @@ public class CategoryController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Category>> Create([FromBody] CreateCategoryRequest request)
     {
-        var createdCategory = await _categoryService.CreateCategoryAsync(request);
+        var createdCategory = await _categoryService.CreateCategoryAsync(request.CategoryName, request.ParentCategoryId);
         return CreatedAtAction(nameof(GetById), new { id = createdCategory.CategoryId }, createdCategory);
     }
 
@@ -61,7 +61,7 @@ public class CategoryController : ControllerBase
     [HttpPut("{id:long}")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateCategoryRequest request)
     {
-        var category = await _categoryService.UpdateCategoryAsync(id, request);
+        var category = await _categoryService.UpdateCategoryAsync(id, request.CategoryName, request.ParentCategoryId);
         if (category == null)
         {
             return NotFound();

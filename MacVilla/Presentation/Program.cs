@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Application.Services;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using Persistence;
 using Persistence.Context;
 using Persistence.Repositories;
 
@@ -77,7 +78,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();

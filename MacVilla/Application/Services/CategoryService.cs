@@ -1,6 +1,5 @@
-using Application.DTOs;
-using Application.Interfaces;
 using Domain.Entities;
+using Domain.Interfaces;
 
 namespace Application.Services;
 
@@ -23,18 +22,18 @@ public class CategoryService : ICategoryService
         return await _categoryRepository.GetByIdAsync(id);
     }
 
-    public async Task<Category> CreateCategoryAsync(CreateCategoryRequest request)
+    public async Task<Category> CreateCategoryAsync(string categoryName, long? parentCategoryId)
     {
         var category = new Category
         {
-            CategoryName = request.CategoryName,
-            ParentCategoryId = request.ParentCategoryId,
+            CategoryName = categoryName,
+            ParentCategoryId = parentCategoryId,
             IsActive = true
         };
         return await _categoryRepository.CreateAsync(category);
     }
 
-    public async Task<Category?> UpdateCategoryAsync(long id, UpdateCategoryRequest request)
+    public async Task<Category?> UpdateCategoryAsync(long id, string categoryName, long? parentCategoryId)
     {
         var existingCategory = await _categoryRepository.GetByIdAsync(id);
         if (existingCategory == null)
@@ -42,8 +41,8 @@ public class CategoryService : ICategoryService
             return null;
         }
 
-        existingCategory.CategoryName = request.CategoryName;
-        existingCategory.ParentCategoryId = request.ParentCategoryId;
+        existingCategory.CategoryName = categoryName;
+        existingCategory.ParentCategoryId = parentCategoryId;
 
         return await _categoryRepository.UpdateAsync(existingCategory);
     }
