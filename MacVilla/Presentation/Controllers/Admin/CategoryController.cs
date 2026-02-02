@@ -1,12 +1,14 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/[controller]")]
+[Authorize(Roles = "Admin")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
