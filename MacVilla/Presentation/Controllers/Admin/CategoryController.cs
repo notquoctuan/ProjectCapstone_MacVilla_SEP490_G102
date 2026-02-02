@@ -1,12 +1,12 @@
 using Application.DTOs;
+using Application.Interfaces;
 using Domain.Entities;
-using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers;
+namespace Presentation.Controllers.Admin;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/admin/[controller]")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -17,14 +17,26 @@ public class CategoryController : ControllerBase
     }
 
     /// <summary>
-    /// Get all categories (view category list)
+    /// Get all categories with search, filter, and pagination
     /// </summary>
-    /// <remarks>GET: api/category</remarks>
+    /// <remarks>GET: api/category?name=electronics&amp;isActive=true&amp;pageNumber=1&amp;pageSize=10</remarks>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Category>>> GetAll()
+    public async Task<ActionResult<PagedResponse<Category>>> GetAll(
+        [FromQuery] string? name,
+        [FromQuery] bool? isActive,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var categories = await _categoryService.GetAllCategoriesAsync();
-        return Ok(categories);
+        var request = new CategorySearchRequest
+        {
+            Name = name,
+            IsActive = isActive,
+            PageNumber = pageNumber > 0 ? pageNumber : 1,
+            PageSize = pageSize > 0 && pageSize <= 100 ? pageSize : 10
+        };
+
+        var result = await _categoryService.SearchCategoriesAsync(request);
+        return Ok(result);
     }
 
     /// <summary>

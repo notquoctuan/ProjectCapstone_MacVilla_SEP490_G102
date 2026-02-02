@@ -13,8 +13,6 @@ public partial class Category
 
     public bool? IsActive { get; set; }
 
-    public DateTime? DeletedAt { get; set; }
-
     public virtual ICollection<Category> InverseParentCategory { get; set; } = new List<Category>();
 
     public virtual Category? ParentCategory { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
-using Persistence;
+using Application.Interfaces;
 using Persistence.Context;
 using Persistence.Repositories;
 

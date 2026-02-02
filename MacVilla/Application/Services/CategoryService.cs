@@ -1,3 +1,5 @@
+using Application.DTOs;
+using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
 
@@ -60,5 +62,23 @@ public class CategoryService : ICategoryService
     public async Task<bool> DeactivateCategoryAsync(long id)
     {
         return await _categoryRepository.SetIsActiveAsync(id, false);
+    }
+
+    public async Task<PagedResponse<Category>> SearchCategoriesAsync(CategorySearchRequest request)
+    {
+        var (categories, totalCount) = await _categoryRepository.SearchAsync(
+            request.Name,
+            request.IsActive,
+            request.PageNumber,
+            request.PageSize
+        );
+
+        return new PagedResponse<Category>
+        {
+            Data = categories,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            TotalCount = totalCount
+        };
     }
 }

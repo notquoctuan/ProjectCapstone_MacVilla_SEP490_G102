@@ -1,6 +1,7 @@
+using Application.DTOs;
 using Domain.Entities;
 
-namespace Domain.Interfaces;
+namespace Application.Interfaces;
 
 public interface ICategoryService
 {
@@ -11,4 +12,5 @@ public interface ICategoryService
     Task<bool> DeleteCategoryAsync(long id);
     Task<bool> ActivateCategoryAsync(long id);
     Task<bool> DeactivateCategoryAsync(long id);
+    Task<PagedResponse<Category>> SearchCategoriesAsync(CategorySearchRequest request);
 }

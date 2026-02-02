@@ -10,4 +10,5 @@ public interface ICategoryRepository
     Task<Category> UpdateAsync(Category category);
     Task<bool> DeleteAsync(long id);
     Task<bool> SetIsActiveAsync(long id, bool isActive);
+    Task<(IEnumerable<Category> Categories, int TotalCount)> SearchAsync(string? name, bool? isActive, int pageNumber, int pageSize);
 }
