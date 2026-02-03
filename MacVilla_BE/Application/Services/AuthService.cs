@@ -15,11 +15,11 @@ public class AuthService
 
     public string? Authenticate(LoginRequest request)
     {
-        var adminUser = _config["AdminAccount:Username"];
+        var adminUser = _config["AdminAccount:Email"];
         var adminPass = _config["AdminAccount:Password"];
 
         // Kiểm tra với tài khoản Admin trong appsettings
-        if (request.Username == adminUser && request.Password == adminPass)
+        if (request.Email == adminUser && request.Password == adminPass)
         {
             return GenerateJwtToken(adminUser, "Admin");
         }
