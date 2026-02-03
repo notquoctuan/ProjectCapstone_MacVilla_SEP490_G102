@@ -92,7 +92,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowRazorPage");
 app.UseAuthentication(); 
 app.UseAuthorization();
 
