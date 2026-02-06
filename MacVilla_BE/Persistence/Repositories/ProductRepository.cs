@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
@@ -12,30 +13,47 @@ namespace Persistence.Repositories
         {
             _context = context;
         }
-
-        public async Task<IEnumerable<Product>> GetProductsForAdminAsync(string? name, decimal? minPrice, decimal? maxPrice, int? categoryId)
+        public async Task<Product> AddAsync(Product product)
         {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
 
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(p => p.Name.Contains(name));
-            if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
-            if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
-            if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
+        public async Task<Product?> GetByIdDetailAsync(long id)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+        }
+        public async Task<bool> UpdateStatusAsync(long id, string status)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return false;
 
-            return await query.OrderByDescending(p => p.ProductId).ToListAsync();
+            product.Status = status;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<IEnumerable<Product>> GetProductsForAdminAsync()
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .ToListAsync();
+        }
+        public async Task UpdateAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Product?> GetByIdAsync(long id)
         {
             return await _context.Products
-                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
-
-        public async Task UpdateAsync(Product product) => _context.Products.Update(product);
-
-        public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
-
     }
 }
