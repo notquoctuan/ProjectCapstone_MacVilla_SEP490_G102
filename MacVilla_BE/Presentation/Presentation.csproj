@@ -27,7 +27,6 @@
   <ItemGroup>
     <Folder Include="Controllers\Customer\" />
     <Folder Include="Controllers\Inventory\" />
-    <Folder Include="Controllers\HomePage\" />
   </ItemGroup>
 
   <ItemGroup>

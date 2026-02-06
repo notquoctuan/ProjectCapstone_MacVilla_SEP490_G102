@@ -1,4 +1,7 @@
 ﻿using Domain.Entities;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Interfaces
 {
@@ -10,5 +13,16 @@ namespace Domain.Interfaces
 
         Task UpdateAsync(Product product);
         Task SaveChangesAsync();
+
+        //new
+        async Task<IEnumerable<Product>> GetFeaturedProductsAsync(int limit)
+        {
+            var all = await GetProductsForAdminAsync(null, null, null, null);
+            if (all == null) return Enumerable.Empty<Product>();
+
+            return all
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(limit);
+        }
     }
 }

@@ -1,0 +1,188 @@
+<!-- ==================== UNIFIED STICKY HEADER ==================== -->
+<app-unified-header></app-unified-header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="main-content">
+  
+  <!-- ==================== TOP SECTION: BANNER + NEWS (Same Height) ==================== -->
+  <div class="top-section">
+    <div class="container">
+      <div class="banner-news-grid">
+        
+        <!-- Banner Slider (LEFT) -->
+        <div class="banner-column">
+          <app-banner-slider></app-banner-slider>
+        </div>
+        
+        <!-- News Sidebar (RIGHT) -->
+        <aside class="news-column">
+          <app-news-sidebar 
+            *ngIf="newsItems$ | async as newsItems"
+            [title]="(sectionTitles$ | async)?.news || 'Latest News'"
+            [newsItems]="newsItems">
+          </app-news-sidebar>
+        </aside>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PRODUCTS SECTION (FULL WIDTH) ==================== -->
+  <div class="products-section">
+    <div class="container">
+      
+      <!-- Featured Products with Pagination -->
+      <section class="section">
+        <header class="section-header">
+          <h2 class="section-title">
+            <span class="material-icons">star</span>
+            SẢN PHẨM NỔI BẬT
+          </h2>
+          <a href="#" class="view-all-link">
+            Xem tất cả
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </header>
+        
+        <div class="products-grid" role="list">
+          <app-product-card 
+            *ngFor="let product of featuredProducts$ | async; trackBy: trackByProduct"
+            [product]="product"
+            (addToCart)="onAddToCart($event)"
+            role="listitem">
+          </app-product-card>
+        </div>
+        
+        <!-- Pagination -->
+        <app-pagination 
+          [pagination]="featuredPagination"
+          (pageChange)="onFeaturedPageChange($event)">
+        </app-pagination>
+      </section>
+
+      <!-- Category Tabs -->
+      <section class="section">
+        <header class="tabs-header">
+          <nav class="tabs-nav" role="tablist">
+            <button 
+              *ngFor="let cat of tabCategories$ | async; let i = index"
+              class="tab-btn"
+              [class.active]="i === 0"
+              role="tab">
+              {{ cat.categoryName }}
+            </button>
+          </nav>
+          <a href="#" class="view-all-link">
+            Xem tất cả
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </header>
+        
+        <div class="products-grid" role="list">
+          <app-product-card 
+            *ngFor="let product of tabProducts$ | async; trackBy: trackByProduct"
+            [product]="product"
+            (addToCart)="onAddToCart($event)"
+            role="listitem">
+          </app-product-card>
+        </div>
+        
+        <app-pagination 
+          [pagination]="tabPagination"
+          (pageChange)="onTabPageChange($event)">
+        </app-pagination>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ==================== BOTTOM SECTIONS: CUSTOMER | FANPAGE | VIDEO ==================== -->
+  <div class="bottom-sections">
+    <div class="container">
+      <div class="bottom-grid">
+        
+        <!-- What Customers Say -->
+        <section class="section testimonials-section">
+          <header class="section-header">
+            <h2 class="section-title">
+              <span class="material-icons">format_quote</span>
+              Khách hàng nói gì
+            </h2>
+          </header>
+          <div class="testimonials-content">
+            <div class="testimonial-item" *ngFor="let i of [1,2,3]">
+              <div class="testimonial-avatar">
+                <span class="material-icons">person</span>
+              </div>
+              <div class="testimonial-text">
+                <p class="testimonial-quote">"Sản phẩm chất lượng cao, dịch vụ tận tâm. Tôi rất hài lòng khi mua sắm tại MacVilla."</p>
+                <div class="testimonial-author">
+                  <strong>Nguyễn Văn A</strong>
+                  <div class="testimonial-rating">
+                    <span class="material-icons">star</span>
+                    <span class="material-icons">star</span>
+                    <span class="material-icons">star</span>
+                    <span class="material-icons">star</span>
+                    <span class="material-icons">star</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Fanpage -->
+        <section class="section fanpage-section">
+          <header class="section-header">
+            <h2 class="section-title">
+              <span class="material-icons">thumb_up</span>
+              Fanpage
+            </h2>
+          </header>
+          <div class="fanpage-content">
+            <div class="fanpage-placeholder">
+              <span class="material-icons">facebook</span>
+              <p>Facebook Fanpage</p>
+              <span class="fanpage-like">1.2K likes</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Video -->
+        <section class="section video-section">
+          <header class="section-header">
+            <h2 class="section-title">
+              <span class="material-icons">play_circle</span>
+              Video
+            </h2>
+          </header>
+          <div class="video-content">
+            <div class="video-placeholder">
+              <span class="material-icons">play_arrow</span>
+              <p>Video giới thiệu</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<app-footer></app-footer>
+
+<!-- ==================== FLOATING BUTTONS ==================== -->
+<div class="floating-actions" aria-label="Liên hệ nhanh">
+  <a href="#" class="fab-btn messenger" aria-label="Chat Messenger">
+    <span class="material-icons">chat</span>
+  </a>
+  <a href="#" class="fab-btn zalo" aria-label="Chat Zalo">Zalo</a>
+  <a href="tel:1900xxxx" class="fab-btn phone" aria-label="Gọi điện">
+    <span class="material-icons">phone</span>
+  </a>
+  <button class="fab-btn scroll-top" (click)="scrollToTop()" aria-label="Lên đầu trang">
+    <span class="material-icons">keyboard_arrow_up</span>
+  </button>
+</div>

@@ -79,5 +79,26 @@ namespace Application.Services
 
             return true;
         }
+
+        // New: return DTOs for homepage featured products
+        public async Task<IEnumerable<ProductHomeResponse>> GetHomepageProductsAsync(int limit = 8)
+        {
+            var products = await _productRepo.GetFeaturedProductsAsync(limit);
+
+            return products.Select(p =>
+            {
+                var mainImage = p.ProductImages?.FirstOrDefault(pi => pi.IsMain == true) ?? p.ProductImages?.FirstOrDefault();
+                return new ProductHomeResponse
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    CategoryName = p.Category?.CategoryName,
+                    Price = p.Price ?? 0,
+                    Status = p.Status,
+                    MainImageUrl = mainImage?.ImageUrl,
+                    CreatedAt = p.CreatedAt
+                };
+            });
+        }
     }
 }

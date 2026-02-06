@@ -37,5 +37,19 @@ namespace Persistence.Repositories
 
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 
+        // New: get featured/recent products; includes images and category
+        public async Task<IEnumerable<Product>> GetFeaturedProductsAsync(int limit)
+        {
+            var query = _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .AsQueryable();
+
+                query = query.Where(p => p.Status == "Active" || p.Status == null)
+                         .OrderByDescending(p => p.CreatedAt);
+
+            return await query.Take(limit).ToListAsync();
+        }
+
     }
 }
