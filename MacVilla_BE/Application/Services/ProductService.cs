@@ -1,83 +1,90 @@
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Application.DTOs;
 
 namespace Application.Services
 {
     public class ProductService
     {
-        private readonly IProductRepository _productRepo;
-        public ProductService(IProductRepository productRepo) => _productRepo = productRepo;
-
-        public async Task<IEnumerable<ProductAdminResponse>> SearchProductsForAdmin(string? name, decimal? min, decimal? max, int? catId)
+        private readonly IProductRepository _productRepository;
+        public ProductService(IProductRepository productRepository)
         {
-            var products = await _productRepo.GetProductsForAdminAsync(name, min, max, catId);
+            _productRepository = productRepository;
+        }
+        public async Task<IEnumerable<ProductAdminResponse>> GetAllProductsForAdmin()
+        {
+            var products = await _productRepository.GetProductsForAdminAsync();
 
             return products.Select(p => new ProductAdminResponse
             {
                 ProductId = p.ProductId,
                 Name = p.Name,
-                CategoryName = p.Category?.CategoryName,
-                Price = p.Price ?? 0,
-                Status = p.Status,  
-                CreatedAt = p.CreatedAt
+                Price = p.Price,
+                Status = p.Status,
+                CreatedAt = p.CreatedAt,
+                CategoryName = p.Category?.CategoryName ?? "N/A",
+                ImageUrl = p.ProductImages?
+                            .OrderByDescending(img => img.IsMain)
+                            .Select(img => img.ImageUrl)
+                            .FirstOrDefault()
             });
         }
-        public async Task<ProductAdminResponse?> GetProductDetailsAsync(long id)
+
+        public async Task<PagedResponse<ProductAdminResponse>> GetPagedProductsForAdminAsync(ProductSearchRequest request)
         {
-            var product = await _productRepo.GetByIdAsync(id);
+            // Lấy dữ liệu thô từ Repository (giữ nguyên code repository cũ)
+            var products = await _productRepository.GetProductsForAdminAsync();
+            var query = products.AsQueryable();
 
-            if (product == null) return null;
-
-            return new ProductAdminResponse
+            // 1. Lọc theo tên (đã qua validate Regex ở DTO)
+            if (!string.IsNullOrEmpty(request.Name))
             {
-                ProductId = product.ProductId,
-                Name = product.Name,
-                CategoryName = product.Category?.CategoryName,
-                Price = product.Price ?? 0,
-                Status = product.Status,
-                CreatedAt = product.CreatedAt
+                query = query.Where(p => p.Name != null && p.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // 2. Lọc theo giá
+            if (request.MinPrice.HasValue) query = query.Where(p => p.Price >= request.MinPrice.Value);
+            if (request.MaxPrice.HasValue) query = query.Where(p => p.Price <= request.MaxPrice.Value);
+
+            // 3. Mapping sang DTO (Sửa lỗi CS8072 bằng cách không dùng ?.)
+            var mappedData = query.Select(p => new ProductAdminResponse
+            {
+                ProductId = p.ProductId,
+                Name = p.Name,
+                Price = p.Price,
+                Status = p.Status,
+                CreatedAt = p.CreatedAt,
+                // Thay p.Category?.CategoryName bằng:
+                CategoryName = p.Category != null ? p.Category.CategoryName : "N/A",
+                // Thay p.ProductImages?. bằng kiểm tra null:
+                ImageUrl = p.ProductImages != null
+                    ? p.ProductImages.OrderByDescending(img => img.IsMain)
+                                     .Select(img => img.ImageUrl)
+                                     .FirstOrDefault()
+                    : null
+            });
+
+            if (!string.IsNullOrEmpty(request.CategoryName))
+            {
+                mappedData = mappedData.Where(r => r.CategoryName != null &&
+                    r.CategoryName.Contains(request.CategoryName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // 5. Thực hiện phân trang
+            int totalCount = mappedData.Count();
+            var items = mappedData
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            return new PagedResponse<ProductAdminResponse>
+            {
+                Data = items,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
             };
         }
-        
-        public async Task<bool> UpdateProductAsync(long id, UpdateProductRequest request)
-        {
-            var product = await _productRepo.GetByIdAsync(id);
-            if (product == null) return false;
 
-            product.Name = request.Name;
-            product.Price = request.Price;
-            product.Status = request.Status;
-            product.CategoryId = request.CategoryId;
-
-            await _productRepo.UpdateAsync(product);
-            await _productRepo.SaveChangesAsync();
-
-            return true;
-        }
-        public async Task<bool> DisableProductAsync(long id)
-        {
-            var product = await _productRepo.GetByIdAsync(id);
-            if (product == null) return false;
-
-            product.Status = "Disabled";
-
-            await _productRepo.UpdateAsync(product);
-            await _productRepo.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<bool> EnableProductAsync(long id)
-        {
-            var product = await _productRepo.GetByIdAsync(id);
-            if (product == null) return false;
-
-            product.Status = "Active";
-
-            await _productRepo.UpdateAsync(product);
-            await _productRepo.SaveChangesAsync();
-
-            return true;
-        }
     }
+    
 }

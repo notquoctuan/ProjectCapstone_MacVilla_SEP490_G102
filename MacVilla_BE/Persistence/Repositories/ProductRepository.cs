@@ -13,29 +13,13 @@ namespace Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Product>> GetProductsForAdminAsync(string? name, decimal? minPrice, decimal? maxPrice, int? categoryId)
-        {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
-
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(p => p.Name.Contains(name));
-            if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
-            if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
-            if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
-
-            return await query.OrderByDescending(p => p.ProductId).ToListAsync();
-        }
-
-        public async Task<Product?> GetByIdAsync(long id)
+        public async Task<IEnumerable<Product>> GetProductsForAdminAsync()
         {
             return await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.ProductId == id);
+                .Include(p => p.ProductImages)
+                .ToListAsync();
         }
-
-        public async Task UpdateAsync(Product product) => _context.Products.Update(product);
-
-        public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 
     }
 }

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj": {}
+    "C:\\Users\\admin\\Downloads\\MacVilla_DoAn\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj": {
+    "C:\\Users\\admin\\Downloads\\MacVilla_DoAn\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
+        "projectUniqueName": "C:\\Users\\admin\\Downloads\\MacVilla_DoAn\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
         "projectName": "MacVilla_Web",
-        "projectPath": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
-        "packagesPath": "C:\\Users\\Duc\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\obj\\",
+        "projectPath": "C:\\Users\\admin\\Downloads\\MacVilla_DoAn\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\admin\\Downloads\\MacVilla_DoAn\\MacVilla_FE\\MacVilla_Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Duc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -78,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

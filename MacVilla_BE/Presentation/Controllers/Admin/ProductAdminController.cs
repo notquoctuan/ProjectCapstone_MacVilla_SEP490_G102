@@ -15,63 +15,54 @@ namespace Presentation.Controllers.Admin
         {
             _productService = productService;
         }
-
-        
+        /// <summary>
+        /// Lấy danh sách sản phẩm hiển thị cho giao diện Admin
+        /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] string? name, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice, [FromQuery] int? categoryId)
+        public async Task<IActionResult> GetProductList()
         {
-            var result = await _productService.SearchProductsForAdmin(name, minPrice, maxPrice, categoryId);
-            return Ok(result);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(long id)
-        {
-            var result = await _productService.GetProductDetailsAsync(id);
-
-            if (result == null)
+            try
             {
-                return NotFound(new { message = $"Không tìm thấy sản phẩm có ID: {id}" });
+                var products = await _productService.GetAllProductsForAdmin();
+
+                if (products == null || !products.Any())
+                {
+                    return NotFound(new { message = "Không tìm thấy sản phẩm nào." });
+                }
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi hệ thống", detail = ex.Message });
+            }
+        }
+        /// <summary>
+        /// Tìm kiếm, lọc và phân trang sản phẩm cho Admin
+        /// </summary>
+        [HttpGet("filter")]
+        public async Task<ActionResult<PagedResponse<ProductAdminResponse>>> FilterProducts([FromQuery] ProductSearchRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
-            return Ok(result);
-        }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(long id, [FromBody] UpdateProductRequest request)
-        {
-            var success = await _productService.UpdateProductAsync(id, request);
-
-            if (!success)
+            if (request.MinPrice.HasValue && request.MaxPrice.HasValue && request.MinPrice > request.MaxPrice)
             {
-                return NotFound(new { message = $"Không tìm thấy sản phẩm ID {id} để cập nhật." });
+                return BadRequest(new { message = "Giá tối thiểu không được lớn hơn giá tối đa." });
             }
 
-            return Ok(new { message = "Cập nhật sản phẩm thành công!" });
-        }
-        [HttpPatch("{id}/disable")]
-        public async Task<IActionResult> DisableProduct(long id)
-        {
-            var result = await _productService.DisableProductAsync(id);
-
-            if (!result)
+            try
             {
-                return NotFound(new { message = $"Không tìm thấy sản phẩm có ID: {id}" });
+                var result = await _productService.GetPagedProductsForAdminAsync(request);
+
+                return Ok(result);
             }
-
-            return Ok(new { message = "Đã vô hiệu hóa sản phẩm thành công." });
-        }
-
-        [HttpPatch("{id}/enable")]
-        public async Task<IActionResult> EnableProduct(long id)
-        {
-            var result = await _productService.EnableProductAsync(id);
-
-            if (!result)
+            catch (Exception ex)
             {
-                return NotFound(new { message = $"Không tìm thấy sản phẩm có ID: {id}" });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi xử lý dữ liệu.", detail = ex.Message });
             }
-
-            return Ok(new { message = "Đã kích hoạt sản phẩm thành công." });
         }
     }
 }

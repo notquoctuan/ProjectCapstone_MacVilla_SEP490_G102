@@ -93,8 +93,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowRazorPage");
+
 app.UseAuthentication(); 
 app.UseAuthorization();
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAngular",
+//        policy => policy
+//            .WithOrigins("http://localhost:4200")
+//            .AllowAnyMethod()
+//            .AllowAnyHeader());
+//});
+
+//app.UseCors("AllowAngular");
 
 app.MapControllers();
 
