@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "oXELxkcLMiQ=",
+  "dgSpecHash": "TQ2en0Bakps=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
+  "projectFilePath": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Duc\\.nuget\\packages\\microsoft.extensions.configuration\\9.0.12\\microsoft.extensions.configuration.9.0.12.nupkg.sha512",
     "C:\\Users\\Duc\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\9.0.12\\microsoft.extensions.configuration.abstractions.9.0.12.nupkg.sha512",
