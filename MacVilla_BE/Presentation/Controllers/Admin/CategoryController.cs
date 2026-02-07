@@ -8,7 +8,7 @@ namespace Presentation.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/[controller]")]
-[Authorize(Roles = "Admin")]
+//[Authorize(Roles = "Admin")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
