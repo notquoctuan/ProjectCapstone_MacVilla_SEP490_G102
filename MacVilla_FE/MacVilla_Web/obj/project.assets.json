@@ -996,11 +996,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
+      "projectUniqueName": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
       "projectName": "MacVilla_Web",
-      "projectPath": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
+      "projectPath": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\MacVilla_Web.csproj",
       "packagesPath": "C:\\Users\\Duc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Duc\\source\\repos\\Test\\MacVilla_FE\\MacVilla_Web\\obj\\",
+      "outputPath": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

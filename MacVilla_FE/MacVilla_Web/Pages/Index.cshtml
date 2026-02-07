@@ -1,10 +1,43 @@
 ﻿@page
 @model IndexModel
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 @{
-    ViewData["Title"] = "Home page";
+    Layout = null; // Tự thiết kế giao diện riêng không dùng Layout chung
+    var token = HttpContextAccessor.HttpContext?.Session.GetString("JWToken");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>MacVilla - Trang Chủ</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        .auth-corner { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .hero-bg { height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="auth-corner">
+        @if (string.IsNullOrEmpty(token))
+        {
+            <a asp-page="/Auth/Login" class="btn btn-primary px-4 shadow">Đăng nhập</a>
+        }
+        else
+        {
+            <div class="btn-group shadow">
+                <button class="btn btn-success" disabled>Chào Admin</button>
+                <a asp-page="/Auth/Logout" class="btn btn-outline-danger">Thoát</a>
+            </div>
+        }
+    </div>
+
+    <div class="hero-bg text-center">
+        <div>
+            <h1 class="display-1 fw-bold text-primary">MacVilla</h1>
+            <p class="lead fs-3">Hệ thống quản lý nghỉ dưỡng chuyên nghiệp</p>
+        </div>
+    </div>
+</body>
+</html>
