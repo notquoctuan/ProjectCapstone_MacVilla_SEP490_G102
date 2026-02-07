@@ -1,20 +1,31 @@
 ﻿using System.Net.Http.Headers;
+using MacVilla_Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// =======================
+// 1. SERVICES
+// =======================
 builder.Services.AddRazorPages();
-
-// --- BỔ SUNG DÒNG NÀY ĐỂ HẾT LỖI ---
 builder.Services.AddHttpContextAccessor();
 
+// Named HttpClient
 builder.Services.AddHttpClient("MacVillaAPI", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7262/");
+    client.BaseAddress = new Uri("https://localhost:7262/"); // BE port
     client.DefaultRequestHeaders.Accept.Clear();
-    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    client.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
-builder.Services.AddDistributedMemoryCache(); 
+// Typed HttpClient
+builder.Services.AddHttpClient<ProductApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7262/");
+});
+
+// Session
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -22,8 +33,14 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// =======================
+// 2. BUILD
+// =======================
 var app = builder.Build();
 
+// =======================
+// 3. MIDDLEWARE
+// =======================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -35,8 +52,10 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
+
+// ⭐ BẮT BUỘC PHẢI CÓ
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
 app.Run();
