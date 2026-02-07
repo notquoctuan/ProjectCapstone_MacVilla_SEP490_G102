@@ -27,7 +27,12 @@ namespace MacVilla_Web.Pages.Auth
                 if (result != null && !string.IsNullOrEmpty(result.Token))
                 {
                     HttpContext.Session.SetString("JWToken", result.Token);
+<<<<<<< Updated upstream
                     return RedirectToPage("/Index");
+=======
+
+                    return RedirectToPage("/Admin/Dashboard/Index");
+>>>>>>> Stashed changes
                 }
             }
 
