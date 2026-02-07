@@ -1,0 +1,229 @@
+@page
+@model MacVilla_Web.Pages.Admin.Categories.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Danh mục";
+    var bgLightGreen = "#e8f5e9";
+}
+
+<style>
+    .admin-category-page {
+        background-color: @bgLightGreen;
+        min-height: calc(100vh - 200px);
+        padding: 1.5rem 0;
+    }
+    .card-category {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: none;
+    }
+    .table-category tbody tr:hover {
+        background-color: #f1f8e9;
+    }
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    .badge-active { background-color: #2e7d32; }
+    .badge-inactive { background-color: #9e9e9e; }
+</style>
+
+<div class="admin-category-page rounded-3">
+    <div class="container">
+        <h2 class="mb-4 text-success">Quản lý Danh mục</h2>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card card-category h-100">
+                    <div class="card-header bg-success text-white rounded-top">
+                        <h5 class="mb-0">Tìm kiếm & Lọc</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label small">Tên danh mục</label>
+                                <input asp-for="SearchName" class="form-control" placeholder="Nhập tên..." />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Trạng thái</label>
+                                <select asp-for="FilterIsActive" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="true">Đang hoạt động</option>
+                                    <option value="false">Ngưng hoạt động</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">Lọc</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-category h-100">
+                    <div class="card-header bg-success text-white rounded-top">
+                        <h5 class="mb-0">Thêm danh mục mới</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="Create">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input asp-for="CreateRequest.CategoryName" class="form-control" placeholder="Tên danh mục" required />
+                                </div>
+                                <div class="col-md-4">
+                                    <select asp-for="CreateRequest.ParentCategoryId" class="form-select">
+                                        <option value="">-- Không có danh mục cha --</option>
+                                        @foreach (var c in Model.AllCategories)
+                                        {
+                                            <option value="@c.CategoryId">@c.CategoryName</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-success w-100">Thêm</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-category">
+            <div class="card-header bg-success text-white rounded-top">
+                <h5 class="mb-0">Danh sách danh mục</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.PagedCategories?.Data != null && Model.PagedCategories.Data.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-category table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên danh mục</th>
+                                    <th>Danh mục cha</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var cat in Model.PagedCategories.Data)
+                                {
+                                    var isEditing = Model.EditCategoryId == cat.CategoryId;
+                                    var parentName = cat.ParentCategoryId.HasValue
+                                        ? (Model.AllCategories.FirstOrDefault(x => x.CategoryId == cat.ParentCategoryId)?.CategoryName ?? "-")
+                                        : "-";
+                                    <tr class="@(isEditing ? "table-warning" : "")">
+                                        <td>@cat.CategoryId</td>
+                                        <td>
+                                            @if (isEditing)
+                                            {
+                                                <form method="post" asp-page-handler="Update" asp-route-id="@cat.CategoryId" class="d-inline-flex gap-2 align-items-center">
+                                                    <input asp-for="UpdateRequest.CategoryName" class="form-control form-control-sm" style="max-width:200px" />
+                                                    <select asp-for="UpdateRequest.ParentCategoryId" class="form-select form-select-sm" style="max-width:150px">
+                                                        <option value="">-- Không có --</option>
+                                                        @foreach (var c in Model.AllCategories.Where(x => x.CategoryId != cat.CategoryId))
+                                                        {
+                                                            <option value="@c.CategoryId" selected="@(c.CategoryId == Model.UpdateRequest.ParentCategoryId)">@c.CategoryName</option>
+                                                        }
+                                                    </select>
+                                                    <button type="submit" class="btn btn-sm btn-success">Lưu</button>
+                                                    <a asp-page="." class="btn btn-sm btn-outline-secondary">Hủy</a>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                @cat.CategoryName
+                                            }
+                                        </td>
+                                        <td>@parentName</td>
+                                        <td>
+                                            @if (cat.IsActive == true)
+                                            {
+                                                <span class="badge badge-active">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-inactive">Ngưng</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            @if (!isEditing)
+                                            {
+                                                <a asp-page="." asp-route-handler="Edit" asp-route-id="@cat.CategoryId" class="btn btn-sm btn-outline-primary btn-action">Sửa</a>
+                                                @if (cat.IsActive == true)
+                                                {
+                                                    <form method="post" asp-page-handler="Deactivate" asp-route-id="@cat.CategoryId" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-warning btn-action" onclick="return confirm('Vô hiệu hóa danh mục này?')">Vô hiệu hóa</button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <form method="post" asp-page-handler="Activate" asp-route-id="@cat.CategoryId" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success btn-action">Kích hoạt</button>
+                                                    </form>
+                                                }
+                                                <form method="post" asp-page-handler="Delete" asp-route-id="@cat.CategoryId" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger btn-action" onclick="return confirm('Xóa danh mục này?')">Xóa</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (Model.PagedCategories.TotalPages > 1)
+                    {
+                        <nav class="p-3 border-top">
+                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                                @if (Model.PagedCategories.HasPreviousPage)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-page="." asp-route-PageNumber="@(Model.PageNumber - 1)" asp-route-SearchName="@Model.SearchName" asp-route-FilterIsActive="@Model.FilterIsActive">Trước</a>
+                                    </li>
+                                }
+                                @for (var i = 1; i <= Model.PagedCategories.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                        <a class="page-link" asp-page="." asp-route-PageNumber="@i" asp-route-SearchName="@Model.SearchName" asp-route-FilterIsActive="@Model.FilterIsActive">@i</a>
+                                    </li>
+                                }
+                                @if (Model.PagedCategories.HasNextPage)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-page="." asp-route-PageNumber="@(Model.PageNumber + 1)" asp-route-SearchName="@Model.SearchName" asp-route-FilterIsActive="@Model.FilterIsActive">Sau</a>
+                                    </li>
+                                }
+                            </ul>
+                            <p class="text-muted small text-center mt-2 mb-0">
+                                Trang @Model.PageNumber / @Model.PagedCategories.TotalPages | Tổng: @Model.PagedCategories.TotalCount danh mục
+                            </p>
+                        </nav>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center py-5 mb-0">Chưa có danh mục nào.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
