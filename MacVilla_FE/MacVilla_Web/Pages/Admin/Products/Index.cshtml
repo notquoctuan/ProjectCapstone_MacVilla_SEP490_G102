@@ -1,81 +1,250 @@
 ﻿@page
 @model MacVilla_Web.Pages.Admin.Products.IndexModel
+@{
+    Layout = null; // Không dùng layout chung
+}
 
-<div class="container mt-4">
-    <h2 class="text-primary mb-4 text-uppercase">Quản lý sản phẩm</h2>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý sản phẩm - MacVilla</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Tìm theo tên</label>
-                    <input type="text" asp-for="Name" class="form-control" placeholder="Nhập tên sản phẩm...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Danh mục</label>
-                    <input type="text" asp-for="CategoryName" class="form-control" placeholder="Tên danh mục...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Sắp xếp giá</label>
-                    <select asp-for="SortOrder" class="form-select">
-                        <option value="">Mới nhất</option>
-                        <option value="price_asc">Giá tăng dần</option>
-                        <option value="price_desc">Giá giảm dần</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary w-100">Lọc</button>
-                    <a asp-page="./Index" class="btn btn-outline-secondary">Xóa</a>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="text-primary">DANH SÁCH SẢN PHẨM</h2>
-                    <a class="btn btn-success btn-sm" asp-page="/Admin/Products/Create">
-                        <i class="bi bi-plus-lg"></i> + Thêm sản phẩm mới
-                    </a>
-                </div>
-            </form>
+    <style>
+        :root {
+            --mv-red-dark: #d30000;
+            --mv-red-light: #fff5f5;
+            --mv-red-border: #ffcccc;
+            --mv-green-footer: #7DA100;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        /* HEADER */
+        .admin-header {
+            background-color: var(--mv-red-dark);
+            height: 65px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1050;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo-white {
+            max-height: 40px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--mv-red-light);
+            height: 100vh;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            border-right: 1px solid var(--mv-red-border);
+            padding-top: 15px;
+            z-index: 1000;
+        }
+
+        .nav-admin-link {
+            color: #333333;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: 0.2s;
+            border-bottom: 1px solid rgba(211, 0, 0, 0.05);
+        }
+
+            .nav-admin-link i {
+                margin-right: 12px;
+                font-size: 18px;
+                color: var(--mv-red-dark);
+            }
+
+            .nav-admin-link:hover {
+                background-color: var(--mv-red-border);
+                color: #000;
+            }
+
+            .nav-admin-link.active {
+                background-color: var(--mv-red-dark);
+                color: #ffffff !important;
+            }
+
+                .nav-admin-link.active i {
+                    color: #ffffff;
+                }
+
+        /* MAIN CONTENT */
+        .admin-wrapper {
+            margin-left: var(--sidebar-width);
+            margin-top: 65px;
+            padding: 30px;
+            min-height: calc(100vh - 115px);
+        }
+
+        /* FOOTER */
+        .admin-footer {
+            margin-left: var(--sidebar-width);
+            background-color: var(--mv-green-footer);
+            color: #ffffff;
+            padding: 12px 30px;
+            font-size: 13px;
+        }
+
+        /* TABLE CUSTOM */
+        .table thead {
+            background-color: #eee;
+        }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .page-link {
+            color: var(--mv-red-dark);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--mv-red-dark);
+            border-color: var(--mv-red-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="admin-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <img src="/Logo/logo-macvilla.png" alt="MacVilla" class="logo-custom me-3">
+            <span class="text-white fw-bold border-start ps-3 small text-uppercase">Hệ thống quản trị</span>
         </div>
-    </div>
+        <div class="text-white small">
+            <i class="bi bi-person-circle me-1"></i> Admin MacVilla
+        </div>
+    </header>
 
-    <table class="table table-hover border shadow-sm bg-white">
-        <thead class="table-dark">
-            <tr>
-                <th>Ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Giá</th>
-                <th>Trạng thái</th>
-                <th class="text-center">Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.PagedProducts.Data)
-            {
-                <tr>
-                    <td><img src="https://localhost:7262@(item.ImageUrl)" width="60" class="img-thumbnail" /></td>
-                    <td class="align-middle fw-bold">@item.Name</td>
-                    <td class="align-middle">@item.CategoryName</td>
-                    <td class="align-middle text-danger">@item.Price.ToString("N0") đ</td>
-                    <td class="align-middle"><span class="badge bg-success">@item.Status</span></td>
-                    <td class="align-middle text-center">
-                        <a class="btn btn-sm btn-warning" asp-page="./Edit" asp-route-id="@item.ProductId">Sửa</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <aside class="admin-sidebar">
+        <nav>
+            <a href="#" class="nav-admin-link"><i class="bi bi-house-door"></i> Tổng quan</a>
+            <a href="#" class="nav-admin-link active"><i class="bi bi-box-seam"></i> Sản phẩm</a>
+            <a href="#" class="nav-admin-link"><i class="bi bi-receipt"></i> Đơn hàng</a>
+            <a href="#" class="nav-admin-link"><i class="bi bi-people"></i> Khách hàng</a>
+        </nav>
+    </aside>
 
-    <nav>
-        <ul class="pagination justify-content-center">
-            @for (int i = 1; i <= Model.PagedProducts.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                    <a class="page-link" asp-route-PageNumber="@i"
-                       asp-route-Name="@Model.Name"
-                       asp-route-CategoryName="@Model.CategoryName"
-                       asp-route-SortOrder="@Model.SortOrder">@i</a>
-                </li>
-            }
-        </ul>
-    </nav>
-</div>
+    <main class="admin-wrapper">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-uppercase m-0">Danh sách sản phẩm</h4>
+            <a class="btn btn-danger btn-sm px-3 shadow-sm" asp-page="/Admin/Products/Create">
+                <i class="bi bi-plus-lg"></i> Thêm mới
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-2">
+                    <div class="col-md-4">
+                        <input type="text" asp-for="Name" class="form-control form-control-sm" placeholder="Tên sản phẩm...">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" asp-for="CategoryName" class="form-control form-control-sm" placeholder="Danh mục...">
+                    </div>
+                    <div class="col-md-3">
+                        <select asp-for="SortOrder" class="form-select form-select-sm">
+                            <option value="">-- Sắp xếp --</option>
+                            <option value="price_asc">Giá tăng dần</option>
+                            <option value="price_desc">Giá giảm dần</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex gap-1">
+                        <button type="submit" class="btn btn-dark btn-sm w-100">Lọc</button>
+                        <a asp-page="./Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-3">Ảnh</th>
+                            <th>Thông tin sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Giá bán</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PagedProducts?.Data != null)
+                        {
+                            foreach (var item in Model.PagedProducts.Data)
+                            {
+                                <tr>
+                                    <td class="ps-3">
+                                        <img src="https://localhost:7262@(item.ImageUrl)" class="product-img" onerror="this.src='https://placehold.co/50x50?text=No+Image'">
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@item.Name</div>
+                                        <div class="text-muted small">ID: #@item.ProductId</div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                                    <td class="fw-bold text-danger">@item.Price.ToString("N0") đ</td>
+                                    <td>
+                                        <span class="badge @(item.Status == "Enable" ? "bg-success" : "bg-secondary")">@item.Status</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-outline-warning btn-sm" asp-page="./Edit" asp-route-id="@item.ProductId">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center">
+                @for (int i = 1; i <= (Model.PagedProducts?.TotalPages ?? 0); i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link shadow-none" asp-route-PageNumber="@i"
+                           asp-route-Name="@Model.Name"
+                           asp-route-CategoryName="@Model.CategoryName"
+                           asp-route-SortOrder="@Model.SortOrder">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </main>
+
+    <footer class="admin-footer d-flex justify-content-between">
+        <div>&copy; 2026 <strong>MACVILLA</strong>. CMS System.</div>
+        <div>Thiết kế bởi: HPSOFT</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
