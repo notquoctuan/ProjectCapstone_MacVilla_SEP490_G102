@@ -26,7 +26,11 @@
             margin: 0;
         }
 
+<<<<<<< Updated upstream
         /* HEADER */
+=======
+        /* HEADER - Đồng bộ 100% */
+>>>>>>> Stashed changes
         .admin-header {
             background-color: var(--mv-green-dark);
             height: 65px;
@@ -34,6 +38,7 @@
             width: 100%;
             top: 0;
             z-index: 1050;
+<<<<<<< Updated upstream
             padding: 0 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -47,10 +52,20 @@
         .admin-sidebar {
             width: var(--sidebar-width);
             background-color: #ffffff;
+=======
+            padding: 0 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* SIDEBAR - Đồng bộ font-weight và hiệu ứng active */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+>>>>>>> Stashed changes
             height: 100vh;
             position: fixed;
             top: 65px;
             left: 0;
+<<<<<<< Updated upstream
             border-right: 1px solid var(--mv-green-border);
             z-index: 1000;
             padding-top: 10px;
@@ -97,10 +112,59 @@
         }
 
         /* DASHBOARD CARDS */
+=======
+            background: white;
+            z-index: 1000;
+            padding-top: 10px;
+            border-right: 1px solid #eee;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #444;
+            text-decoration: none;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+            .nav-link-custom i {
+                margin-right: 15px;
+                font-size: 1.2rem;
+                color: var(--mv-green-dark);
+            }
+
+            .nav-link-custom:hover {
+                background-color: var(--mv-green-light);
+                color: var(--mv-green-dark);
+            }
+
+            .nav-link-custom.active {
+                background-color: var(--mv-green-dark) !important;
+                color: #ffffff !important;
+            }
+
+                .nav-link-custom.active i {
+                    color: #ffffff !important;
+                }
+
+        /* MAIN WRAPPER */
+        .admin-wrapper {
+            margin-top: 65px;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            min-height: calc(100vh - 115px);
+        }
+
+        /* DASHBOARD SPECIFIC CARDS */
+>>>>>>> Stashed changes
         .stat-card {
             border: none;
             border-radius: 12px;
             transition: transform 0.3s;
+<<<<<<< Updated upstream
         }
 
         .stat-card:hover {
@@ -116,10 +180,32 @@
             color: #ffffff;
             padding: 15px 30px;
             font-size: 13px;
+=======
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .bg-mv-green {
+            background-color: var(--mv-green-dark);
+            color: white;
+        }
+
+        /* FOOTER - Đồng bộ */
+        .admin-footer {
+            background-color: var(--mv-green-dark);
+            color: #ffffff;
+            padding: 15px 40px;
+            font-size: 13px;
+            margin-left: var(--sidebar-width);
+>>>>>>> Stashed changes
         }
     </style>
 </head>
 <body>
+<<<<<<< Updated upstream
     <header class="admin-header d-flex align-items-center justify-content-between text-white">
         <div class="d-flex align-items-center">
             <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" class="logo-custom me-3">
@@ -127,21 +213,36 @@
         </div>
         <div class="dropdown">
             <button class="btn btn-link text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+=======
+
+    <header class="admin-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" style="height: 35px;" class="me-3">
+            <span class="text-white fw-bold border-start ps-3 small text-uppercase">Quản lý hệ thống</span>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-link text-white text-decoration-none dropdown-toggle small" data-bs-toggle="dropdown">
+>>>>>>> Stashed changes
                 <i class="bi bi-person-circle me-1"></i> Admin MacVilla
             </button>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
                 <li><a class="dropdown-item py-2" href="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
                 <li><hr class="dropdown-divider"></li>
+<<<<<<< Updated upstream
                 <li>
                     <a class="dropdown-item small text-danger" asp-page="/Auth/Logout">
                         <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
                     </a>
                 </li>
+=======
+                <li><a class="dropdown-item py-2 text-danger" asp-page="/Auth/Logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</a></li>
+>>>>>>> Stashed changes
             </ul>
         </div>
     </header>
 
     <aside class="admin-sidebar shadow-sm">
+<<<<<<< Updated upstream
         <div class="px-3 py-2 small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Menu chính</div>
         <nav>
             <a asp-page="/Admin/Dashboard" class="nav-link-custom active">
@@ -155,50 +256,108 @@
             </a>
             <a href="#" class="nav-link-custom">
                 <i class="bi bi-people"></i> Khách hàng
+=======
+        <div class="px-4 py-3 small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Menu chính</div>
+        <nav>
+            <a asp-page="/Admin/Dashboard/Index" class="nav-link-custom active">
+                <i class="bi bi-speedometer2"></i> Tổng quan
+            </a>
+            <a asp-page="/Admin/Products/Index" class="nav-link-custom">
+                <i class="bi bi-box-seam"></i> Quản lý Sản phẩm
+            </a>
+            <a asp-page="/Admin/Categories/Index" class="nav-link-custom">
+                <i class="bi bi-tags"></i> Quản lý Danh Mục
+            </a>
+            <a href="#" class="nav-link-custom">
+                <i class="bi bi-receipt"></i> Quản lý Đơn hàng
+            </a>
+            <a href="#" class="nav-link-custom">
+                <i class="bi bi-people"></i> Quản lý người dùng
+>>>>>>> Stashed changes
             </a>
         </nav>
     </aside>
 
     <main class="admin-wrapper">
         <div class="d-flex justify-content-between align-items-center mb-4">
+<<<<<<< Updated upstream
             <h4 class="fw-bold mb-0">Bảng điều khiển tổng quan</h4>
             <span class="badge bg-white text-dark shadow-sm p-2">Hôm nay: @DateTime.Now.ToString("dd/MM/yyyy")</span>
+=======
+            <div>
+                <h3 class="fw-bold m-0">Bảng điều khiển tổng quan</h3>
+                <p class="text-muted small mb-0">Chào mừng bạn trở lại hệ thống quản trị MacVilla</p>
+            </div>
+            <span class="badge bg-white text-dark shadow-sm p-2 border">Hôm nay: @DateTime.Now.ToString("dd/MM/yyyy")</span>
+>>>>>>> Stashed changes
         </div>
 
         <div class="row g-4 mb-4">
             <div class="col-md-3">
+<<<<<<< Updated upstream
                 <div class="card stat-card bg-mv-green shadow-sm">
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-box-seam fs-1 mb-2"></i>
                         <h6 class="text-uppercase small fw-bold">Tổng sản phẩm</h6>
                         <h2 class="mb-0">0</h2>
+=======
+                <div class="card stat-card bg-mv-green text-white">
+                    <div class="card-body p-4 text-center">
+                        <i class="bi bi-box-seam fs-1 mb-2"></i>
+                        <h6 class="text-uppercase small fw-bold">Tổng sản phẩm</h6>
+                        <h2 class="mb-0 fw-bold">128</h2>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
+<<<<<<< Updated upstream
                 <div class="card stat-card bg-white shadow-sm border-start border-4 border-warning">
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-cart-check fs-1 text-warning mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Đơn hàng mới</h6>
                         <h2 class="mb-0">0</h2>
+=======
+                <div class="card stat-card bg-white border-start border-4 border-warning">
+                    <div class="card-body p-4 text-center">
+                        <i class="bi bi-cart-check fs-1 text-warning mb-2"></i>
+                        <h6 class="text-uppercase small fw-bold text-muted">Đơn hàng mới</h6>
+                        <h2 class="mb-0 fw-bold">12</h2>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
+<<<<<<< Updated upstream
                 <div class="card stat-card bg-white shadow-sm border-start border-4 border-info">
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-people fs-1 text-info mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Khách hàng</h6>
                         <h2 class="mb-0">0</h2>
+=======
+                <div class="card stat-card bg-white border-start border-4 border-info">
+                    <div class="card-body p-4 text-center">
+                        <i class="bi bi-people fs-1 text-info mb-2"></i>
+                        <h6 class="text-uppercase small fw-bold text-muted">Khách hàng</h6>
+                        <h2 class="mb-0 fw-bold">1,050</h2>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
+<<<<<<< Updated upstream
                 <div class="card stat-card bg-white shadow-sm border-start border-4 border-success">
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-currency-dollar fs-1 text-success mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Doanh thu tháng</h6>
                         <h2 class="mb-0">0</h2>
+=======
+                <div class="card stat-card bg-white border-start border-4 border-success">
+                    <div class="card-body p-4 text-center">
+                        <i class="bi bi-currency-dollar fs-1 text-success mb-2"></i>
+                        <h6 class="text-uppercase small fw-bold text-muted">Doanh thu tháng</h6>
+                        <h2 class="mb-0 fw-bold">150M</h2>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
@@ -208,10 +367,20 @@
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-header bg-white py-3 fw-bold border-bottom">
+<<<<<<< Updated upstream
                         <i class="bi bi-graph-up-arrow me-2 text-success"></i> TĂNG TRƯỞNG DOANH THU
                     </div>
                     <div class="card-body" style="height: 300px; display: flex; align-items: center; justify-content: center;">
                         <p class="text-muted italic">[Biểu đồ sẽ hiển thị tại đây]</p>
+=======
+                        <i class="bi bi-graph-up-arrow me-2" style="color: var(--mv-green-dark)"></i> TĂNG TRƯỞNG DOANH THU
+                    </div>
+                    <div class="card-body" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center">
+                            <i class="bi bi-bar-chart-line text-muted mb-2" style="font-size: 3rem;"></i>
+                            <p class="text-muted italic">[Biểu đồ thống kê sẽ hiển thị tại đây]</p>
+                        </div>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
@@ -221,6 +390,7 @@
                         <i class="bi bi-lightning-charge me-2 text-warning"></i> HOẠT ĐỘNG GẦN ĐÂY
                     </div>
                     <div class="card-body">
+<<<<<<< Updated upstream
                         <ul class="list-group list-group-flush small">
                             <li class="list-group-item border-0 px-0">
                                 <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.5rem;"></i>
@@ -234,6 +404,21 @@
                                 <i class="bi bi-circle-fill text-warning me-2" style="font-size: 0.5rem;"></i>
                                 
                             </li>
+=======
+                        <ul class="list-group list-group-flush">
+                           @*  <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
+                                <i class="bi bi-circle-fill text-success me-3" style="font-size: 0.6rem;"></i>
+                                <div class="small">Đơn hàng <strong>#1234</strong> vừa được thanh toán thành công.</div>
+                            </li>
+                            <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
+                                <i class="bi bi-circle-fill text-primary me-3" style="font-size: 0.6rem;"></i>
+                                <div class="small">Sản phẩm <strong>MacBook Pro M3</strong> vừa được cập nhật giá.</div>
+                            </li>
+                            <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
+                                <i class="bi bi-circle-fill text-warning me-3" style="font-size: 0.6rem;"></i>
+                                <div class="small">Yêu cầu hỗ trợ mới từ khách hàng <strong>Nguyễn Văn A</strong>.</div>
+                            </li> *@
+>>>>>>> Stashed changes
                         </ul>
                     </div>
                 </div>
@@ -242,10 +427,18 @@
     </main>
 
     <footer class="admin-footer d-flex justify-content-between">
+<<<<<<< Updated upstream
         <div>&copy; 2026 <strong>MACVILLA</strong>. CMS System.</div>
         <div>Thiết kế bởi: <strong>HPSOFT</strong></div>
+=======
+        <div>&copy; 2026 <strong>MACVILLA</strong>. CMS.</div>
+>>>>>>> Stashed changes
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<<<<<<< Updated upstream
 </html>
+=======
+</html>
+>>>>>>> Stashed changes

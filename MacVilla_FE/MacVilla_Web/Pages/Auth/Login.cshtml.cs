@@ -32,6 +32,9 @@ namespace MacVilla_Web.Pages.Auth
 =======
 
                     return RedirectToPage("/Admin/Dashboard/Index");
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                 }
             }
