@@ -2,6 +2,8 @@
 using Application.DTOs;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Application.Services
 {
@@ -15,10 +17,6 @@ namespace Application.Services
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
         }
-
-        /// <summary>
-        /// Tạo sản phẩm mới kèm theo upload ảnh từ máy tính và gán danh mục
-        /// </summary>
         public async Task<ProductAdminResponse> CreateProductWithFilesAsync(ProductCreateRequest request, string webRootPath)
         {
             // 1. Kiểm tra Category
@@ -26,7 +24,7 @@ namespace Application.Services
             if (!categories.Any(c => c.CategoryId == request.CategoryId))
                 throw new Exception("Danh mục không tồn tại.");
 
-            // 2. Khởi tạo Entity
+            // 2. Tạo Entity Product
             var product = new Product
             {
                 Name = request.Name,
@@ -34,42 +32,45 @@ namespace Application.Services
                 CategoryId = request.CategoryId,
                 Description = request.Description,
                 Status = request.Status,
-                CreatedAt = DateTime.Now,
-                ProductImages = new List<ProductImage>()
+                CreatedAt = DateTime.Now
             };
 
-            // 3. Xử lý lưu ảnh
-            if (request.ImageFiles != null && request.ImageFiles.Any())
+            // 3. Xử lý lưu File ảnh
+            if (request.ImageFiles != null && request.ImageFiles.Count > 0)
             {
-                // Đường dẫn vật lý để ghi file (Có wwwroot)
-                string uploadsFolder = Path.Combine(webRootPath, "uploads", "products");
-                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                var uploadPath = Path.Combine(webRootPath, "uploads", "products");
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
 
-                foreach (var file in request.ImageFiles)
+                for (int i = 0; i < request.ImageFiles.Count; i++)
                 {
-                    // Tạo tên file duy nhất để tránh trùng lặp
-                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
-                    string filePath = Path.Combine(uploadsFolder, fileName);
+                    var file = request.ImageFiles[i];
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var filePath = Path.Combine(uploadPath, fileName);
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await file.CopyToAsync(fileStream);
+                        await file.CopyToAsync(stream);
                     }
 
-                    // LƯU VÀO DB: Chỉ lưu đường dẫn tương đối (KHÔNG có wwwroot)
-                    // Dấu '/' ở đầu rất quan trọng để FE hiểu đây là đường dẫn từ gốc domain
                     product.ProductImages.Add(new ProductImage
                     {
-                        ImageUrl = "/uploads/products/" + fileName,
-                        IsMain = product.ProductImages.Count == 0
+                        ImageUrl = $"/uploads/products/{fileName}",
+                        IsMain = (i == 0) // Ảnh đầu tiên là ảnh chính
                     });
                 }
             }
 
-            await _productRepository.AddAsync(product);
-            return new ProductAdminResponse { ProductId = product.ProductId, Name = product.Name };
-        }
+            var savedProduct = await _productRepository.AddAsync(product);
 
+            return new ProductAdminResponse
+            {
+                ProductId = savedProduct.ProductId,
+                Name = savedProduct.Name,
+                Price = savedProduct.Price ?? 0,
+                Status = savedProduct.Status ?? "Pending",
+                CategoryName = categories.FirstOrDefault(c => c.CategoryId == savedProduct.CategoryId)?.CategoryName
+            };
+        }
         /// <summary>
         /// Lấy toàn bộ danh sách sản phẩm cho Admin (không phân trang)
         /// </summary>
@@ -94,57 +95,57 @@ namespace Application.Services
             });
         }
 
-        /// <summary>
-        /// Tìm kiếm, lọc và phân trang danh sách sản phẩm cho Admin
-        /// </summary>
         public async Task<PagedResponse<ProductAdminResponse>> GetPagedProductsForAdminAsync(ProductSearchRequest request)
         {
-            // Lấy dữ liệu thô từ Repository (đã bao gồm Include Category và Images)
-            var products = await _productRepository.GetProductsForAdminAsync();
-            var query = products.AsQueryable();
+            // 1. Lấy Queryable gốc
+            var query = _productRepository.GetQueryable();
 
-            // 1. Lọc theo tên sản phẩm
+            // 2. Lọc theo tên sản phẩm (nếu có)
             if (!string.IsNullOrEmpty(request.Name))
             {
-                query = query.Where(p => p.Name != null && p.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(p => p.Name.Contains(request.Name));
             }
 
-            // 2. Lọc theo khoảng giá
+            // 3. Lọc theo Tên danh mục (nếu có)
+            if (!string.IsNullOrEmpty(request.CategoryName))
+            {
+                query = query.Where(p => p.Category != null && p.Category.CategoryName.Contains(request.CategoryName));
+            }
+
+            // 4. Lọc theo khoảng giá
             if (request.MinPrice.HasValue) query = query.Where(p => p.Price >= request.MinPrice.Value);
             if (request.MaxPrice.HasValue) query = query.Where(p => p.Price <= request.MaxPrice.Value);
 
-            // 3. Mapping sang DTO (Đã sửa lỗi CS8072 - không dùng ?. trong Expression)
-            var mappedData = query.Select(p => new ProductAdminResponse
+            // 5. Xử lý Sắp xếp theo giá
+            query = request.SortOrder switch
             {
-                ProductId = p.ProductId,
-                Name = p.Name,
-                Price = p.Price,
-                Description = p.Description,
-                Status = p.Status,
-                CreatedAt = p.CreatedAt,
-                CategoryName = p.Category != null ? p.Category.CategoryName : "N/A",
-                ImageUrl = p.ProductImages != null
-                    ? p.ProductImages.OrderByDescending(img => img.IsMain)
-                                     .Select(img => img.ImageUrl)
-                                     .FirstOrDefault()
-                    : null
-            });
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                _ => query.OrderByDescending(p => p.CreatedAt) // Mặc định sắp xếp theo ngày tạo mới nhất
+            };
 
-            // 4. Lọc theo tên danh mục (thực hiện sau khi đã map hoặc truy cập qua navigation property)
-            if (!string.IsNullOrEmpty(request.CategoryName))
-            {
-                mappedData = mappedData.Where(r => r.CategoryName != null &&
-                    r.CategoryName.Contains(request.CategoryName, StringComparison.OrdinalIgnoreCase));
-            }
+            // 6. Tính tổng số bản ghi sau khi đã lọc (để phân trang ở FE)
+            int totalCount = await query.CountAsync();
 
-            // 5. Thực hiện phân trang và tính toán tổng số bản ghi
-            int totalCount = mappedData.Count();
-            var items = mappedData
+            // 7. Thực hiện phân trang và Map dữ liệu sang Response DTO
+            var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .ToList();
+                .Select(p => new ProductAdminResponse
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Price = p.Price ?? 0,
+                    CategoryName = p.Category != null ? p.Category.CategoryName : "N/A",
+                    Status = p.Status,
+                    CreatedAt = p.CreatedAt ?? DateTime.Now,
+                    ImageUrl = p.ProductImages
+                        .OrderByDescending(img => img.IsMain)
+                        .Select(img => img.ImageUrl)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
 
-            // Trả về kết quả bọc trong PagedResponse
             return new PagedResponse<ProductAdminResponse>
             {
                 Data = items,
@@ -155,55 +156,74 @@ namespace Application.Services
         }
         public async Task<UpdateResult> UpdateProductAsync(long id, ProductUpdateRequest request, string webRootPath)
         {
-            // 1. Tìm sản phẩm cũ
+            // 1. Tìm sản phẩm cũ kèm danh sách ảnh (phải Include ProductImages)
             var existingProduct = await _productRepository.GetByIdAsync(id);
             if (existingProduct == null)
                 return new UpdateResult { Success = false, Message = "Không tìm thấy sản phẩm." };
 
-            // 2. Kiểm tra xem có bất kỳ sự thay đổi nào không
-            bool isChanged = false;
+            // 2. Kiểm tra danh mục hợp lệ (Bảo mật tầng BE)
+            var categoryExists = await _categoryRepository.GetByIdAsync(request.CategoryId);
+            if (categoryExists == null)
+                return new UpdateResult { Success = false, Message = "Danh mục không hợp lệ." };
 
-            if (existingProduct.Name != request.Name) isChanged = true;
-            if (existingProduct.Price != request.Price) isChanged = true;
-            if (existingProduct.Description != request.Description) isChanged = true;
-            if (existingProduct.CategoryId != request.CategoryId) isChanged = true;
-            if (existingProduct.Status != request.Status) isChanged = true;
-
-            // Kiểm tra nếu có upload ảnh mới
-            if (request.NewImageFiles != null && request.NewImageFiles.Any()) isChanged = true;
-
-            // 3. Nếu không có gì thay đổi, trả về thông báo ngay
-            if (!isChanged)
-            {
-                return new UpdateResult { Success = true, Message = "Dữ liệu giống hệt bản cũ, không có gì để cập nhật." };
-            }
-
-            // 4. Nếu có thay đổi, tiến hành gán giá trị mới
+            // 3. Tiến hành cập nhật và kiểm tra thay đổi
             existingProduct.Name = request.Name;
             existingProduct.Price = request.Price;
             existingProduct.Description = request.Description;
             existingProduct.CategoryId = request.CategoryId;
             existingProduct.Status = request.Status;
 
-            // Xử lý ảnh mới (nếu có)
+            // 4. Xử lý ảnh mới (Chỉ thực hiện nếu có file upload)
             if (request.NewImageFiles != null && request.NewImageFiles.Any())
             {
+                // A. XÓA FILE ẢNH VẬT LÝ TRÊN SERVER (Tránh rác bộ nhớ)
+                foreach (var oldImg in existingProduct.ProductImages)
+                {
+                    var oldPath = Path.Combine(webRootPath, oldImg.ImageUrl.TrimStart('/'));
+                    if (File.Exists(oldPath))
+                    {
+                        File.Delete(oldPath);
+                    }
+                }
+
+                // B. Xóa dữ liệu ảnh cũ trong DB
                 existingProduct.ProductImages.Clear();
+
+                // C. Lưu file mới vào thư mục
                 string uploadsFolder = Path.Combine(webRootPath, "uploads", "products");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                bool isFirst = true;
                 foreach (var file in request.NewImageFiles)
                 {
-                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                    string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
                     string filePath = Path.Combine(uploadsFolder, fileName);
+
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    existingProduct.ProductImages.Add(new ProductImage { ImageUrl = "/uploads/products/" + fileName });
+
+                    // D. Thêm vào danh sách ảnh mới
+                    existingProduct.ProductImages.Add(new ProductImage
+                    {
+                        ImageUrl = "/uploads/products/" + fileName,
+                        IsMain = isFirst // Tự động gán cái đầu tiên làm ảnh chính
+                    });
+                    isFirst = false;
                 }
             }
 
-            await _productRepository.UpdateAsync(existingProduct);
-            return new UpdateResult { Success = true, Message = "Cập nhật sản phẩm thành công." };
+            // 5. Lưu vào Database thông qua Repository
+            try
+            {
+                await _productRepository.UpdateAsync(existingProduct);
+                return new UpdateResult { Success = true, Message = "Cập nhật sản phẩm thành công." };
+            }
+            catch (Exception ex)
+            {
+                return new UpdateResult { Success = false, Message = "Lỗi hệ thống: " + ex.Message };
+            }
         }
         public async Task<bool> ChangeProductStatusAsync(long id, string newStatus)
         {

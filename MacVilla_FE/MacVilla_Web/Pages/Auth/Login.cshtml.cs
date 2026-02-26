@@ -18,7 +18,6 @@ namespace MacVilla_Web.Pages.Auth
         public async Task<IActionResult> OnPostAsync()
         {
             var client = _clientFactory.CreateClient("MacVillaAPI");
-
             var response = await client.PostAsJsonAsync("api/auth/login", Input);
 
             if (response.IsSuccessStatusCode)
@@ -27,7 +26,8 @@ namespace MacVilla_Web.Pages.Auth
                 if (result != null && !string.IsNullOrEmpty(result.Token))
                 {
                     HttpContext.Session.SetString("JWToken", result.Token);
-                    return RedirectToPage("/Index");
+
+                    return RedirectToPage("/Admin/Dashboard/Index");
                 }
             }
 

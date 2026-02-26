@@ -1,25 +1,51 @@
 using System.Text;
+using Application.Interfaces;
 using Application.Services;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
-using Application.Interfaces;
 using Persistence.Context;
 using Persistence.Repositories;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// =======================
+// 1. DATABASE
+// =======================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<MacvilladbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
+// =======================
+// 2. CORS
+// =======================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowRazorPage", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
+// =======================
+// 3. CONTROLLERS
+// =======================
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
+// =======================
+// 4. JWT AUTHENTICATION (⭐ QUAN TRỌNG)
+// =======================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -34,7 +60,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-            )
+            ),
+
+            // ⭐ DÒNG QUYẾT ĐỊNH CHO [Authorize(Roles="Admin")]
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
@@ -57,7 +86,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Macvilla API",
+        Title = "MacVilla API",
         Version = "v1"
     });
 
@@ -67,8 +96,7 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Nhập token theo dạng: Bearer {JWT token}"
+        In = ParameterLocation.Header
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -97,7 +125,10 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
-app.UseStaticFiles();
+
+// =======================
+// 8. PIPELINE
+// =======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -105,10 +136,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
 app.UseCors("AllowRazorPage");
+
+// ⭐ THỨ TỰ BẮT BUỘC
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

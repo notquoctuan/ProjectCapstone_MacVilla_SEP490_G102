@@ -13,7 +13,30 @@ public class CategoryService : ICategoryService
     {
         _categoryRepository = categoryRepository;
     }
+    public async Task<IEnumerable<Category>> GetCategoriesOrderedAsync()
+    {
+        var allCategories = await _categoryRepository.GetAllAsync();
+        var result = new List<Category>();
 
+        var rootCategories = allCategories.Where(c => c.ParentCategoryId == null).OrderBy(c => c.CategoryName);
+
+        foreach (var parent in rootCategories)
+        {
+            result.Add(parent);
+            AddChildren(allCategories, parent.CategoryId, result);
+        }
+
+        return result;
+    }
+    private void AddChildren(IEnumerable<Category> all, long parentId, List<Category> result)
+    {
+        var children = all.Where(c => c.ParentCategoryId == parentId).OrderBy(c => c.CategoryName);
+        foreach (var child in children)
+        {
+            result.Add(child);
+            AddChildren(all, child.CategoryId, result);
+        }
+    }
     public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
     {
         return await _categoryRepository.GetAllAsync();

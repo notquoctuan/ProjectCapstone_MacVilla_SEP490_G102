@@ -1,8 +1,9 @@
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Persistence.Repositories;
 
 namespace Presentation.Controllers.Admin;
 
@@ -12,10 +13,41 @@ namespace Presentation.Controllers.Admin;
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
-
     public CategoryController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
+    }
+
+    [HttpGet("getall")]
+    public async Task<IActionResult> GetAll()
+    {
+        var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+
+        var result = new List<object>();
+
+        void BuildHierarchy(long? parentId, int level)
+        {
+            var children = categories
+                .Where(c => c.ParentCategoryId == parentId)
+                .OrderBy(c => c.CategoryName);
+
+            foreach (var item in children)
+            {
+                string prefix = new string('-', level * 2);
+
+                result.Add(new
+                {
+                    CategoryId = item.CategoryId,
+                    Name = level > 0 ? $"{prefix} {item.CategoryName}" : item.CategoryName
+                });
+
+                BuildHierarchy(item.CategoryId, level + 1);
+            }
+        }
+
+        BuildHierarchy(null, 0);
+
+        return Ok(result);
     }
 
     /// <summary>
