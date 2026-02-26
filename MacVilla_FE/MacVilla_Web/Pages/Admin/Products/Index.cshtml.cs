@@ -24,6 +24,8 @@ namespace MacVilla_Web.Pages.Admin.Products
         [BindProperty(SupportsGet = true)]
         public int PageNumber { get; set; } = 1;
 
+        public List<CategoryVM> Categories { get; set; } = new();
+
         public IndexModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -32,9 +34,16 @@ namespace MacVilla_Web.Pages.Admin.Products
         public async Task OnGetAsync()
         {
             var client = _httpClientFactory.CreateClient("MacVillaAPI");
+            // 1. Lấy toàn bộ danh sách giống hệt bên Create
+            var allCats = await client.GetFromJsonAsync<List<CategoryVM>>("api/admin/category/getall") ?? new();
 
+            // 2. CHỈ LẤY CHA: Lọc những thằng không có ParentCategoryId (tức là null)
+            Categories = allCats.Where(x => x.ParentCategoryId == null).ToList();
+
+            // 3. Giữ nguyên logic lấy sản phẩm của bạn
             // QUAN TRỌNG: Phải có "/filter" và truyền đúng các tham số
-            var url = $"api/admin/products/filter?Name={Name}&CategoryName={CategoryName}&PageNumber={PageNumber}&PageSize=10";
+            //var url = $"api/admin/products/filter?Name={Name}&CategoryName={CategoryName}&PageNumber={PageNumber}&PageSize=10";
+            var url = $"api/admin/products/filter?Name={Name}&CategoryName={CategoryName}&SortOrder={SortOrder}&PageNumber={PageNumber}&PageSize=10";
 
             var response = await client.GetAsync(url);
 
