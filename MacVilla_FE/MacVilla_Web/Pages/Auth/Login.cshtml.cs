@@ -27,7 +27,7 @@ namespace MacVilla_Web.Pages.Auth
                 {
                     HttpContext.Session.SetString("JWToken", result.Token);
 
-                    return RedirectToPage("/Admin/Products/Index");
+                    return RedirectToPage("/Admin/Dashboard/Index");
                 }
             }
 
