@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Admin\" />
     <Folder Include="Pages\HomePage\" />
     <Folder Include="Pages\Customer\" />
     <Folder Include="Pages\Inventory\" />

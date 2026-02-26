@@ -12,5 +12,7 @@ namespace Domain.Interfaces
         Task UpdateAsync(Product product);
         Task<Product?> GetByIdAsync(long id);
         Task<bool> UpdateStatusAsync(long id, string status);
+        IQueryable<Product> GetQueryable();
+
     }
 }

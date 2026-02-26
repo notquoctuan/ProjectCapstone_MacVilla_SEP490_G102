@@ -55,63 +55,61 @@ namespace Presentation.Controllers.Admin
         /// Tìm kiếm, lọc và phân trang sản phẩm cho Admin
         /// </summary>
         [HttpGet("filter")]
-        public async Task<ActionResult<PagedResponse<ProductAdminResponse>>> FilterProducts([FromQuery] ProductSearchRequest request)
+        public async Task<IActionResult> GetProductList([FromQuery] ProductSearchRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (request.MinPrice.HasValue && request.MaxPrice.HasValue && request.MinPrice > request.MaxPrice)
-            {
-                return BadRequest(new { message = "Giá tối thiểu không được lớn hơn giá tối đa." });
-            }
-
             try
             {
                 var result = await _productService.GetPagedProductsForAdminAsync(request);
-
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi xử lý dữ liệu.", detail = ex.Message });
+                return StatusCode(500, new { message = "Lỗi hệ thống", detail = ex.Message });
             }
         }
-        [HttpPost("create-with-image")]
-        [Consumes("multipart/form-data")] // Chỉ định nhận dữ liệu form-data
+        [HttpPost]
         public async Task<IActionResult> Create([FromForm] ProductCreateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
-                // Lấy đường dẫn wwwroot để lưu file
                 string webRootPath = _webHostEnvironment.WebRootPath;
+
                 var result = await _productService.CreateProductWithFilesAsync(request, webRootPath);
 
-                return Ok(new { message = "Tạo sản phẩm và tải ảnh thành công", data = result });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = "Lỗi khi tạo sản phẩm: " + ex.Message });
             }
         }
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(long id, [FromForm] ProductUpdateRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 string webRootPath = _webHostEnvironment.WebRootPath;
                 var result = await _productService.UpdateProductAsync(id, request, webRootPath);
 
-                if (!result.Success) return NotFound(new { message = result.Message });
+                if (!result.Success)
+                {
+                    return result.Message.Contains("không tìm thấy")
+                        ? NotFound(new { message = result.Message })
+                        : BadRequest(new { message = result.Message });
+                }
 
                 return Ok(new { message = result.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
         [HttpPatch("{id}/status")]

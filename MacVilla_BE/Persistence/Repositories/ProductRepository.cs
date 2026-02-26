@@ -19,7 +19,13 @@ namespace Persistence.Repositories
             await _context.SaveChangesAsync();
             return product;
         }
-
+        public IQueryable<Product> GetQueryable()
+        {
+            return _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .AsNoTracking();
+        }
         public async Task<Product?> GetByIdDetailAsync(long id)
         {
             return await _context.Products
