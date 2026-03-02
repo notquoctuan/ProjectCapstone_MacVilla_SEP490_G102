@@ -1,0 +1,94 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\admin\\products\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\admin\\products\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\auth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\auth\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:13:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Program.cs",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Program.cs",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Program.cs",
+              "RelativeToolTip": "MacVilla_Web\\Program.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAIwD0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-07T06:58:38.298Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Create.cshtml",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Products\\Create.cshtml",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Create.cshtml",
+              "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\Products\\Create.cshtml",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAIwFQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-07T06:58:29.412Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Auth\\Login.cshtml",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Auth\\Login.cshtml",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Auth\\Login.cshtml",
+              "RelativeToolTip": "MacVilla_Web\\Pages\\Auth\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-07T06:58:27.652Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 800,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:14:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:12:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
