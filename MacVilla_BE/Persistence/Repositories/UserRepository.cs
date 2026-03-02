@@ -13,18 +13,25 @@ namespace Persistence.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly MacvilladbContext _context;
-        public UserRepository(MacvilladbContext context) => _context = context;
 
-        public async Task<IEnumerable<User>> GetAllAsync()
-            => await _context.Users.OrderByDescending(u => u.CreatedAt).ToListAsync();
+        public UserRepository(MacvilladbContext context)
+        {
+            _context = context;
+        }
 
-        public async Task<User?> GetByEmailAsync(string email)
-            => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        public async Task<User?> GetByPhoneAsync(string phone)
-        => await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+        public async Task AddUserAsync(User user)
+        {
+            await _context.Users.AddAsync(user);
+        }
 
-        public async Task AddAsync(User user) => await _context.Users.AddAsync(user);
+        public async Task AddCredentialAsync(UserCredential credential)
+        {
+            await _context.UserCredentials.AddAsync(credential);
+        }
 
-        public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -9,12 +9,8 @@ namespace Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<User?> GetByEmailAsync(string email);
-        Task<User?> GetByPhoneAsync(string phone); // Thêm hàm này để tránh trùng số đt
-        Task AddAsync(User user);
-
-        //Task UpdateAsync(User user);
+        Task AddUserAsync(User user);
+        Task AddCredentialAsync(UserCredential credential);
         Task SaveChangesAsync();
     }
 }
