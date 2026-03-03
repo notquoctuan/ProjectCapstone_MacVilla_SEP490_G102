@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MacVilla_Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+baad5fbd865ae1ed456d92208abda85f65fad9fc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+323b5ecb67015bfd2998329f0f845e04d8f0a1a6")]
 [assembly: System.Reflection.AssemblyProductAttribute("MacVilla_Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MacVilla_Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

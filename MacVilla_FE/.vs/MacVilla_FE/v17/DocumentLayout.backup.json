@@ -3,6 +3,26 @@
   "WorkspaceRootPath": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\admin\\products\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\admin\\products\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\admin\\products\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\admin\\products\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\services\\productapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\services\\productapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\admin\\products\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\admin\\products\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\models\\productadminvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\models\\productadminvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\pages\\admin\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\admin\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -23,16 +43,8 @@
       "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\pages\\index1.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\models\\productadminvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\models\\productadminvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\models\\productupdatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\models\\productupdatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\services\\productapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|solutionrelative:macvilla_web\\services\\productapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{19EC7AF4-5E26-4CFF-AAFC-2F7650AB8F13}|MacVilla_Web\\MacVilla_Web.csproj|c:\\users\\duc\\downloads\\sep490\\code\\projectcapstone_macvilla_sep490_g102\\macvilla_fe\\macvilla_web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -86,15 +98,54 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Details.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml.cs",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml.cs",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml.cs",
+              "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-03T12:13:48.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml",
+              "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\Products\\Details.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAuwA8AAABWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-03T12:13:45.036Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Index.cshtml",
+              "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Products\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Products\\Index.cshtml",
+              "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\Products\\Index.cshtml",
+              "ViewState": "AgIAAPQAAAAAAAAAAAAewAMBAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-03T12:11:24.71Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:13:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 10,
               "Title": "ProductUpdateVM.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\ProductUpdateVM.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Models\\ProductUpdateVM.cs",
@@ -102,25 +153,24 @@
               "RelativeToolTip": "MacVilla_Web\\Models\\ProductUpdateVM.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-03T11:56:06.673Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T11:56:06.673Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "ProductAdminVM.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\ProductAdminVM.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Models\\ProductAdminVM.cs",
               "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\ProductAdminVM.cs",
               "RelativeToolTip": "MacVilla_Web\\Models\\ProductAdminVM.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAA4wBwAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAcwBwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-03T11:47:58.871Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "Index.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml.cs",
@@ -132,20 +182,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 2,
               "Title": "ProductApiService.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Services\\ProductApiService.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Services\\ProductApiService.cs",
               "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Services\\ProductApiService.cs",
               "RelativeToolTip": "MacVilla_Web\\Services\\ProductApiService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAAcAAAAAAAAAAAA8wBQAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-03T09:58:08.909Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "DashboardApiService.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Services\\DashboardApiService.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Services\\DashboardApiService.cs",
@@ -157,7 +207,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "DashboardVM.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\DashboardVM.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Models\\DashboardVM.cs",
@@ -169,20 +219,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml",
               "ToolTip": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml",
               "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\Dashboard\\Index.cshtml",
-              "ViewState": "AgIAAIUAAAAAAAAAAAAAAJsAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAIUAAAAAAAAAAAAAAJMAAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-03-03T09:14:38.259Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "Index1.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Index1.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Index1.cshtml",
@@ -190,12 +240,11 @@
               "RelativeToolTip": "MacVilla_Web\\Pages\\Index1.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-03T09:14:30.33Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T09:14:30.33Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Index.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Index.cshtml",
@@ -203,12 +252,11 @@
               "RelativeToolTip": "MacVilla_Web\\Pages\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-03T09:14:18.719Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T09:14:18.719Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 19,
               "Title": "_ViewStart.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\_ViewStart.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\_ViewStart.cshtml",
@@ -220,7 +268,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 20,
               "Title": "_ViewImports.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\_ViewImports.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\_ViewImports.cshtml",
@@ -232,7 +280,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "Create.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\UserManager\\Create.cshtml.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\UserManager\\Create.cshtml.cs",
@@ -244,7 +292,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "Create.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\UserManager\\Create.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\UserManager\\Create.cshtml",
@@ -256,7 +304,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 18,
               "Title": "UserCreateRequest.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\UserCreateRequest.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Models\\UserCreateRequest.cs",
@@ -268,7 +316,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "Index.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml.cs",
@@ -276,12 +324,11 @@
               "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-03T08:54:11.112Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T08:54:11.112Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Program.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Program.cs",
@@ -289,12 +336,11 @@
               "RelativeToolTip": "MacVilla_Web\\Program.cs",
               "ViewState": "AgIAABIAAAAAAAAAAAAAAB4AAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-03T08:52:17.912Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T08:52:17.912Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "UserApiService.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Services\\UserApiService.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Services\\UserApiService.cs",
@@ -306,7 +352,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 21,
               "Title": "UserAdminVM.cs",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Models\\UserAdminVM.cs",
               "RelativeDocumentMoniker": "MacVilla_Web\\Models\\UserAdminVM.cs",
@@ -318,7 +364,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\Duc\\Downloads\\SEP490\\Code\\ProjectCapstone_MacVilla_SEP490_G102\\MacVilla_FE\\MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml",
               "RelativeDocumentMoniker": "MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml",
@@ -326,8 +372,7 @@
               "RelativeToolTip": "MacVilla_Web\\Pages\\Admin\\UserManager\\Index.cshtml",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAB0AAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-03T08:39:24.002Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-03T08:39:24.002Z"
             }
           ]
         },
