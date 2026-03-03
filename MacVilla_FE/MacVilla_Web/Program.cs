@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // =======================
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<UserApiService>();
 // Named HttpClient
 builder.Services.AddHttpClient("MacVillaAPI", client =>
 {
@@ -23,7 +23,13 @@ builder.Services.AddHttpClient<ProductApiService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7262/");
 });
-
+builder.Services.AddHttpClient<UserApiService>(client => {
+    client.BaseAddress = new Uri("https://localhost:7262/"); 
+});
+builder.Services.AddHttpClient<DashboardApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001/");
+});
 // Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
