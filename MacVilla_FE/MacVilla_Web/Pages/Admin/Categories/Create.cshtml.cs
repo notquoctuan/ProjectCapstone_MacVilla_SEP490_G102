@@ -40,7 +40,11 @@ public class CreateModel : PageModel
             return RedirectToPage("Index");
         }
 
-        ErrorMessage = "Không thể tạo danh mục. Vui lòng thử lại.";
+        // Cố gắng đọc thông báo lỗi chi tiết từ API (ví dụ: tên danh mục trùng)
+        var error = await response.Content.ReadFromJsonAsync<SimpleErrorResponse>();
+        ErrorMessage = !string.IsNullOrEmpty(error?.Message)
+            ? error!.Message
+            : "Không thể tạo danh mục. Vui lòng thử lại.";
         await LoadParentCategoriesAsync();
         return Page();
     }
@@ -73,5 +77,10 @@ public class CreateModel : PageModel
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         return client;
+    }
+
+    private class SimpleErrorResponse
+    {
+        public string? Message { get; set; }
     }
 }

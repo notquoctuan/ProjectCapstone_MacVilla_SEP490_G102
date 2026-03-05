@@ -97,4 +97,25 @@ public class CategoryRepository : ICategoryRepository
 
         return (categories, totalCount);
     }
+
+    public async Task<bool> ExistsByNameAsync(string categoryName, long? excludeId = null)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            return false;
+        }
+
+        var normalized = categoryName.Trim().ToLower();
+
+        return await _dbContext.Categories
+            .AnyAsync(c =>
+                c.CategoryName != null &&
+                c.CategoryName.ToLower() == normalized &&
+                (!excludeId.HasValue || c.CategoryId != excludeId.Value));
+    }
+
+    public async Task<bool> HasProductsAsync(long categoryId)
+    {
+        return await _dbContext.Products.AnyAsync(p => p.CategoryId == categoryId);
+    }
 }

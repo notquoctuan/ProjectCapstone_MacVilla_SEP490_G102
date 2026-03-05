@@ -63,9 +63,18 @@ public class EditModel : PageModel
             return RedirectToPage("Index");
         }
 
-        ErrorMessage = response.StatusCode == System.Net.HttpStatusCode.BadRequest
-            ? "Dữ liệu không hợp lệ. Danh mục không thể trở thành danh mục cha của chính nó."
-            : "Không thể cập nhật. Vui lòng thử lại.";
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            // Đọc thông điệp cụ thể từ API (trùng tên, tự làm cha của chính nó, ...)
+            var error = await response.Content.ReadFromJsonAsync<SimpleErrorResponse>();
+            ErrorMessage = !string.IsNullOrEmpty(error?.Message)
+                ? error!.Message
+                : "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.";
+        }
+        else
+        {
+            ErrorMessage = "Không thể cập nhật. Vui lòng thử lại.";
+        }
         await LoadParentCategoriesAsync();
         return Page();
     }
@@ -98,5 +107,10 @@ public class EditModel : PageModel
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         return client;
+    }
+
+    private class SimpleErrorResponse
+    {
+        public string? Message { get; set; }
     }
 }

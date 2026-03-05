@@ -50,10 +50,10 @@ public class IndexModel : PageModel
         });
     }
 
-    public async Task<IActionResult> OnPostUpdateStatusAsync(long id, string status, string? notes)
+    public async Task<IActionResult> OnPostUpdateStatusAsync(long id, string newStatus, string? notes)
     {
         var client = CreateAuthenticatedClient();
-        var request = new UpdateOrderStatusRequest { Status = status, Notes = notes };
+        var request = new UpdateOrderStatusRequest { Status = newStatus, Notes = notes };
         var response = await client.PutAsJsonAsync($"api/admin/Order/{id}/status", request);
         return RedirectToPage(new
         {

@@ -49,9 +49,22 @@ public class CategoryService : ICategoryService
 
     public async Task<Category> CreateCategoryAsync(string categoryName, long? parentCategoryId)
     {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            throw new ArgumentException("Tên danh mục không được để trống.", nameof(categoryName));
+        }
+
+        var normalizedName = categoryName.Trim();
+
+        // Ngăn tạo trùng tên danh mục
+        if (await _categoryRepository.ExistsByNameAsync(normalizedName))
+        {
+            throw new InvalidOperationException("Tên danh mục đã tồn tại. Vui lòng chọn tên khác.");
+        }
+
         var category = new Category
         {
-            CategoryName = categoryName,
+            CategoryName = normalizedName,
             ParentCategoryId = parentCategoryId,
             IsActive = true
         };
@@ -60,13 +73,26 @@ public class CategoryService : ICategoryService
 
     public async Task<Category?> UpdateCategoryAsync(long id, string categoryName, long? parentCategoryId)
     {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            throw new ArgumentException("Tên danh mục không được để trống.", nameof(categoryName));
+        }
+
+        var normalizedName = categoryName.Trim();
+
         var existingCategory = await _categoryRepository.GetByIdAsync(id);
         if (existingCategory == null)
         {
             return null;
         }
 
-        existingCategory.CategoryName = categoryName;
+        // Ngăn trùng tên với danh mục khác
+        if (await _categoryRepository.ExistsByNameAsync(normalizedName, id))
+        {
+            throw new InvalidOperationException("Tên danh mục đã tồn tại. Vui lòng chọn tên khác.");
+        }
+
+        existingCategory.CategoryName = normalizedName;
         existingCategory.ParentCategoryId = parentCategoryId;
 
         return await _categoryRepository.UpdateAsync(existingCategory);
@@ -74,6 +100,12 @@ public class CategoryService : ICategoryService
 
     public async Task<bool> DeleteCategoryAsync(long id)
     {
+        // Nếu danh mục đang có sản phẩm thì không cho phép xóa
+        if (await _categoryRepository.HasProductsAsync(id))
+        {
+            throw new InvalidOperationException("Danh mục đang được gắn với sản phẩm, không thể xóa.");
+        }
+
         return await _categoryRepository.DeleteAsync(id);
     }
 
