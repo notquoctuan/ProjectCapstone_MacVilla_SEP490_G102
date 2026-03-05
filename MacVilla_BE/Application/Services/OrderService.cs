@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 
 namespace Application.Services;
@@ -10,15 +11,9 @@ public class OrderService : IOrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IInventoryRepository _inventoryRepository;
 
-    // Valid order statuses
-    private static readonly string[] ValidStatuses = 
-    {
-        "Pending",
-        "Processing",
-        "Shipped",
-        "Completed",
-        "Cancelled"
-    };
+    // Valid order statuses (centralised via enum for clarity)
+    private static readonly string[] ValidStatuses =
+        Enum.GetNames(typeof(OrderStatus));
 
     public OrderService(IOrderRepository orderRepository, IInventoryRepository inventoryRepository)
     {

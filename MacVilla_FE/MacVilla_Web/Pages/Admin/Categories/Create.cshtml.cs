@@ -52,7 +52,11 @@ public class CreateModel : PageModel
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<PagedResponse<Category>>();
-            ParentCategories = result?.Data ?? new List<Category>();
+            // Chỉ lấy các danh mục gốc (không có danh mục cha) để hiển thị trong dropdown "Danh mục cha"
+            ParentCategories = result?.Data?
+                .Where(c => !c.ParentCategoryId.HasValue)
+                .ToList()
+                ?? new List<Category>();
         }
         else
         {

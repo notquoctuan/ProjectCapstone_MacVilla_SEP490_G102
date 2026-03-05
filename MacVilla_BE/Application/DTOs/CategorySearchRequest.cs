@@ -4,7 +4,7 @@ namespace Application.DTOs;
 
 public class CategorySearchRequest
 {
-    [StringLength(255, ErrorMessage = "Tên tìm kiếm không được vượt quá 255 ký tự.")]
+    
     public string? Name { get; set; }
 
     public bool? IsActive { get; set; }
