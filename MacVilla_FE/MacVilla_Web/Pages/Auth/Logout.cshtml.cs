@@ -9,7 +9,7 @@ namespace MacVilla_Web.Pages.Auth
         {
             
             HttpContext.Session.Remove("JWToken");
-            return RedirectToPage("Login");
+            return RedirectToPage("Index");
         }
     }
 }

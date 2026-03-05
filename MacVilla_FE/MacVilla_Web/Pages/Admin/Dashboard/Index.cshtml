@@ -151,7 +151,7 @@
             <a asp-page="/Admin/Orders/Index" class="nav-link-custom">
                 <i class="bi bi-receipt"></i> Quản lý Đơn hàng
             </a>
-            <a href="#" class="nav-link-custom">
+            <a href="/Admin/UserManager/Index" class="nav-link-custom">
                 <i class="bi bi-people"></i> Quản lý người dùng
             </a>
         </nav>
@@ -172,7 +172,7 @@
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-box-seam fs-1 mb-2"></i>
                         <h6 class="text-uppercase small fw-bold">Tổng sản phẩm</h6>
-                        <h2 class="mb-0 fw-bold">128</h2>
+                        <h2 class="mb-0 fw-bold">@Model.Data.TotalActiveProducts</h2>
                     </div>
                 </div>
             </div>
@@ -181,7 +181,7 @@
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-cart-check fs-1 text-warning mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Đơn hàng mới</h6>
-                        <h2 class="mb-0 fw-bold">12</h2>
+                        <h2 class="mb-0 fw-bold">@Model.Data.NewOrdersToday</h2>
                     </div>
                 </div>
             </div>
@@ -190,7 +190,7 @@
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-people fs-1 text-info mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Khách hàng</h6>
-                        <h2 class="mb-0 fw-bold">1,050</h2>
+                        <h2 class="mb-0 fw-bold">@Model.Data.TotalCustomers.ToString("N0")</h2>
                     </div>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                     <div class="card-body p-4 text-center">
                         <i class="bi bi-currency-dollar fs-1 text-success mb-2"></i>
                         <h6 class="text-uppercase small fw-bold text-muted">Doanh thu tháng</h6>
-                        <h2 class="mb-0 fw-bold">150M</h2>
+                        <h2 class="mb-0 fw-bold">@Model.Data.MonthlyRevenue.ToString("N0")đ</h2>
                     </div>
                 </div>
             </div>
@@ -209,36 +209,34 @@
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-header bg-white py-3 fw-bold border-bottom">
-                        <i class="bi bi-graph-up-arrow me-2" style="color: var(--mv-green-dark)"></i> TĂNG TRƯỞNG DOANH THU
+                        <i class="bi bi-graph-up-arrow me-2" style="color: var(--mv-green-dark)"></i> TĂNG TRƯỞNG DOANH THU (7 NGÀY GẦN NHẤT)
                     </div>
-                    <div class="card-body" style="height: 350px; display: flex; align-items: center; justify-content: center;">
-                        <div class="text-center">
-                            <i class="bi bi-bar-chart-line text-muted mb-2" style="font-size: 3rem;"></i>
-                            <p class="text-muted italic">[Biểu đồ thống kê sẽ hiển thị tại đây]</p>
-                        </div>
+                    <div class="card-body" style="height: 350px;">
+                        <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
                     <div class="card-header bg-white py-3 fw-bold border-bottom">
-                        <i class="bi bi-lightning-charge me-2 text-warning"></i> HOẠT ĐỘNG GẦN ĐÂY
+                        <i class="bi bi-lightning-charge me-2 text-warning"></i> TRẠNG THÁI HỆ THỐNG
                     </div>
                     <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                           @*  <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
-                                <i class="bi bi-circle-fill text-success me-3" style="font-size: 0.6rem;"></i>
-                                <div class="small">Đơn hàng <strong>#1234</strong> vừa được thanh toán thành công.</div>
-                            </li>
-                            <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
-                                <i class="bi bi-circle-fill text-primary me-3" style="font-size: 0.6rem;"></i>
-                                <div class="small">Sản phẩm <strong>MacBook Pro M3</strong> vừa được cập nhật giá.</div>
-                            </li>
-                            <li class="list-group-item border-0 px-0 py-3 d-flex align-items-center">
-                                <i class="bi bi-circle-fill text-warning me-3" style="font-size: 0.6rem;"></i>
-                                <div class="small">Yêu cầu hỗ trợ mới từ khách hàng <strong>Nguyễn Văn A</strong>.</div>
-                            </li> *@
-                        </ul>
+                        <div class="mb-4">
+                            <label class="small fw-bold text-muted d-block mb-1">Dung lượng bộ nhớ</label>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 25%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="small fw-bold text-muted d-block mb-1">Tiến độ đơn hàng tháng</label>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border small">
+                            <i class="bi bi-info-circle me-2"></i> Hệ thống đang hoạt động ổn định.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -247,8 +245,55 @@
 
     <footer class="admin-footer d-flex justify-content-between">
         <div>&copy; 2026 <strong>MACVILLA</strong>. CMS.</div>
+        <div>Phiên bản 2.0.1</div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Lấy dữ liệu từ Backend gửi qua Model
+        const rawData = @Html.Raw(Json.Serialize(Model.Data.RevenueChart));
+
+        // Xử lý dữ liệu cho biểu đồ
+        const labels = rawData.map(item => item.Date);
+        const values = rawData.map(item => item.Value);
+
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VND)',
+                    data: values,
+                    borderColor: '#7DA100',
+                    backgroundColor: 'rgba(125, 161, 0, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#7DA100'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
