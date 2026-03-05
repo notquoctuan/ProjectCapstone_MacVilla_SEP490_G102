@@ -55,20 +55,8 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>GET: api/category?name=electronics&amp;isActive=true&amp;pageNumber=1&amp;pageSize=10</remarks>
     [HttpGet]
-    public async Task<ActionResult<PagedResponse<Category>>> GetAll(
-        [FromQuery] string? name,
-        [FromQuery] bool? isActive,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<PagedResponse<Category>>> GetAll([FromQuery] CategorySearchRequest request)
     {
-        var request = new CategorySearchRequest
-        {
-            Name = name,
-            IsActive = isActive,
-            PageNumber = pageNumber > 0 ? pageNumber : 1,
-            PageSize = pageSize > 0 && pageSize <= 100 ? pageSize : 10
-        };
-
         var result = await _categoryService.SearchCategoriesAsync(request);
         return Ok(result);
     }
@@ -78,8 +66,11 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>GET: api/category/{id}</remarks>
     [HttpGet("{id:long}")]
-    public async Task<ActionResult<Category>> GetById(long id)
+    public async Task<ActionResult<Category>> GetById([FromRoute] long id)
     {
+        if (id <= 0)
+            return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
+
         var category = await _categoryService.GetCategoryByIdAsync(id);
         if (category == null)
         {
@@ -105,8 +96,14 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>PUT: api/category/{id}</remarks>
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Update(long id, [FromBody] UpdateCategoryRequest request)
+    public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateCategoryRequest request)
     {
+        if (id <= 0)
+            return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
+
+        if (request.ParentCategoryId.HasValue && request.ParentCategoryId.Value == id)
+            return BadRequest(new { message = "Danh mục không thể trở thành danh mục cha của chính nó." });
+
         var category = await _categoryService.UpdateCategoryAsync(id, request.CategoryName, request.ParentCategoryId);
         if (category == null)
         {
@@ -121,8 +118,11 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>DELETE: api/category/{id}</remarks>
     [HttpDelete("{id:long}")]
-    public async Task<IActionResult> Delete(long id)
+    public async Task<IActionResult> Delete([FromRoute] long id)
     {
+        if (id <= 0)
+            return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
+
         var deleted = await _categoryService.DeleteCategoryAsync(id);
         if (!deleted)
         {
@@ -137,8 +137,11 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>PATCH: api/category/{id}/activate</remarks>
     [HttpPatch("{id:long}/activate")]
-    public async Task<IActionResult> Activate(long id)
+    public async Task<IActionResult> Activate([FromRoute] long id)
     {
+        if (id <= 0)
+            return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
+
         var success = await _categoryService.ActivateCategoryAsync(id);
         if (!success)
         {
@@ -153,8 +156,11 @@ public class CategoryController : ControllerBase
     /// </summary>
     /// <remarks>PATCH: api/category/{id}/deactivate</remarks>
     [HttpPatch("{id:long}/deactivate")]
-    public async Task<IActionResult> Deactivate(long id)
+    public async Task<IActionResult> Deactivate([FromRoute] long id)
     {
+        if (id <= 0)
+            return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
+
         var success = await _categoryService.DeactivateCategoryAsync(id);
         if (!success)
         {

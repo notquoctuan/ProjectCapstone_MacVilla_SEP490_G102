@@ -1,7 +1,7 @@
 @page
-@model MacVilla_Web.Pages.Admin.Categories.IndexModel
+@model MacVilla_Web.Pages.Admin.Orders.IndexModel
 @{
-    Layout = null; // Tự định nghĩa cấu trúc đồng bộ
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -9,15 +9,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý danh mục - MacVilla</title>
+    <title>Quản lý đơn hàng - MacVilla</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
     <style>
         :root {
             --mv-green-dark: #7DA100;
             --mv-green-light: #f9fff0;
-            --mv-green-border: #e2f0d1;
             --sidebar-width: 260px;
         }
 
@@ -27,7 +25,6 @@
             margin: 0;
         }
 
-        /* Header */
         .admin-header {
             background-color: var(--mv-green-dark);
             height: 65px;
@@ -39,7 +36,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Sidebar */
         .admin-sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -79,11 +75,6 @@
                 color: #ffffff !important;
             }
 
-                .nav-link-custom.active i {
-                    color: #ffffff !important;
-                }
-
-        /* Main Wrapper */
         .admin-wrapper {
             margin-top: 65px;
             margin-left: var(--sidebar-width);
@@ -91,7 +82,6 @@
             min-height: calc(100vh - 115px);
         }
 
-        /* Card & Table Styles */
         .admin-card {
             background: #fff;
             border-radius: 12px;
@@ -111,16 +101,6 @@
                 color: white;
             }
 
-        .btn-outline-mv {
-            border: 1px solid var(--mv-green-dark);
-            color: var(--mv-green-dark);
-        }
-
-            .btn-outline-mv:hover {
-                background-color: var(--mv-green-dark);
-                color: white;
-            }
-
         .admin-footer {
             background-color: var(--mv-green-dark);
             color: #ffffff;
@@ -131,7 +111,6 @@
     </style>
 </head>
 <body>
-
     <header class="admin-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
             <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" style="height: 35px;" class="me-3">
@@ -158,14 +137,11 @@
             <a asp-page="/Admin/Products/Index" class="nav-link-custom">
                 <i class="bi bi-box-seam"></i> Quản lý Sản phẩm
             </a>
-            <a asp-page="/Admin/Categories/Index" class="nav-link-custom active">
+            <a asp-page="/Admin/Categories/Index" class="nav-link-custom">
                 <i class="bi bi-tags"></i> Quản lý Danh Mục
             </a>
-            <a href="/Admin/Orders/Index" class="nav-link-custom">
+            <a asp-page="/Admin/Orders/Index" class="nav-link-custom active">
                 <i class="bi bi-receipt"></i> Quản lý Đơn hàng
-            </a>
-            <a href="#" class="nav-link-custom">
-                <i class="bi bi-people"></i> Quản lý người dùng
             </a>
         </nav>
     </aside>
@@ -173,46 +149,46 @@
     <main class="admin-wrapper">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h3 class="fw-bold m-0">Danh mục sản phẩm</h3>
-                <p class="text-muted small mb-0">Cấu trúc phân loại sản phẩm của MacVilla</p>
+                <h3 class="fw-bold m-0">Đơn hàng</h3>
+                <p class="text-muted small mb-0">Theo dõi trạng thái, thanh toán và vận chuyển</p>
             </div>
-            <a asp-page="Create" class="btn btn-mv px-4 shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Thêm danh mục
-            </a>
         </div>
 
-        @if (!string.IsNullOrEmpty(Model.Message))
-        {
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> @Model.Message
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        <div class="admin-card">
+        <div class="admin-card mb-4">
             <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold text-muted">Tên danh mục</label>
-                    <input asp-for="SearchRequest.Name" class="form-control" placeholder="Tìm kiếm..." />
-                </div>
                 <div class="col-md-3">
-                    <label class="form-label small fw-bold text-muted">Trạng thái</label>
-                    <select asp-for="SearchRequest.IsActive" class="form-select">
+                    <label class="form-label small fw-bold text-muted">Trạng thái đơn</label>
+                    <select asp-for="SearchRequest.Status" class="form-select">
                         <option value="">-- Tất cả --</option>
-                        <option value="true">Đang hoạt động</option>
-                        <option value="false">Ngừng hoạt động</option>
+                        <option value="Pending">Chờ xử lý</option>
+                        <option value="Processing">Đang xử lý</option>
+                        <option value="Shipped">Đã gửi hàng</option>
+                        <option value="Completed">Hoàn thành</option>
+                        <option value="Cancelled">Đã hủy</option>
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Mã khách hàng</label>
+                    <input asp-for="SearchRequest.UserId" class="form-control" placeholder="User Id" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Từ ngày</label>
+                    <input asp-for="SearchRequest.StartDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Đến ngày</label>
+                    <input asp-for="SearchRequest.EndDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-1">
                     <label class="form-label small fw-bold text-muted">Hiển thị</label>
                     <select asp-for="SearchRequest.PageSize" class="form-select">
-                        <option value="10">10 dòng</option>
-                        <option value="20">20 dòng</option>
-                        <option value="50">50 dòng</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-mv w-100">Lọc dữ liệu</button>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-mv w-100">Lọc</button>
                     <a asp-page="Index" class="btn btn-light border w-100">Reset</a>
                 </div>
             </form>
@@ -223,9 +199,13 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Tên danh mục</th>
-                            <th>Danh mục cha</th>
+                            <th class="ps-4">Mã đơn</th>
+                            <th>Ngày tạo</th>
+                            <th>Khách hàng</th>
+                            <th>Sản phẩm</th>
+                            <th>Tổng tiền</th>
+                            <th>Thanh toán</th>
+                            @* <th>Vận chuyển</th> *@
                             <th>Trạng thái</th>
                             <th class="text-end pe-4">Thao tác</th>
                         </tr>
@@ -233,58 +213,45 @@
                     <tbody>
                         @if (Model.PagedResult?.Data != null && Model.PagedResult.Data.Any())
                         {
-                            @foreach (var item in Model.PagedResult.Data)
+                            @foreach (var order in Model.PagedResult.Data)
                             {
                                 <tr>
-                                    <td class="ps-4 fw-bold">#@item.CategoryId</td>
-                                    <td>@item.CategoryName</td>
+                                    <td class="ps-4 fw-bold">#@order.OrderId</td>
+                                    <td>@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>
-                                        @{
-                                            string parentName = "-";
-                                            if (item.ParentCategoryId.HasValue &&
-                                                Model.CategoryNameLookup.TryGetValue(item.ParentCategoryId.Value, out var pName))
-                                            {
-                                                parentName = pName;
-                                            }
-                                        }
-                                        @parentName
+                                        <div class="fw-semibold">@order.CustomerName</div>
+                                        <div class="text-muted small">@order.CustomerEmail</div>
                                     </td>
-                                    <td>
-                                        @if (item.IsActive == true)
-                                        {
-                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">Hoạt động</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary px-3">Ngừng</span>
-                                        }
-                                    </td>
+                                    <td>@order.ItemCount sản phẩm</td>
+                                    <td>@String.Format("{0:N0} đ", order.TotalAmount ?? 0)</td>
+                                    <td>@order.PaymentStatus</td>
+                                    @* <td>@order.ShippingStatus</td> *@
+                                    <td>@order.Status</td>
                                     <td class="text-end pe-4">
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a asp-page="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-mv">
-                                                <i class="bi bi-pencil"></i>
+                                            <a asp-page="Detail" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-eye"></i>
                                             </a>
-
-                                            @if (item.IsActive == true)
-                                            {
-                                                <form asp-page-handler="Deactivate" asp-route-id="@item.CategoryId" method="post">
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Ngừng hoạt động danh mục này?')">
-                                                        <i class="bi bi-slash-circle"></i>
-                                                    </button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <form asp-page-handler="Activate" asp-route-id="@item.CategoryId" method="post">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </button>
-                                                </form>
-                                            }
-
-                                            <form asp-page-handler="Delete" asp-route-id="@item.CategoryId" method="post">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa danh mục này?')">
-                                                    <i class="bi bi-trash"></i>
+                                            <a asp-page="Tracking" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-signpost-split"></i>
+                                            </a>
+                                            <form asp-page-handler="UpdateStatus" method="post" class="d-inline-flex align-items-center gap-1">
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <select name="status" class="form-select form-select-sm">
+                                                    <option value="Pending" selected="@("Pending".Equals(order.Status))">Pending</option>
+                                                    <option value="Processing" selected="@("Processing".Equals(order.Status))">Processing</option>
+                                                    <option value="Shipped" selected="@("Shipped".Equals(order.Status))">Shipped</option>
+                                                    <option value="Completed" selected="@("Completed".Equals(order.Status))">Completed</option>
+                                                    <option value="Cancelled" selected="@("Cancelled".Equals(order.Status))">Cancelled</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-mv">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-page-handler="Cancel" method="post" class="d-inline" onsubmit="return confirm('Hủy đơn hàng này?');">
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </form>
                                         </div>
@@ -295,9 +262,9 @@
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-folder-x fs-1 d-block mb-2"></i>
-                                    Không có dữ liệu danh mục nào
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt-cutoff fs-1 d-block mb-2"></i>
+                                    Không có đơn hàng nào
                                 </td>
                             </tr>
                         }
@@ -316,7 +283,7 @@
                             @for (var i = 1; i <= Model.PagedResult.TotalPages; i++)
                             {
                                 <li class="page-item @(i == Model.SearchRequest.PageNumber ? "active" : "")">
-                                    <a class="page-link @(i == Model.SearchRequest.PageNumber ? "bg-mv-green border-mv-green" : "")"
+                                    <a class="page-link"
                                        style="@(i == Model.SearchRequest.PageNumber ? "background-color: var(--mv-green-dark); border-color: var(--mv-green-dark);" : "")"
                                        asp-page="Index" asp-all-route-data="Model.GetPageRouteData(i)">@i</a>
                                 </li>
@@ -338,3 +305,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

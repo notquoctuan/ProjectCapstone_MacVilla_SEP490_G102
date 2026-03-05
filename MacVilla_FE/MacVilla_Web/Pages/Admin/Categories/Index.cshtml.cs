@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using MacVilla_Web.DTOs;
+using MacVilla_Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -14,8 +15,11 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public CategorySearchRequest SearchRequest { get; set; } = new();
 
-    public PagedResponse<Category>? PagedResult { get; set; }
+    public Models.PagedResponse<Category>? PagedResult { get; set; }
     public string? Message { get; set; }
+
+    // Dùng để tra cứu tên danh mục cha khi hiển thị trong bảng.
+    public Dictionary<long, string> CategoryNameLookup { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -25,12 +29,14 @@ public class IndexModel : PageModel
 
         if (response.IsSuccessStatusCode)
         {
-            PagedResult = await response.Content.ReadFromJsonAsync<PagedResponse<Category>>();
+            PagedResult = await response.Content.ReadFromJsonAsync<Models.PagedResponse<Category>>();
         }
         else
         {
-            PagedResult = new PagedResponse<Category>();
+            PagedResult = new Models.PagedResponse<Category>();
         }
+
+        await LoadCategoryLookupAsync(client);
 
         Message = TempData["Message"]?.ToString();
         return Page();
@@ -115,4 +121,22 @@ public class IndexModel : PageModel
         parts.Add($"pageSize={SearchRequest.PageSize}");
         return string.Join("&", parts);
     }
+
+    private async Task LoadCategoryLookupAsync(HttpClient client)
+    {
+        var response = await client.GetAsync("api/admin/Category/getall");
+        if (response.IsSuccessStatusCode)
+        {
+            var allCategories = await response.Content.ReadFromJsonAsync<List<CategoryVM>>();
+            CategoryNameLookup = allCategories?
+                .GroupBy(c => c.CategoryId)
+                .ToDictionary(g => g.Key, g => g.First().Name)
+                ?? new Dictionary<long, string>();
+        }
+        else
+        {
+            CategoryNameLookup = new Dictionary<long, string>();
+        }
+    }
 }
+

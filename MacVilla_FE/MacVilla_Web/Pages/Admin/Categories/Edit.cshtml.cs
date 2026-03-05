@@ -77,7 +77,11 @@ public class EditModel : PageModel
         if (response.IsSuccessStatusCode)
         {
             var result = await response.Content.ReadFromJsonAsync<PagedResponse<Category>>();
-            ParentCategories = result?.Data?.Where(c => c.CategoryId != Id).ToList() ?? new List<Category>();
+            // Chỉ hiển thị các danh mục gốc (không có danh mục cha) và khác danh mục hiện tại
+            ParentCategories = result?.Data?
+                .Where(c => c.CategoryId != Id && !c.ParentCategoryId.HasValue)
+                .ToList()
+                ?? new List<Category>();
         }
         else
         {
