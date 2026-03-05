@@ -119,10 +119,12 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<Domain.Interfaces.IBannerRepository, Persistence.Repositories.BannerRepository>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<Application.Interfaces.IHomeService, Application.Services.HomeService>();
 
 var app = builder.Build();
 
