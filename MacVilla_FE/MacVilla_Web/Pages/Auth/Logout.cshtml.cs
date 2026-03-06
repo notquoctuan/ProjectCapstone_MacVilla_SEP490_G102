@@ -7,8 +7,9 @@ namespace MacVilla_Web.Pages.Auth
     {
         public IActionResult OnGet()
         {
-            
-            HttpContext.Session.Remove("JWToken");
+            HttpContext.Session.Clear();
+            // Xóa cookie jwt
+            Response.Cookies.Delete("jwt");
             return RedirectToPage("Login");
         }
     }

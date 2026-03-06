@@ -1,188 +1,202 @@
-@page "{id:long}"
-@model MacVilla_Web.Pages.Admin.Orders.DetailModel
+@page "/Admin/Orders/Detail/{id:long}"
 @{
-    Layout = null;
+    Layout = "_AdminLayout"; ViewData["Title"] = "Chi tiết đơn hàng";
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chi tiết đơn hàng - MacVilla</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --mv-green-dark: #7DA100;
-            --mv-green-light: #f9fff0;
-        }
+<div class="mv-page-header d-flex justify-content-between align-items-start">
+    <div><h1 id="pageTitle">Chi tiết đơn hàng</h1><p>Thông tin đầy đủ về đơn hàng</p></div>
+    <a href="/Admin/Orders" class="btn-outline-mv" style="text-decoration:none;display:flex;align-items:center;gap:6px;"><i class="bi bi-arrow-left"></i> Quay lại</a>
+</div>
 
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-        }
-
-        .admin-header {
-            background-color: var(--mv-green-dark);
-            height: 65px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1050;
-            padding: 0 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .admin-wrapper {
-            margin-top: 65px;
-            padding: 30px 15%;
-            min-height: calc(100vh - 115px);
-        }
-
-        .admin-card {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid #eee;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-        }
-
-        .admin-footer {
-            background-color: var(--mv-green-dark);
-            color: #ffffff;
-            padding: 15px 15%;
-            font-size: 13px;
-        }
-    </style>
-</head>
-<body>
-    <header class="admin-header d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" style="height: 35px;" class="me-3">
-            <span class="text-white fw-bold border-start ps-3 small text-uppercase">Chi tiết đơn hàng</span>
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;">
+    <!-- Left -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Order items -->
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Sản phẩm trong đơn</h5></div>
+            <div id="orderItems"><div style="padding:24px;text-align:center;color:#9ca3af;">Đang tải...</div></div>
         </div>
-        <a asp-page="Index" class="btn btn-sm btn-light">
-            <i class="bi bi-arrow-left"></i> Quay lại danh sách
-        </a>
-    </header>
+        <!-- Customer -->
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Thông tin khách hàng</h5></div>
+            <div class="mv-card-body" id="customerInfo"><div style="color:#9ca3af;">Đang tải...</div></div>
+        </div>
+        <!-- Shipping -->
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Thông tin vận chuyển</h5></div>
+            <div class="mv-card-body" id="shippingInfo"><div style="color:#9ca3af;">Đang tải...</div></div>
+        </div>
+        <!-- Payment -->
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Thanh toán</h5></div>
+            <div class="mv-card-body" id="paymentInfo"><div style="color:#9ca3af;">Đang tải...</div></div>
+        </div>
+    </div>
 
-    <main class="admin-wrapper">
-        @if (Model.Order == null)
-        {
-            <div class="alert alert-danger">Không tìm thấy đơn hàng.</div>
-        }
-        else
-        {
-            <div class="admin-card mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h4 class="fw-bold mb-1">Đơn hàng #@Model.Order.OrderId</h4>
-                        <div class="text-muted small">
-                            Ngày tạo: @Model.Order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")
-                        </div>
-                    </div>
-                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
-                        @Model.Order.Status
-                    </span>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6 class="text-uppercase text-muted small fw-bold mb-2">Thông tin khách hàng</h6>
-                        <div class="border rounded p-3 bg-light">
-                            <div class="fw-semibold">@Model.Order.Customer?.FullName</div>
-                            <div class="small text-muted">@Model.Order.Customer?.Email</div>
-                            <div class="small">@Model.Order.Customer?.Phone</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-uppercase text-muted small fw-bold mb-2">Thanh toán &amp; vận chuyển</h6>
-                        <div class="border rounded p-3 bg-light small">
-                            <div class="mb-2">
-                                <strong>Thanh toán:</strong>
-                                @Model.Order.Payments.FirstOrDefault()?.PaymentStatus ?? "Chưa có"
-                            </div>
-                            <div>
-                                <strong>Địa chỉ giao hàng:</strong><br />
-                                @{
-                                    var shipping = Model.Order.Shippings.FirstOrDefault();
-                                    if (shipping?.ShippingAddress != null)
-                                    {
-                                        <span>
-                                            @shipping.ShippingAddress.ReceiverName - @shipping.ShippingAddress.Phone<br />
-                                            @shipping.ShippingAddress.AddressLine, @shipping.ShippingAddress.Ward,
-                                            @shipping.ShippingAddress.District, @shipping.ShippingAddress.City
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span>Chưa có thông tin giao hàng</span>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Right -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Tóm tắt đơn hàng</h5></div>
+            <div class="mv-card-body" id="orderSummary"><div style="color:#9ca3af;">Đang tải...</div></div>
+        </div>
+        <div class="mv-card" id="actionCard" style="display:none;">
+            <div class="mv-card-header"><h5>Cập nhật trạng thái</h5></div>
+            <div class="mv-card-body" style="display:flex;flex-direction:column;gap:10px;">
+                <select id="newStatus" class="form-select-mv">
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <button onclick="doUpdateStatus()" class="btn-primary-mv w-100">Cập nhật</button>
+                <button onclick="doCancelOrder()" class="btn btn-outline-danger w-100 btn-sm" id="btnCancel" style="display:none;">Huỷ đơn hàng</button>
             </div>
+        </div>
+        <!-- Tracking timeline -->
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Tracking</h5></div>
+            <div class="mv-card-body" id="trackingTimeline"><div style="color:#9ca3af;">Đang tải...</div></div>
+        </div>
+    </div>
+</div>
 
-            <div class="admin-card">
-                <h6 class="text-uppercase text-muted small fw-bold mb-3">Sản phẩm trong đơn</h6>
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>Sản phẩm</th>
-                                <th>Danh mục</th>
-                                <th class="text-center">Số lượng</th>
-                                <th class="text-end">Đơn giá</th>
-                                <th class="text-end">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Order.OrderItems)
-                            {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if (!string.IsNullOrEmpty(item.ProductImageUrl))
-                                            {
-                                                <img src="@item.ProductImageUrl" alt="@item.ProductName" class="me-3 rounded" style="width: 56px; height: 56px; object-fit: cover;" />
-                                            }
-                                            <div>
-                                                <div class="fw-semibold">@item.ProductName</div>
-                                                <div class="text-muted small">ID: @item.ProductId</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>@item.CategoryName</td>
-                                    <td class="text-center">@item.Quantity</td>
-                                    <td class="text-end">@String.Format("{0:N0} đ", item.UnitPrice ?? 0)</td>
-                                    <td class="text-end">@String.Format("{0:N0} đ", item.SubTotal ?? 0)</td>
-                                </tr>
-                            }
-                        </tbody>
-                        <tfoot class="border-top">
-                            <tr>
-                                <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
-                                <td class="text-end fw-bold text-success">
-                                    @String.Format("{0:N0} đ", Model.Order.TotalAmount ?? 0)
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+@section Scripts {
+    <script>
+        const orderId = parseInt(location.pathname.split('/').pop());
+        const statusMap = { Pending:'badge-pending', Processing:'badge-processing', Shipped:'badge-shipped', Completed:'badge-completed', Cancelled:'badge-cancelled' };
+
+        async function loadOrder() {
+            try {
+                const [dRes, tRes] = await Promise.all([
+                    apiFetch(`/api/admin/order/${orderId}`),
+                    apiFetch(`/api/admin/order/${orderId}/tracking`)
+                ]);
+                const order = await dRes.json();
+                const tracking = await tRes.json();
+
+                document.getElementById('pageTitle').textContent = `Đơn hàng #${order.OrderId}`;
+
+                // Summary
+                const date = order.CreatedAt ? new Date(order.CreatedAt).toLocaleString('vi-VN') : '---';
+                document.getElementById('orderSummary').innerHTML = `
+                    <div style="display:flex;flex-direction:column;gap:10px;font-size:.875rem;">
+                        <div style="display:flex;justify-content:space-between;"><span style="color:#6b7280;">Mã đơn</span><strong>#${order.OrderId}</strong></div>
+                        <div style="display:flex;justify-content:space-between;"><span style="color:#6b7280;">Ngày tạo</span><span>${date}</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span style="color:#6b7280;">Trạng thái</span><span class="badge-status ${statusMap[order.Status]||'badge-pending'}">${order.Status}</span></div>
+                        <div style="border-top:1px solid #f3f4f6;padding-top:10px;display:flex;justify-content:space-between;"><span style="color:#6b7280;">Tổng cộng</span><strong style="color:#2E7D32;font-size:1rem;">${(order.TotalAmount||0).toLocaleString('vi-VN')}đ</strong></div>
+                    </div>`;
+
+                // Action card
+                if (order.Status !== 'Completed' && order.Status !== 'Cancelled') {
+                    document.getElementById('actionCard').style.display = '';
+                    if (order.Status === 'Pending') document.getElementById('btnCancel').style.display = '';
+                }
+
+                // Customer
+                const c = order.Customer;
+                document.getElementById('customerInfo').innerHTML = c ? `
+                    <div style="display:flex;flex-direction:column;gap:8px;font-size:.875rem;">
+                        <div style="display:flex;gap:8px;"><span style="color:#6b7280;width:80px;">Họ tên</span><strong>${c.FullName||'---'}</strong></div>
+                        <div style="display:flex;gap:8px;"><span style="color:#6b7280;width:80px;">Email</span><span>${c.Email||'---'}</span></div>
+                        <div style="display:flex;gap:8px;"><span style="color:#6b7280;width:80px;">SĐT</span><span>${c.Phone||'---'}</span></div>
+                    </div>` : '<p style="color:#9ca3af;">Không có thông tin</p>';
+
+                // Items
+                const items = order.OrderItems || [];
+                document.getElementById('orderItems').innerHTML = items.length ? `
+                    <table class="mv-table">
+                        <thead><tr><th>Sản phẩm</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead>
+                        <tbody>${items.map(i => `<tr>
+                            <td><div style="display:flex;align-items:center;gap:10px;">
+                                ${i.ProductImageUrl ? `<img src="https://localhost:7262${i.ProductImageUrl}" class="img-thumb">` : '<div style="width:56px;height:56px;background:#f3f4f6;border-radius:8px;"></div>'}
+                                <div><div style="font-weight:500;">${i.ProductName||'---'}</div><div style="font-size:.75rem;color:#9ca3af;">${i.CategoryName||''}</div></div>
+                            </div></td>
+                            <td>${i.Quantity||0}</td>
+                            <td>${(i.UnitPrice||0).toLocaleString('vi-VN')}đ</td>
+                            <td style="font-weight:600;">${(i.SubTotal||0).toLocaleString('vi-VN')}đ</td>
+                        </tr>`).join('')}</tbody>
+                    </table>` : '<div style="padding:24px;text-align:center;color:#9ca3af;">Không có sản phẩm</div>';
+
+                // Shipping
+                const ships = order.Shippings || [];
+                document.getElementById('shippingInfo').innerHTML = ships.length ? ships.map(s => {
+                    const addr = s.ShippingAddress;
+                    const method = s.ShippingMethod;
+                    return `<div style="font-size:.875rem;display:flex;flex-direction:column;gap:8px;">
+                        ${addr ? `<div style="background:#f9fafb;padding:12px;border-radius:8px;">
+                            <div style="font-weight:600;margin-bottom:6px;">${addr.ReceiverName||''} — ${addr.Phone||''}</div>
+                            <div style="color:#6b7280;">${[addr.AddressLine,addr.Ward,addr.District,addr.City].filter(Boolean).join(', ')}</div>
+                        </div>` : ''}
+                        ${method ? `<div><span style="color:#6b7280;">Phương thức:</span> ${method.MethodName||''} — ${method.EstimatedDays||''} ngày — <strong>${(method.BaseFee||0).toLocaleString('vi-VN')}đ</strong></div>` : ''}
+                        <div><span style="color:#6b7280;">Trạng thái vận chuyển:</span> ${s.Status||'---'}</div>
+                    </div>`;
+                }).join('<hr style="margin:10px 0;">') : '<p style="color:#9ca3af;">Chưa có thông tin vận chuyển</p>';
+
+                // Payment
+                const pays = order.Payments || [];
+                document.getElementById('paymentInfo').innerHTML = pays.length ? `
+                    <table class="mv-table">
+                        <thead><tr><th>#</th><th>Phương thức</th><th>Trạng thái</th><th>Thời gian</th></tr></thead>
+                        <tbody>${pays.map(p => `<tr>
+                            <td style="color:#9ca3af;">#${p.PaymentId}</td>
+                            <td>${p.PaymentMethod||'---'}</td>
+                            <td>${p.PaymentStatus||'---'}</td>
+                            <td style="font-size:.8rem;color:#9ca3af;">${p.PaidAt ? new Date(p.PaidAt).toLocaleString('vi-VN') : '---'}</td>
+                        </tr>`).join('')}</tbody>
+                    </table>` : '<p style="color:#9ca3af;">Chưa có thông tin thanh toán</p>';
+
+                // Tracking
+                const tl = tracking?.Timeline;
+                if (tl) {
+                    const steps = [
+                        { label: 'Đã đặt hàng', done: tl.IsOrderPlaced, time: tl.OrderPlacedAt },
+                        { label: 'Đã thanh toán', done: tl.IsPaymentReceived, time: tl.PaymentReceivedAt },
+                        { label: 'Đang xử lý', done: tl.IsProcessing, time: tl.ProcessingStartedAt },
+                        { label: 'Đã giao vận chuyển', done: tl.IsShipped, time: tl.ShippedAt },
+                        { label: 'Đã giao hàng', done: tl.IsDelivered, time: tl.DeliveredAt },
+                    ];
+                    if (tl.IsCancelled) steps.push({ label: 'Đã huỷ', done: true, time: null, cancelled: true });
+                    document.getElementById('trackingTimeline').innerHTML = `
+                        <div style="display:flex;flex-direction:column;gap:0;">
+                            ${steps.map((s,i) => `<div style="display:flex;align-items:flex-start;gap:14px;${i<steps.length-1?'padding-bottom:16px;':''}">
+                                <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                                    <div style="width:28px;height:28px;border-radius:50%;background:${s.cancelled?'#fee2e2':s.done?'#dcfce7':'#f3f4f6'};border:2px solid ${s.cancelled?'#dc2626':s.done?'#15803d':'#d1d5db'};display:flex;align-items:center;justify-content:center;font-size:.8rem;">
+                                        ${s.cancelled ? '✕' : s.done ? '✓' : '○'}
+                                    </div>
+                                    ${i<steps.length-1 ? `<div style="width:2px;background:${s.done?'#4CAF50':'#e5e7eb'};flex:1;min-height:20px;margin-top:2px;"></div>` : ''}
+                                </div>
+                                <div style="padding-top:4px;">
+                                    <div style="font-size:.875rem;font-weight:${s.done?'600':'400'};color:${s.done?(s.cancelled?'#dc2626':'#1a1a2e'):'#9ca3af'};">${s.label}</div>
+                                    ${s.time ? `<div style="font-size:.75rem;color:#9ca3af;">${new Date(s.time).toLocaleString('vi-VN')}</div>` : ''}
+                                </div>
+                            </div>`).join('')}
+                        </div>`;
+                }
+            } catch(e) { showToast('Lỗi tải đơn hàng: ' + e.message, 'error'); }
         }
-    </main>
 
-    <footer class="admin-footer d-flex justify-content-between">
-        <div>&copy; 2026 <strong>MACVILLA</strong>. CMS.</div>
-    </footer>
+        async function doUpdateStatus() {
+            const status = document.getElementById('newStatus').value;
+            try {
+                const r = await apiFetch(`/api/admin/order/${orderId}/status`, { method:'PUT', body: JSON.stringify({ Status: status }) });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.message);
+                showToast('Cập nhật trạng thái thành công', 'success');
+                setTimeout(() => loadOrder(), 800);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        async function doCancelOrder() {
+            confirmModal('Huỷ đơn hàng', `Bạn có chắc muốn huỷ đơn hàng <strong>#${orderId}</strong>?`, async () => {
+                try {
+                    const r = await apiFetch(`/api/admin/order/${orderId}/cancel`, { method:'POST', body: JSON.stringify({}) });
+                    if (!r.ok) throw new Error((await r.json()).message);
+                    showToast('Đã huỷ đơn hàng', 'success');
+                    setTimeout(() => loadOrder(), 800);
+                } catch(e) { showToast(e.message, 'error'); }
+            });
+        }
 
+        loadOrder();
+    </script>
+}

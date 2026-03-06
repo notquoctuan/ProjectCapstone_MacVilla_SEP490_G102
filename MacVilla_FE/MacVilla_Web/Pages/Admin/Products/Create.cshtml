@@ -1,229 +1,167 @@
-﻿@page
-@model MacVilla_Web.Pages.Admin.Products.CreateModel
+﻿@page "/Admin/Products/Create"
 @{
-    Layout = null;
+    Layout = "_AdminLayout"; ViewData["Title"] = "Thêm sản phẩm";
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thêm sản phẩm mới - MacVilla</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --mv-green-dark: #7DA100;
-            --mv-green-light: #f9fff0;
-            --mv-green-border: #e2f0d1;
-        }
+<div class="mv-page-header d-flex justify-content-between align-items-start">
+    <div><h1>Thêm sản phẩm mới</h1><p>Điền thông tin và upload ảnh sản phẩm</p></div>
+    <a href="/Admin/Products" class="btn-outline-mv" style="text-decoration:none;display:flex;align-items:center;gap:6px;">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
+</div>
 
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-        }
-
-        /* HEADER - Cùng kiểu Index */
-        .admin-header {
-            background-color: var(--mv-green-dark);
-            height: 65px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1050;
-            padding: 0 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .logo-custom {
-            height: 35px;
-            width: auto;
-        }
-
-        /* MAIN CONTENT - Không sidebar, căn giữa tập trung */
-        .admin-wrapper {
-            margin-top: 65px;
-            padding: 40px 15%;
-            min-height: calc(100vh - 115px);
-        }
-
-        @@media (max-width: 992px) {
-            .admin-wrapper {
-                padding: 30px 5%;
-            }
-        }
-
-        /* CARD STYLE */
-        .card-custom {
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-        }
-
-        .card-header-mv {
-            background-color: var(--mv-green-dark);
-            color: #ffffff;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 1.2rem;
-            border: none;
-        }
-
-        /* FORM ELEMENTS */
-        .form-label {
-            color: #555;
-            margin-bottom: 0.5rem;
-            font-size: 0.85rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--mv-green-dark);
-            box-shadow: 0 0 0 0.25rem rgba(125, 161, 0, 0.1);
-        }
-
-        .upload-box {
-            border: 2px dashed var(--mv-green-border);
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #fff;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-            .upload-box:hover {
-                border-color: var(--mv-green-dark);
-                background-color: var(--mv-green-light);
-            }
-
-        /* FOOTER */
-        .admin-footer {
-            background-color: var(--mv-green-dark);
-            color: #ffffff;
-            padding: 15px 15%;
-            font-size: 13px;
-        }
-
-        .btn-mv-primary {
-            background-color: var(--mv-green-dark);
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-            .btn-mv-primary:hover {
-                background-color: #6a8900;
-                color: white;
-                transform: translateY(-2px);
-            }
-    </style>
-</head>
-<body>
-    <header class="admin-header d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" class="logo-custom me-3">
-            <span class="text-white fw-bold border-start ps-3 small text-uppercase d-none d-sm-inline">Hệ thống quản trị</span>
-        </div>
-
-        <div class="dropdown">
-            <button class="btn btn-link text-white text-decoration-none dropdown-toggle small" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-1"></i> Admin MacVilla
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                <li><a class="dropdown-item small" href="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                <li><a class="dropdown-item small" asp-page="./Index"><i class="bi bi-box-seam me-2"></i> Quản lý sản phẩm</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item small text-danger" asp-page="/Auth/Logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</a></li>
-            </ul>
-        </div>
-    </header>
-
-    <main class="admin-wrapper">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb small">
-                <li class="breadcrumb-item"><a asp-page="./Index" class="text-decoration-none" style="color: var(--mv-green-dark)">Sản phẩm</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Thêm sản phẩm mới</li>
-            </ol>
-        </nav>
-
-        <div class="card card-custom">
-            <div class="card-header card-header-mv text-center">
-                <i class="bi bi-plus-circle me-2"></i> KHỞI TẠO SẢN PHẨM MỚI
-            </div>
-            <div class="card-body p-4 p-lg-5">
-                <form method="post" enctype="multipart/form-data">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small border-0 shadow-sm"></div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">DANH MỤC SẢN PHẨM</label>
-                            <select asp-for="Product.CategoryId" class="form-select form-select-lg" asp-items="@(new SelectList(Model.Categories, "CategoryId", "Name"))">
-                                <option value="">-- Chọn danh mục --</option>
-                            </select>
-                            <span asp-validation-for="Product.CategoryId" class="text-danger small"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">TÊN SẢN PHẨM</label>
-                            <input asp-for="Product.Name" class="form-control form-control-lg" placeholder="Nhập tên sản phẩm..." />
-                            <span asp-validation-for="Product.Name" class="text-danger small"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">GIÁ BÁN NIÊM YẾT (VNĐ)</label>
-                            <div class="input-group input-group-lg">
-                                <input asp-for="Product.Price" type="number" class="form-control fw-bold text-success" placeholder="0" />
-                                <span class="input-group-text bg-light text-muted small">₫</span>
-                            </div>
-                            <span asp-validation-for="Product.Price" class="text-danger small"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">TRẠNG THÁI HIỂN THỊ</label>
-                            <select asp-for="Product.Status" class="form-select form-select-lg">
-                                <option value="Enable">Đang kinh doanh (Hiển thị)</option>
-                                <option value="Disable">Tạm ẩn (Ngừng kinh doanh)</option>
-                                <option value="Pending">Chờ kiểm duyệt</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label fw-bold">HÌNH ẢNH SẢN PHẨM</label>
-                            <div class="upload-box">
-                                <i class="bi bi-cloud-arrow-up fs-2 text-muted mb-2 d-block"></i>
-                                <input asp-for="Product.ImageFiles" type="file" multiple class="form-control" accept="image/*" />
-                                <div class="form-text mt-2 small">Có thể chọn nhiều ảnh cùng lúc. Định dạng: JPG, PNG, WEBP.</div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label fw-bold">MÔ TẢ CHI TIẾT</label>
-                            <textarea asp-for="Product.Description" class="form-control" rows="5" placeholder="Thông tin chi tiết về sản phẩm..."></textarea>
-                        </div>
+<div style="display:grid;grid-template-columns:1fr 380px;gap:20px;">
+    <!-- Left -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Thông tin cơ bản</h5></div>
+            <div class="mv-card-body" style="display:flex;flex-direction:column;gap:16px;">
+                <div>
+                    <label class="form-label-mv">Tên sản phẩm <span style="color:red;">*</span></label>
+                    <input type="text" id="f-name" class="form-control-mv" placeholder="Nhập tên sản phẩm...">
+                </div>
+                <div>
+                    <label class="form-label-mv">Mô tả</label>
+                    <textarea id="f-desc" class="form-control-mv" rows="4" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div>
+                        <label class="form-label-mv">Giá (VNĐ) <span style="color:red;">*</span></label>
+                        <input type="number" id="f-price" class="form-control-mv" placeholder="0" min="0">
                     </div>
-
-                    <div class="mt-5 pt-4 border-top d-flex gap-2">
-                        <button type="submit" class="btn btn-mv-primary shadow">
-                            <i class="bi bi-check2-circle me-2"></i> LƯU SẢN PHẨM
-                        </button>
-                        <a asp-page="./Index" class="btn btn-outline-secondary px-4 fw-bold">
-                            QUAY LẠI
-                        </a>
+                    <div>
+                        <label class="form-label-mv">Danh mục <span style="color:red;">*</span></label>
+                        <select id="f-cat" class="form-select-mv"><option value="">-- Chọn danh mục --</option></select>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </main>
 
-    <footer class="admin-footer d-flex justify-content-between mt-5">
-        <div>&copy; 2026 <strong>MACVILLA</strong>. CMS System.</div>
-    </footer>
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Hình ảnh sản phẩm</h5></div>
+            <div class="mv-card-body">
+                <div id="dropZone" onclick="document.getElementById('imgInput').click()" style="border:2px dashed #d1d5db;border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:.2s;background:#fafafa;">
+                    <i class="bi bi-cloud-upload" style="font-size:2rem;color:#9ca3af;"></i>
+                    <p style="margin-top:8px;color:#6b7280;font-size:.875rem;">Kéo thả ảnh vào đây hoặc <strong style="color:#2E7D32;">nhấn để chọn</strong></p>
+                    <p style="font-size:.75rem;color:#9ca3af;">JPG, PNG, WEBP — tối đa 5MB, tối đa 10 ảnh</p>
+                </div>
+                <input type="file" id="imgInput" multiple accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="previewImages(this)">
+                <div class="img-preview-grid" id="imgPreview"></div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Right -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Trạng thái</h5></div>
+            <div class="mv-card-body">
+                <select id="f-status" class="form-select-mv">
+                    <option value="Pending">Pending</option>
+                    <option value="Enable">Enable</option>
+                    <option value="Disable">Disable</option>
+                </select>
+                <div style="margin-top:12px;padding:10px;background:#f9fafb;border-radius:8px;font-size:.78rem;color:#6b7280;">
+                    <div><strong>Enable</strong>: Hiển thị trên web</div>
+                    <div><strong>Disable</strong>: Ẩn khỏi web</div>
+                    <div><strong>Pending</strong>: Chờ duyệt</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mv-card">
+            <div class="mv-card-header"><h5>Thao tác</h5></div>
+            <div class="mv-card-body" style="display:flex;flex-direction:column;gap:8px;">
+                <button onclick="doCreate()" class="btn-primary-mv w-100" id="btnSave">
+                    <i class="bi bi-check-lg me-1"></i> Lưu sản phẩm
+                </button>
+                <a href="/Admin/Products" class="btn-outline-mv w-100 text-center" style="text-decoration:none;">Huỷ</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedFiles = [];
+
+        async function loadCategories() {
+            const r = await apiFetch('/api/admin/category/getall');
+            const cats = await r.json();
+            const sel = document.getElementById('f-cat');
+            cats.forEach(c => sel.innerHTML += `<option value="${c.CategoryId}">${c.Name}</option>`);
+        }
+
+        function previewImages(input) {
+            selectedFiles = [...selectedFiles, ...Array.from(input.files)];
+            renderPreview();
+            input.value = '';
+        }
+
+        function renderPreview() {
+            const grid = document.getElementById('imgPreview');
+            grid.innerHTML = selectedFiles.map((f, i) => {
+                const url = URL.createObjectURL(f);
+                return `<div class="img-preview-item">
+                    <img src="${url}">
+                    ${i===0 ? '<span class="img-main-badge">CHÍNH</span>' : ''}
+                    <button class="btn-del-img" onclick="removeImg(${i})">×</button>
+                </div>`;
+            }).join('');
+        }
+
+        function removeImg(i) { selectedFiles.splice(i, 1); renderPreview(); }
+
+        // Drag & drop
+        const dz = document.getElementById('dropZone');
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor='#4CAF50'; dz.style.background='#f0fff4'; });
+        dz.addEventListener('dragleave', () => { dz.style.borderColor='#d1d5db'; dz.style.background='#fafafa'; });
+        dz.addEventListener('drop', e => {
+            e.preventDefault();
+            dz.style.borderColor='#d1d5db'; dz.style.background='#fafafa';
+            selectedFiles = [...selectedFiles, ...Array.from(e.dataTransfer.files)];
+            renderPreview();
+        });
+
+        async function doCreate() {
+            const name = document.getElementById('f-name').value.trim();
+            const price = document.getElementById('f-price').value;
+            const catId = document.getElementById('f-cat').value;
+            const status = document.getElementById('f-status').value;
+            const desc = document.getElementById('f-desc').value.trim();
+
+            if (!name) { showToast('Vui lòng nhập tên sản phẩm', 'error'); return; }
+            if (!price || parseFloat(price) < 0) { showToast('Vui lòng nhập giá hợp lệ', 'error'); return; }
+            if (!catId) { showToast('Vui lòng chọn danh mục', 'error'); return; }
+
+            const btn = document.getElementById('btnSave');
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass"></i> Đang lưu...';
+
+            const form = new FormData();
+            form.append('Name', name);
+            form.append('Price', price);
+            form.append('CategoryId', catId);
+            form.append('Status', status);
+            if (desc) form.append('Description', desc);
+            selectedFiles.forEach(f => form.append('ImageFiles', f));
+
+            try {
+                const token = getToken();
+                const r = await fetch('https://localhost:7262/api/admin/products', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: form
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.message || 'Tạo thất bại');
+                showToast('Tạo sản phẩm thành công!', 'success');
+                setTimeout(() => window.location.href = '/Admin/Products', 1200);
+            } catch(e) {
+                showToast(e.message, 'error');
+                btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Lưu sản phẩm';
+            }
+        }
+
+        loadCategories();
+    </script>
+}

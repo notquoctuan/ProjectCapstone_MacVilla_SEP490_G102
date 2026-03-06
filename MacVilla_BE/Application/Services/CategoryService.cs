@@ -98,10 +98,11 @@ public class CategoryService : ICategoryService
 
         return new PagedResponse<Category>
         {
-            Data = categories,
+            Data = categories.ToList(),
             PageNumber = request.PageNumber,
             PageSize = request.PageSize,
-            TotalCount = totalCount
+            TotalCount = totalCount,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize)
         };
     }
 }

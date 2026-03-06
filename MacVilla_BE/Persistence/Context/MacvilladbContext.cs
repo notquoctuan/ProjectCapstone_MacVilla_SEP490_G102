@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +42,8 @@ public partial class MacvilladbContext : DbContext
     public virtual DbSet<ProductSpecification> ProductSpecifications { get; set; }
 
     public virtual DbSet<Quotation> Quotations { get; set; }
-
+    public virtual DbSet<Cart> Carts { get; set; }
+    public virtual DbSet<CartItem> CartItems { get; set; }
     public virtual DbSet<Rfq> Rfqs { get; set; }
 
     public virtual DbSet<RolePermission> RolePermissions { get; set; }
@@ -234,21 +235,42 @@ public partial class MacvilladbContext : DbContext
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.TotalAmount)
+                .HasPrecision(12, 2)
+                .HasColumnName("total_amount");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.Note)
+                .HasColumnType("text")
+                .HasColumnName("note");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasColumnName("status");
-            entity.Property(e => e.TotalAmount)
-                .HasPrecision(12, 2)
-                .HasColumnName("total_amount");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Orders)
+            entity.Property(e => e.ShippingAddressId).HasColumnName("shipping_address_id");
+            entity.Property(e => e.ShippingMethodId).HasColumnName("shipping_method_id");
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("orders_ibfk_1");
+
+            entity.HasOne(d => d.ShippingAddress)
+                .WithMany()
+                .HasForeignKey(d => d.ShippingAddressId)
+                .HasConstraintName("fk_orders_shipping_address");
+
+            entity.HasOne(d => d.ShippingMethod)
+                .WithMany()
+                .HasForeignKey(d => d.ShippingMethodId)
+                .HasConstraintName("fk_orders_shipping_method");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
@@ -310,6 +332,7 @@ public partial class MacvilladbContext : DbContext
             entity.ToTable("products");
 
             entity.HasIndex(e => e.CategoryId, "category_id");
+            // Index cho các cột filter thường dùng
 
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
@@ -329,6 +352,7 @@ public partial class MacvilladbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
+
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -659,6 +683,48 @@ public partial class MacvilladbContext : DbContext
             entity.HasOne(d => d.Wishlist).WithMany(p => p.WishlistItems)
                 .HasForeignKey(d => d.WishlistId)
                 .HasConstraintName("wishlist_items_ibfk_1");
+        });
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.CartId).HasName("PRIMARY");
+            entity.ToTable("carts");
+            entity.HasIndex(e => e.UserId, "uq_user_cart").IsUnique();
+            entity.Property(e => e.CartId).HasColumnName("cart_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+            entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("carts_ibfk_1");
+            entity.HasMany(d => d.CartItems).WithOne(p => p.Cart)
+                .HasForeignKey(d => d.CartId)
+                .HasConstraintName("cart_items_ibfk_1");
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.CartItemId).HasName("PRIMARY");
+            entity.ToTable("cart_items");
+            entity.HasIndex(e => new { e.CartId, e.ProductId }, "uq_cart_product").IsUnique();
+            entity.Property(e => e.CartItemId).HasColumnName("cart_item_id");
+            entity.Property(e => e.CartId).HasColumnName("cart_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Quantity)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("quantity");
+            entity.Property(e => e.AddedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("added_at");
+            entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("cart_items_ibfk_2");
         });
 
         OnModelCreatingPartial(modelBuilder);

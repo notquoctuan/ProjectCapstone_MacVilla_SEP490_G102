@@ -1,4 +1,12 @@
-namespace MacVilla_Web.DTOs;
+﻿public class OrderSearchRequest
+{
+    public string? Status { get; set; }
+    public long? UserId { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 15;
+}
 
 public class OrderListResponse
 {
@@ -11,16 +19,6 @@ public class OrderListResponse
     public int ItemCount { get; set; }
     public string? PaymentStatus { get; set; }
     public string? ShippingStatus { get; set; }
-}
-
-public class OrderSearchRequest
-{
-    public string? Status { get; set; }
-    public long? UserId { get; set; }
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
 }
 
 public class OrderDetailResponse
@@ -52,9 +50,7 @@ public class OrderItemDetailDto
     public string? CategoryName { get; set; }
     public int? Quantity { get; set; }
     public decimal? UnitPrice { get; set; }
-    public decimal? SubTotal => Quantity.HasValue && UnitPrice.HasValue
-        ? Quantity.Value * UnitPrice.Value
-        : 0;
+    public decimal? SubTotal { get; set; }
 }
 
 public class PaymentInfoDto
@@ -92,46 +88,8 @@ public class ShippingMethodDto
     public int? EstimatedDays { get; set; }
 }
 
-public class OrderTrackingResponse
-{
-    public long OrderId { get; set; }
-    public string? CurrentStatus { get; set; }
-    public DateTime? CreatedAt { get; set; }
-    public List<OrderStatusHistoryDto> StatusHistory { get; set; } = new();
-    public OrderTimelineDto Timeline { get; set; } = new();
-}
-
-public class OrderStatusHistoryDto
-{
-    public string? Status { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public string? Notes { get; set; }
-}
-
-public class OrderTimelineDto
-{
-    public bool IsOrderPlaced { get; set; }
-    public DateTime? OrderPlacedAt { get; set; }
-    public bool IsPaymentReceived { get; set; }
-    public DateTime? PaymentReceivedAt { get; set; }
-    public bool IsProcessing { get; set; }
-    public DateTime? ProcessingStartedAt { get; set; }
-    public bool IsShipped { get; set; }
-    public DateTime? ShippedAt { get; set; }
-    public bool IsDelivered { get; set; }
-    public DateTime? DeliveredAt { get; set; }
-    public bool IsCancelled { get; set; }
-    public DateTime? CancelledAt { get; set; }
-}
-
 public class UpdateOrderStatusRequest
 {
     public string Status { get; set; } = string.Empty;
     public string? Notes { get; set; }
 }
-
-public class CancelOrderRequest
-{
-    public string? Reason { get; set; }
-}
-

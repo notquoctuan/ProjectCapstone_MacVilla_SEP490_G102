@@ -1,340 +1,222 @@
-@page
-@model MacVilla_Web.Pages.Admin.Categories.IndexModel
+@page "/Admin/Categories"
 @{
-    Layout = null; // Tự định nghĩa cấu trúc đồng bộ
+    Layout = "_AdminLayout"; ViewData["Title"] = "Danh mục";
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý danh mục - MacVilla</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<div class="mv-page-header d-flex justify-content-between align-items-start">
+    <div><h1>Quản lý danh mục</h1><p>Quản lý cấu trúc danh mục sản phẩm</p></div>
+    <button onclick="openModal('createModal')" class="btn-primary-mv" style="display:flex;align-items:center;gap:6px;border:none;cursor:pointer;">
+        <i class="bi bi-plus-lg"></i> Thêm danh mục
+    </button>
+</div>
 
-    <style>
-        :root {
-            --mv-green-dark: #7DA100;
-            --mv-green-light: #f9fff0;
-            --mv-green-border: #e2f0d1;
-            --sidebar-width: 260px;
-        }
+<!-- Search -->
+<div class="search-bar">
+    <div class="form-group" style="flex:2;">
+        <label class="form-label-mv">Tên danh mục</label>
+        <input type="text" id="f-name" class="form-control-mv" placeholder="Tìm kiếm...">
+    </div>
+    <div class="form-group" style="flex:1;">
+        <label class="form-label-mv">Trạng thái</label>
+        <select id="f-active" class="form-select-mv">
+            <option value="">Tất cả</option>
+            <option value="true">Đang hoạt động</option>
+            <option value="false">Vô hiệu hóa</option>
+        </select>
+    </div>
+    <div class="form-group" style="flex-direction:row;align-items:flex-end;gap:8px;">
+        <button onclick="loadCats(1)" class="btn-primary-mv"><i class="bi bi-search"></i> Tìm</button>
+        <button onclick="resetFilter()" class="btn-outline-mv">Đặt lại</button>
+    </div>
+</div>
 
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-        }
+<div class="mv-card">
+    <div class="mv-card-header">
+        <h5>Danh sách danh mục</h5>
+        <span id="totalCount" style="font-size:.8rem;color:#6b7280;"></span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="mv-table">
+            <thead>
+                <tr>
+                    <th>#ID</th>
+                    <th>Tên danh mục</th>
+                    <th>Danh mục cha</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="catBody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr></tbody>
+        </table>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid #f3f4f6;">
+        <div class="mv-pagination" id="pagination"></div>
+    </div>
+</div>
 
-        /* Header */
-        .admin-header {
-            background-color: var(--mv-green-dark);
-            height: 65px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1050;
-            padding: 0 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Sidebar */
-        .admin-sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            top: 65px;
-            left: 0;
-            background: white;
-            z-index: 1000;
-            padding-top: 10px;
-            border-right: 1px solid #eee;
-        }
-
-        .nav-link-custom {
-            display: flex;
-            align-items: center;
-            padding: 12px 25px;
-            color: #444;
-            text-decoration: none;
-            transition: 0.2s;
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-            .nav-link-custom i {
-                margin-right: 15px;
-                font-size: 1.2rem;
-                color: var(--mv-green-dark);
-            }
-
-            .nav-link-custom:hover {
-                background-color: var(--mv-green-light);
-                color: var(--mv-green-dark);
-            }
-
-            .nav-link-custom.active {
-                background-color: var(--mv-green-dark) !important;
-                color: #ffffff !important;
-            }
-
-                .nav-link-custom.active i {
-                    color: #ffffff !important;
-                }
-
-        /* Main Wrapper */
-        .admin-wrapper {
-            margin-top: 65px;
-            margin-left: var(--sidebar-width);
-            padding: 40px;
-            min-height: calc(100vh - 115px);
-        }
-
-        /* Card & Table Styles */
-        .admin-card {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid #eee;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-        }
-
-        .btn-mv {
-            background-color: var(--mv-green-dark);
-            color: white;
-        }
-
-            .btn-mv:hover {
-                background-color: #6a8900;
-                color: white;
-            }
-
-        .btn-outline-mv {
-            border: 1px solid var(--mv-green-dark);
-            color: var(--mv-green-dark);
-        }
-
-            .btn-outline-mv:hover {
-                background-color: var(--mv-green-dark);
-                color: white;
-            }
-
-        .admin-footer {
-            background-color: var(--mv-green-dark);
-            color: #ffffff;
-            padding: 15px 40px;
-            font-size: 13px;
-            margin-left: var(--sidebar-width);
-        }
-    </style>
-</head>
-<body>
-
-    <header class="admin-header d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla" style="height: 35px;" class="me-3">
-            <span class="text-white fw-bold border-start ps-3 small text-uppercase">Quản lý hệ thống</span>
-        </div>
-        <div class="dropdown">
-            <button class="btn btn-link text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-1"></i> Admin MacVilla
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
-                <li><a class="dropdown-item py-2" href="/Admin/Dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item py-2 text-danger" asp-page="/Auth/Logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</a></li>
-            </ul>
-        </div>
-    </header>
-
-    <aside class="admin-sidebar shadow-sm">
-        <div class="px-4 py-3 small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Menu chính</div>
-        <nav>
-            <a asp-page="/Admin/Dashboard/Index" class="nav-link-custom">
-                <i class="bi bi-speedometer2"></i> Tổng quan
-            </a>
-            <a asp-page="/Admin/Products/Index" class="nav-link-custom">
-                <i class="bi bi-box-seam"></i> Quản lý Sản phẩm
-            </a>
-            <a asp-page="/Admin/Categories/Index" class="nav-link-custom active">
-                <i class="bi bi-tags"></i> Quản lý Danh Mục
-            </a>
-            <a href="/Admin/Orders/Index" class="nav-link-custom">
-                <i class="bi bi-receipt"></i> Quản lý Đơn hàng
-            </a>
-            <a href="#" class="nav-link-custom">
-                <i class="bi bi-people"></i> Quản lý người dùng
-            </a>
-        </nav>
-    </aside>
-
-    <main class="admin-wrapper">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+<!-- Create Modal -->
+<div class="mv-modal-overlay" id="createModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Thêm danh mục mới</h5><button class="btn-close-mv" onclick="closeModal('createModal')">&times;</button></div>
+        <div class="mv-modal-body" style="display:flex;flex-direction:column;gap:14px;">
             <div>
-                <h3 class="fw-bold m-0">Danh mục sản phẩm</h3>
-                <p class="text-muted small mb-0">Cấu trúc phân loại sản phẩm của MacVilla</p>
+                <label class="form-label-mv">Tên danh mục <span style="color:red;">*</span></label>
+                <input type="text" id="c-name" class="form-control-mv" placeholder="Nhập tên danh mục...">
             </div>
-            <a asp-page="Create" class="btn btn-mv px-4 shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Thêm danh mục
-            </a>
+            <div>
+                <label class="form-label-mv">Danh mục cha (tuỳ chọn)</label>
+                <select id="c-parent" class="form-select-mv"><option value="">-- Không có --</option></select>
+            </div>
         </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('createModal')">Huỷ</button>
+            <button class="btn btn-sm btn-success px-4" onclick="doCreate()">Thêm</button>
+        </div>
+    </div>
+</div>
 
-        @if (!string.IsNullOrEmpty(Model.Message))
-        {
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> @Model.Message
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<!-- Edit Modal -->
+<div class="mv-modal-overlay" id="editModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Chỉnh sửa danh mục</h5><button class="btn-close-mv" onclick="closeModal('editModal')">&times;</button></div>
+        <div class="mv-modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="e-id">
+            <div>
+                <label class="form-label-mv">Tên danh mục <span style="color:red;">*</span></label>
+                <input type="text" id="e-name" class="form-control-mv">
             </div>
+            <div>
+                <label class="form-label-mv">Danh mục cha</label>
+                <select id="e-parent" class="form-select-mv"><option value="">-- Không có --</option></select>
+            </div>
+        </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('editModal')">Huỷ</button>
+            <button class="btn btn-sm btn-success px-4" onclick="doEdit()">Lưu</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        let allCats = [];
+
+        async function loadAllCats() {
+            const r = await apiFetch('/api/admin/category/getall');
+            allCats = await r.json();
+            ['c-parent','e-parent'].forEach(id => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = '<option value="">-- Không có --</option>';
+                allCats.forEach(c => sel.innerHTML += `<option value="${c.CategoryId}">${c.Name}</option>`);
+            });
         }
 
-        <div class="admin-card">
-            <form method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold text-muted">Tên danh mục</label>
-                    <input asp-for="SearchRequest.Name" class="form-control" placeholder="Tìm kiếm..." />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold text-muted">Trạng thái</label>
-                    <select asp-for="SearchRequest.IsActive" class="form-select">
-                        <option value="">-- Tất cả --</option>
-                        <option value="true">Đang hoạt động</option>
-                        <option value="false">Ngừng hoạt động</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold text-muted">Hiển thị</label>
-                    <select asp-for="SearchRequest.PageSize" class="form-select">
-                        <option value="10">10 dòng</option>
-                        <option value="20">20 dòng</option>
-                        <option value="50">50 dòng</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-mv w-100">Lọc dữ liệu</button>
-                    <a asp-page="Index" class="btn btn-light border w-100">Reset</a>
-                </div>
-            </form>
-        </div>
+        async function loadCats(page = 1) {
+            currentPage = page;
+            const name = document.getElementById('f-name').value;
+            const isActive = document.getElementById('f-active').value;
+            const params = new URLSearchParams({ PageNumber: page, PageSize: 15, ...(name&&{Name:name}), ...(isActive!==''&&{IsActive:isActive}) });
+            document.getElementById('catBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr>';
+            try {
+                const r = await apiFetch('/api/admin/category?' + params);
+                const data = await r.json();
+                document.getElementById('totalCount').textContent = `${data.TotalCount||0} danh mục`;
+                const items = data.Data || [];
+                if (!items.length) {
+                    document.getElementById('catBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#9ca3af;">Không tìm thấy</td></tr>';
+                } else {
+                    document.getElementById('catBody').innerHTML = items.map(c => {
+                        const parent = allCats.find(a => a.CategoryId === c.ParentCategoryId);
+                        return `<tr>
+                            <td style="color:#9ca3af;font-size:.8rem;">#${c.CategoryId}</td>
+                            <td style="font-weight:500;">${c.CategoryName||''}</td>
+                            <td style="color:#6b7280;font-size:.85rem;">${parent ? parent.Name : '<span style="color:#d1d5db;">—</span>'}</td>
+                            <td><span class="badge-status ${c.IsActive?'badge-active':'badge-disable'}">${c.IsActive?'Hoạt động':'Vô hiệu'}</span></td>
+                            <td>
+                                <div style="display:flex;gap:6px;">
+                                    <button onclick="openEdit(${c.CategoryId})" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:6px;background:transparent;color:#374151;cursor:pointer;font-size:.85rem;"><i class="bi bi-pencil"></i></button>
+                                    <button onclick="toggleActive(${c.CategoryId},${c.IsActive})" title="${c.IsActive?'Vô hiệu hóa':'Kích hoạt'}" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid ${c.IsActive?'#fee2e2':'#dcfce7'};border-radius:6px;background:transparent;color:${c.IsActive?'#dc2626':'#15803d'};cursor:pointer;font-size:.85rem;">
+                                        <i class="bi ${c.IsActive?'bi-toggle-on':'bi-toggle-off'}"></i>
+                                    </button>
+                                    <button onclick="deleteCat(${c.CategoryId},'${(c.CategoryName||'').replace(/'/g,"\\'")}')" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #fee2e2;border-radius:6px;background:transparent;color:#dc2626;cursor:pointer;font-size:.85rem;"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
+                const total = data.TotalPages || 1;
+                let html = '';
+                if (page > 1) html += `<a onclick="loadCats(${page-1})" href="#">‹</a>`;
+                for (let i = Math.max(1,page-2); i <= Math.min(total,page+2); i++) html += i===page ? `<span class="active">${i}</span>` : `<a onclick="loadCats(${i})" href="#">${i}</a>`;
+                if (page < total) html += `<a onclick="loadCats(${page+1})" href="#">›</a>`;
+                document.getElementById('pagination').innerHTML = html;
+            } catch(e) { showToast('Lỗi tải danh mục', 'error'); }
+        }
 
-        <div class="admin-card p-0 overflow-hidden">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Tên danh mục</th>
-                            <th>Danh mục cha</th>
-                            <th>Trạng thái</th>
-                            <th class="text-end pe-4">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.PagedResult?.Data != null && Model.PagedResult.Data.Any())
-                        {
-                            @foreach (var item in Model.PagedResult.Data)
-                            {
-                                <tr>
-                                    <td class="ps-4 fw-bold">#@item.CategoryId</td>
-                                    <td>@item.CategoryName</td>
-                                    <td>
-                                        @{
-                                            string parentName = "-";
-                                            if (item.ParentCategoryId.HasValue &&
-                                                Model.CategoryNameLookup.TryGetValue(item.ParentCategoryId.Value, out var pName))
-                                            {
-                                                parentName = pName;
-                                            }
-                                        }
-                                        @parentName
-                                    </td>
-                                    <td>
-                                        @if (item.IsActive == true)
-                                        {
-                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">Hoạt động</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary px-3">Ngừng</span>
-                                        }
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a asp-page="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-mv">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+        function resetFilter() { document.getElementById('f-name').value=''; document.getElementById('f-active').value=''; loadCats(1); }
 
-                                            @if (item.IsActive == true)
-                                            {
-                                                <form asp-page-handler="Deactivate" asp-route-id="@item.CategoryId" method="post">
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Ngừng hoạt động danh mục này?')">
-                                                        <i class="bi bi-slash-circle"></i>
-                                                    </button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <form asp-page-handler="Activate" asp-route-id="@item.CategoryId" method="post">
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">
-                                                        <i class="bi bi-play-circle"></i>
-                                                    </button>
-                                                </form>
-                                            }
+        async function doCreate() {
+            const name = document.getElementById('c-name').value.trim();
+            const parent = document.getElementById('c-parent').value;
+            if (!name) { showToast('Vui lòng nhập tên danh mục', 'error'); return; }
+            try {
+                const r = await apiFetch('/api/admin/category', { method:'POST', body: JSON.stringify({ CategoryName: name, ParentCategoryId: parent || null }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('createModal');
+                document.getElementById('c-name').value = '';
+                showToast('Thêm danh mục thành công', 'success');
+                await loadAllCats(); loadCats(1);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
 
-                                            <form asp-page-handler="Delete" asp-route-id="@item.CategoryId" method="post">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa danh mục này?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-folder-x fs-1 d-block mb-2"></i>
-                                    Không có dữ liệu danh mục nào
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+        function openEdit(id) {
+            const cat = allCats.find(c => c.CategoryId === id);
+            if (!cat) return;
+            document.getElementById('e-id').value = id;
+            document.getElementById('e-name').value = cat.Name || '';
+            document.getElementById('e-parent').value = '';
+            openModal('editModal');
+            apiFetch(`/api/admin/category/${id}`).then(r => r.json()).then(c => {
+                document.getElementById('e-parent').value = c.ParentCategoryId || '';
+            });
+        }
 
-            @if (Model.PagedResult != null && Model.PagedResult.TotalPages > 1)
-            {
-                <div class="p-3 border-top bg-light">
-                    <nav>
-                        <ul class="pagination pagination-sm justify-content-center m-0">
-                            <li class="page-item @(Model.SearchRequest.PageNumber <= 1 ? "disabled" : "")">
-                                <a class="page-link" asp-page="Index" asp-all-route-data="Model.GetPageRouteData(Model.SearchRequest.PageNumber - 1)">Trước</a>
-                            </li>
-                            @for (var i = 1; i <= Model.PagedResult.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == Model.SearchRequest.PageNumber ? "active" : "")">
-                                    <a class="page-link @(i == Model.SearchRequest.PageNumber ? "bg-mv-green border-mv-green" : "")"
-                                       style="@(i == Model.SearchRequest.PageNumber ? "background-color: var(--mv-green-dark); border-color: var(--mv-green-dark);" : "")"
-                                       asp-page="Index" asp-all-route-data="Model.GetPageRouteData(i)">@i</a>
-                                </li>
-                            }
-                            <li class="page-item @(Model.SearchRequest.PageNumber >= Model.PagedResult.TotalPages ? "disabled" : "")">
-                                <a class="page-link" asp-page="Index" asp-all-route-data="Model.GetPageRouteData(Model.SearchRequest.PageNumber + 1)">Sau</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            }
-        </div>
-    </main>
+        async function doEdit() {
+            const id = document.getElementById('e-id').value;
+            const name = document.getElementById('e-name').value.trim();
+            const parent = document.getElementById('e-parent').value;
+            if (!name) { showToast('Vui lòng nhập tên danh mục', 'error'); return; }
+            try {
+                const r = await apiFetch(`/api/admin/category/${id}`, { method:'PUT', body: JSON.stringify({ CategoryName: name, ParentCategoryId: parent || null }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('editModal');
+                showToast('Cập nhật thành công', 'success');
+                await loadAllCats(); loadCats(currentPage);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
 
-    <footer class="admin-footer d-flex justify-content-between">
-        <div>&copy; 2026 <strong>MACVILLA</strong>. CMS.</div>
-    </footer>
+        async function toggleActive(id, current) {
+            const endpoint = current ? 'deactivate' : 'activate';
+            try {
+                const r = await apiFetch(`/api/admin/category/${id}/${endpoint}`, { method:'PATCH' });
+                if (!r.ok) throw new Error((await r.json()).message);
+                showToast(`Đã ${current?'vô hiệu hóa':'kích hoạt'} danh mục`, 'success');
+                loadCats(currentPage);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        async function deleteCat(id, name) {
+            confirmModal('Xác nhận xoá', `Bạn chắc chắn muốn xoá danh mục <strong>${name}</strong>?`, async () => {
+                try {
+                    const r = await apiFetch(`/api/admin/category/${id}`, { method:'DELETE' });
+                    if (!r.ok) throw new Error((await r.json()).message);
+                    showToast('Đã xoá danh mục', 'success');
+                    await loadAllCats(); loadCats(currentPage);
+                } catch(e) { showToast(e.message, 'error'); }
+            });
+        }
+
+        loadAllCats().then(() => loadCats(1));
+    </script>
+}

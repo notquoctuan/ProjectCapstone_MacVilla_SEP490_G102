@@ -5,16 +5,12 @@ namespace MacVilla_Web.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger)
+        public IActionResult OnGet()
         {
-            _logger = logger;
-        }
-
-        public void OnGet()
-        {
-
+            var token = HttpContext.Session.GetString("JWToken");
+            if (!string.IsNullOrEmpty(token))
+                return RedirectToPage("/Admin/Dashboard/Index");
+            return RedirectToPage("/Auth/Login");
         }
     }
 }

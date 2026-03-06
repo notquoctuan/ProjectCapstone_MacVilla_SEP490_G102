@@ -6,27 +6,25 @@ namespace Application.DTOs
     public class ProductCreateRequest
     {
         [Required(ErrorMessage = "Tên sản phẩm là bắt buộc.")]
-        [StringLength(200, ErrorMessage = "Tên sản phẩm không được vượt quá 200 ký tự.")]
-        [RegularExpression(@"^[^!@#$%^&*()_+=\[{\]};:<>|./?]*$",
-            ErrorMessage = "Tên không được chứa ký tự đặc biệt.")]
+        [StringLength(200, MinimumLength = 2, ErrorMessage = "Tên sản phẩm phải từ 2 đến 200 ký tự.")]
         public string Name { get; set; } = null!;
 
         [Required(ErrorMessage = "Giá sản phẩm là bắt buộc.")]
-        [Range(0, (double)decimal.MaxValue, ErrorMessage = "Giá phải lớn hơn hoặc bằng 0.")]
+        [Range(1000, 999_999_999, ErrorMessage = "Giá sản phẩm phải từ 1,000 đến 999,999,999 VNĐ.")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn danh mục.")]
+        [Range(1, long.MaxValue, ErrorMessage = "Danh mục không hợp lệ.")]
         public long CategoryId { get; set; }
 
+        [StringLength(5000, ErrorMessage = "Mô tả không được vượt quá 5000 ký tự.")]
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Trạng thái là bắt buộc.")]
-        [RegularExpression("^(Disable|Enable|Pending)$",
-            ErrorMessage = "Trạng thái chỉ được phép là: Disable, Enable hoặc Pending.")]
+        [RegularExpression("^(Enable|Disable|Pending)$",
+            ErrorMessage = "Trạng thái chỉ được là: Enable, Disable hoặc Pending.")]
         public string Status { get; set; } = "Pending";
 
-        [Required(ErrorMessage = "Vui lòng chọn ít nhất một ảnh.")]
-        [DataType(DataType.Upload)]
-        public List<IFormFile> ImageFiles { get; set; } = new();
+        public List<IFormFile>? ImageFiles { get; set; }
     }
 }
