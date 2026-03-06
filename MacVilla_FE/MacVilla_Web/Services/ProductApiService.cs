@@ -15,7 +15,19 @@ namespace MacVilla_Web.Services
         {
             return await _httpClient.GetFromJsonAsync<List<ProductAdminVM>>("api/admin/products");
         }
-
+        // Thêm vào trong class ProductApiService
+        public async Task<ProductAdminVM?> GetProductByIdAsync(long id)
+        {
+            try
+            {
+                // Gọi đến endpoint api/admin/products/{id} của Backend
+                return await _httpClient.GetFromJsonAsync<ProductAdminVM>($"api/admin/products/{id}");
+            }
+            catch
+            {
+                return null;
+            }
+        }
         public async Task UpdateStatusAsync(long id, string status)
         {
             await _httpClient.PatchAsync($"api/admin/products/{id}/status?status={status}", null);

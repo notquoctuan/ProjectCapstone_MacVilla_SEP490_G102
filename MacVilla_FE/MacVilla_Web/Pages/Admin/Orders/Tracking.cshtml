@@ -50,6 +50,60 @@
             margin-bottom: 20px;
         }
 
+        .status-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            position: relative;
+        }
+
+            .status-steps::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background-color: #e5e7eb;
+                z-index: 1;
+            }
+
+        .status-step {
+            position: relative;
+            text-align: center;
+            flex: 1;
+            z-index: 2;
+        }
+
+        .status-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            background-color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .status-step.completed .status-circle {
+            background-color: var(--mv-green-dark);
+            border-color: var(--mv-green-dark);
+            color: #fff;
+        }
+
+        .status-step.current .status-circle {
+            background-color: #fff;
+            border-color: var(--mv-green-dark);
+            color: var(--mv-green-dark);
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+        }
+
         .timeline {
             position: relative;
             padding-left: 30px;
@@ -126,6 +180,31 @@
                     <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
                         @Model.Tracking.CurrentStatus
                     </span>
+                </div>
+
+                @{
+                    var orderedStatuses = new[] { "Pending", "Processing", "Shipped", "Completed", "Cancelled" };
+                    var current = Model.Tracking.CurrentStatus ?? string.Empty;
+                    var currentIndex = Array.IndexOf(orderedStatuses, current);
+                    if (currentIndex < 0) { currentIndex = 0; }
+                }
+
+                <div class="status-steps">
+                    @for (var i = 0; i < orderedStatuses.Length; i++)
+                    {
+                        var s = orderedStatuses[i];
+                        var isCompleted = i < currentIndex && !string.Equals(current, "Cancelled", StringComparison.OrdinalIgnoreCase);
+                        var isCurrent = i == currentIndex;
+                        var cssClass = isCurrent ? "current" : (isCompleted ? "completed" : "");
+                        <div class="status-step @cssClass">
+                            <div class="status-circle">
+                                @(i + 1)
+                            </div>
+                            <div class="status-label">
+                                @s
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
 

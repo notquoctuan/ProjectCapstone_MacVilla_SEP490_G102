@@ -237,7 +237,7 @@
                                             </a>
                                             <form asp-page-handler="UpdateStatus" method="post" class="d-inline-flex align-items-center gap-1">
                                                 <input type="hidden" name="id" value="@order.OrderId" />
-                                                <select name="status" class="form-select form-select-sm">
+                                                <select name="newStatus" class="form-select form-select-sm">
                                                     <option value="Pending" selected="@("Pending".Equals(order.Status))">Pending</option>
                                                     <option value="Processing" selected="@("Processing".Equals(order.Status))">Processing</option>
                                                     <option value="Shipped" selected="@("Shipped".Equals(order.Status))">Shipped</option>

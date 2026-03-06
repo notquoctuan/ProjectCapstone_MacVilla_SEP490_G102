@@ -8,11 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // =======================
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<UserApiService>();
 // Named HttpClient
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7262/";
 builder.Services.AddHttpClient("MacVillaAPI", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7262/"); // BE port
+    client.BaseAddress = new Uri(apiBaseUrl);
     client.DefaultRequestHeaders.Accept.Clear();
     client.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue("application/json"));
@@ -21,9 +22,15 @@ builder.Services.AddHttpClient("MacVillaAPI", client =>
 // Typed HttpClient
 builder.Services.AddHttpClient<ProductApiService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7262/");
+    client.BaseAddress = new Uri(apiBaseUrl);
 });
-
+builder.Services.AddHttpClient<UserApiService>(client => {
+    client.BaseAddress = new Uri("https://localhost:7262/"); 
+});
+builder.Services.AddHttpClient<DashboardApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001/");
+});
 // Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

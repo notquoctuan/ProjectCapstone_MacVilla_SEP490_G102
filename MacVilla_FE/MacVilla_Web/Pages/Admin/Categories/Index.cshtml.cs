@@ -82,7 +82,18 @@ public class IndexModel : PageModel
         }
         else
         {
-            TempData["Message"] = "Không thể xóa. Vui lòng thử lại.";
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                // Ví dụ: danh mục đang được gắn với sản phẩm
+                var error = await response.Content.ReadFromJsonAsync<SimpleErrorResponse>();
+                TempData["Message"] = !string.IsNullOrEmpty(error?.Message)
+                    ? error!.Message
+                    : "Không thể xóa. Vui lòng thử lại.";
+            }
+            else
+            {
+                TempData["Message"] = "Không thể xóa. Vui lòng thử lại.";
+            }
         }
         return RedirectToPage(new { SearchRequest.Name, SearchRequest.IsActive, SearchRequest.PageNumber, SearchRequest.PageSize });
     }
@@ -137,6 +148,11 @@ public class IndexModel : PageModel
         {
             CategoryNameLookup = new Dictionary<long, string>();
         }
+    }
+
+    private class SimpleErrorResponse
+    {
+        public string? Message { get; set; }
     }
 }
 

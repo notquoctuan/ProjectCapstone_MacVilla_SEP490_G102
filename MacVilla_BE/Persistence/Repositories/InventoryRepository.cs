@@ -5,7 +5,7 @@ using Persistence.Context;
 
 namespace Persistence.Repositories;
 
-public class InventoryRepository : IInventoryRepository
+    public class InventoryRepository : IInventoryRepository
 {
     private readonly MacvilladbContext _context;
 
@@ -66,7 +66,57 @@ public class InventoryRepository : IInventoryRepository
         return true;
     }
 
-    private async Task AddInventoryHistoryAsync(long inventoryId, int changeQty, string reason)
+    public async Task<Inventory?> GetByIdAsync(long inventoryId)
+    {
+        return await _context.Inventories
+            .Include(i => i.InventoryHistories)
+            .Include(i => i.Product)
+            .FirstOrDefaultAsync(i => i.InventoryId == inventoryId);
+    }
+
+    public async Task<(IEnumerable<Inventory> Inventories, int TotalCount)> SearchAsync(string? keyword, int pageNumber, int pageSize)
+    {
+        var query = _context.Inventories
+            .Include(i => i.Product)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var normalized = keyword.Trim().ToLower();
+            query = query.Where(i =>
+                (i.Sku != null && i.Sku.ToLower().Contains(normalized)) ||
+                (i.Product != null && i.Product.Name != null && i.Product.Name.ToLower().Contains(normalized)));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var inventories = await query
+            .OrderBy(i => i.Product!.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return (inventories, totalCount);
+    }
+
+    public async Task<List<InventoryHistory>> GetHistoryAsync(long inventoryId)
+    {
+        return await _context.InventoryHistories
+            .Where(h => h.InventoryId == inventoryId)
+            .OrderByDescending(h => h.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<Inventory> CreateInventoryAsync(Inventory inventory)
+    {
+        _context.Inventories.Add(inventory);
+        await _context.SaveChangesAsync();
+        return inventory;
+    }
+
+    public async Task AddInventoryHistoryAsync(long inventoryId, int changeQty, string reason)
     {
         var history = new InventoryHistory
         {

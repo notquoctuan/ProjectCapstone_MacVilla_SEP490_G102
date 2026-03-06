@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -87,8 +87,19 @@ public class CategoryController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Category>> Create([FromBody] CreateCategoryRequest request)
     {
-        var createdCategory = await _categoryService.CreateCategoryAsync(request.CategoryName, request.ParentCategoryId);
-        return CreatedAtAction(nameof(GetById), new { id = createdCategory.CategoryId }, createdCategory);
+        try
+        {
+            var createdCategory = await _categoryService.CreateCategoryAsync(request.CategoryName, request.ParentCategoryId);
+            return CreatedAtAction(nameof(GetById), new { id = createdCategory.CategoryId }, createdCategory);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -104,13 +115,24 @@ public class CategoryController : ControllerBase
         if (request.ParentCategoryId.HasValue && request.ParentCategoryId.Value == id)
             return BadRequest(new { message = "Danh mục không thể trở thành danh mục cha của chính nó." });
 
-        var category = await _categoryService.UpdateCategoryAsync(id, request.CategoryName, request.ParentCategoryId);
-        if (category == null)
+        try
         {
-            return NotFound();
-        }
+            var category = await _categoryService.UpdateCategoryAsync(id, request.CategoryName, request.ParentCategoryId);
+            if (category == null)
+            {
+                return NotFound();
+            }
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -123,13 +145,20 @@ public class CategoryController : ControllerBase
         if (id <= 0)
             return BadRequest(new { message = "ID danh mục phải lớn hơn 0." });
 
-        var deleted = await _categoryService.DeleteCategoryAsync(id);
-        if (!deleted)
+        try
         {
-            return NotFound();
-        }
+            var deleted = await _categoryService.DeleteCategoryAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>
