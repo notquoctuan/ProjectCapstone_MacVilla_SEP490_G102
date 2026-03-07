@@ -7,8 +7,6 @@ namespace Application.DTOs
     {
         [Required(ErrorMessage = "Tên sản phẩm là bắt buộc.")]
         [StringLength(200, ErrorMessage = "Tên sản phẩm không được vượt quá 200 ký tự.")]
-        [RegularExpression(@"^[^!@#$%^&*()_+=\[{\]};:<>|./?]*$",
-            ErrorMessage = "Tên không được chứa ký tự đặc biệt.")]
         public string Name { get; set; } = null!;
 
         [Required(ErrorMessage = "Giá sản phẩm là bắt buộc.")]
