@@ -6,6 +6,7 @@ namespace Application.Interfaces;
 public interface ICategoryService
 {
     Task<IEnumerable<Category>> GetAllCategoriesAsync();
+    Task<IEnumerable<Category>> GetCategoriesOrderedAsync();
     Task<Category?> GetCategoryByIdAsync(long id);
     Task<Category> CreateCategoryAsync(string categoryName, long? parentCategoryId);
     Task<Category?> UpdateCategoryAsync(long id, string categoryName, long? parentCategoryId);

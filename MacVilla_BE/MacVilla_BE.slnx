@@ -10,4 +10,5 @@
   <Folder Name="/PresentationLayer/">
     <Project Path="Presentation/Presentation.csproj" />
   </Folder>
+  <Project Path="Macvilla.Tests/Macvilla.Tests.csproj" />
 </Solution>

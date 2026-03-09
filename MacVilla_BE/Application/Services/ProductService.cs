@@ -30,7 +30,7 @@ namespace Application.Services
             var category = await _categoryRepo.GetByIdAsync(request.CategoryId)
                 ?? throw new KeyNotFoundException($"Danh mục ID {request.CategoryId} không tồn tại.");
 
-            if (await _productRepo.ExistsByNameAsync(request.Name))
+            if (await _productRepo.ExistsByNameAsync(request.Name, null))
                 throw new InvalidOperationException($"Sản phẩm '{request.Name}' đã tồn tại.");
 
             var imageFiles = request.ImageFiles ?? new List<IFormFile>();

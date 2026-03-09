@@ -53,7 +53,7 @@ public class OrderService : IOrderService
     {
         if (!ValidStatuses.Contains(request.Status))
             throw new ArgumentException(
-                $"Trạng thái không hợp lệ. Các trạng thái được phép: {string.Join(", ", ValidStatuses)}");
+                $"Invalid status '{request.Status}'. Allowed: {string.Join(", ", ValidStatuses)}");
 
         // Transaction qua IOrderRepository — không cần inject DbContext vào Application layer
         await using var transaction = await _orderRepository.BeginTransactionAsync();
@@ -67,8 +67,8 @@ public class OrderService : IOrderService
 
             if (!IsValidStatusTransition(oldStatus, newStatus))
                 throw new InvalidOperationException(
-                    $"Không thể chuyển từ '{oldStatus}' sang '{newStatus}'. " +
-                    $"Các chuyển trạng thái hợp lệ: {GetValidTransitions(oldStatus)}");
+                    $"Cannot transition from '{oldStatus}' to '{newStatus}'. " +
+                    $"Valid transitions: {GetValidTransitions(oldStatus)}");
 
             await HandleInventoryOnStatusChange(order, oldStatus, newStatus);
 
@@ -95,7 +95,7 @@ public class OrderService : IOrderService
             if (order == null) return false;
 
             if (order.Status == "Completed")
-                throw new InvalidOperationException("Không thể huỷ đơn hàng đã hoàn thành.");
+                throw new InvalidOperationException("Cannot cancel a completed order.");
 
             if (order.Status == "Cancelled")
             {
@@ -203,9 +203,10 @@ public class OrderService : IOrderService
                 .OrderByDescending(p => p.PaidAt).FirstOrDefault()?.PaidAt,
             IsProcessing = order.Status == "Processing",
             ProcessingStartedAt = order.Status == "Processing" ? order.CreatedAt : null,
-            IsShipped = order.Status == "Shipped",
+            IsShipped = order.Status == "Shipped" || order.Status == "Completed",
             ShippedAt = order.Shippings?.OrderByDescending(s => s.DeliveredDate).FirstOrDefault()?.DeliveredDate,
-            IsDelivered = order.Status == "Completed",
+            IsDelivered = order.Status == "Completed"
+                || (order.Shippings?.Any(s => s.Status == "Delivered") ?? false),
             DeliveredAt = order.Shippings?.Where(s => s.Status == "Delivered")
                 .OrderByDescending(s => s.DeliveredDate).FirstOrDefault()?.DeliveredDate,
             IsCancelled = order.Status == "Cancelled"
@@ -267,7 +268,7 @@ public class OrderService : IOrderService
 
             if (!success)
                 throw new InvalidOperationException(
-                    $"Không đủ tồn kho cho sản phẩm ID {item.ProductId}. Không thể xử lý đơn {order.OrderId}.");
+                    $"Insufficient inventory for product ID {item.ProductId}. Cannot process order {order.OrderId}.");
         }
     }
 
