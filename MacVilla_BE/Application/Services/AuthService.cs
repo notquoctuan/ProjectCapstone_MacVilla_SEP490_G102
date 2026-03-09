@@ -1,51 +1,86 @@
 ﻿using Application.DTOs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Application.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
 
 namespace Application.Services;
 
-public class AuthService
+public class AuthService : IAuthService
 {
-    private readonly IConfiguration _config;
+    private readonly IUserRepository _userRepo;
+    private readonly ITokenService _tokenService;
 
-    public AuthService(IConfiguration config) => _config = config;
-
-    public string? Authenticate(LoginRequest request)
+    public AuthService(IUserRepository userRepo, ITokenService tokenService)
     {
-        var adminUser = _config["AdminAccount:Email"];
-        var adminPass = _config["AdminAccount:Password"];
-
-        // Kiểm tra với tài khoản Admin trong appsettings
-        if (request.Email == adminUser && request.Password == adminPass)
-        {
-            return GenerateJwtToken(adminUser, "Admin");
-        }
-
-        return null; // Sai tài khoản/mật khẩu
+        _userRepo = userRepo;
+        _tokenService = tokenService;
     }
 
-    private string GenerateJwtToken(string username, string role)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role) // Gắn Role Admin vào đây
-        };
+        // 1. Validate input thủ công (bổ sung thêm ngoài DataAnnotations)
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("Email không được để trống.");
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        if (string.IsNullOrWhiteSpace(request.Password))
+            throw new ArgumentException("Mật khẩu không được để trống.");
 
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.Now.AddHours(8),
-            signingCredentials: creds
+        // 2. Tìm user theo email
+        var user = await _userRepo.GetByEmailAsync(request.Email.Trim().ToLower())
+                   ?? throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng.");
+
+        // 3. Kiểm tra trạng thái tài khoản
+        if (user.Status?.ToLower() != "active")
+            throw new UnauthorizedAccessException("Tài khoản đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
+
+        // 4. Lấy password hash
+        var credential = await _userRepo.GetCredentialAsync(user.UserId)
+                         ?? throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng.");
+
+        // 5. Verify BCrypt
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, credential.PasswordHash))
+            throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng.");
+
+        // 6. Generate JWT
+        var token = _tokenService.GenerateToken(user);
+
+        return new LoginResponse(
+            user.UserId,
+            user.Email,
+            user.FullName ?? "",
+            user.Role ?? "",
+            token
+        );
+    }
+
+    public async Task<LoginResponse> CreateAdminAsync(CreateAdminRequest request)
+    {
+        // Kiểm tra email đã tồn tại chưa
+        var existing = await _userRepo.GetByEmailAsync(request.Email.Trim().ToLower());
+        if (existing is not null)
+            throw new InvalidOperationException($"Email '{request.Email}' đã tồn tại.");
+
+        // Tạo user + credential
+        var user = await _userRepo.CreateUserAsync(
+            new User
+            {
+                Email = request.Email.Trim().ToLower(),
+                FullName = request.FullName.Trim(),
+                Role = request.Role,
+                Status = "Active",
+                CreatedAt = DateTime.UtcNow
+            },
+            BCrypt.Net.BCrypt.HashPassword(request.Password)
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var token = _tokenService.GenerateToken(user);
+
+        return new LoginResponse(
+            user.UserId,
+            user.Email,
+            user.FullName ?? "",
+            user.Role ?? "",
+            token
+        );
     }
 }

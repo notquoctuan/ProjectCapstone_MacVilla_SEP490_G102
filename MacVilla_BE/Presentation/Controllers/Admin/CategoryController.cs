@@ -9,7 +9,7 @@ namespace Presentation.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/[controller]")]
-//[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -174,10 +174,10 @@ public class CategoryController : ControllerBase
         var success = await _categoryService.ActivateCategoryAsync(id);
         if (!success)
         {
-            return NotFound(new { message = "Category not found." });
+            return NotFound(new { message = "Category không tìm thấy." });
         }
 
-        return Ok(new { message = "Category activated successfully." });
+        return Ok(new { message = "Danh mục đã được kích hoạt thành công." });
     }
 
     /// <summary>
@@ -193,9 +193,9 @@ public class CategoryController : ControllerBase
         var success = await _categoryService.DeactivateCategoryAsync(id);
         if (!success)
         {
-            return NotFound(new { message = "Category not found." });
+            return NotFound(new { message = "Category không tìm thấy." });
         }
 
-        return Ok(new { message = "Category deactivated successfully." });
+        return Ok(new { message = "Danh mục đã được vô hiệu hóa thành công." });
     }
 }

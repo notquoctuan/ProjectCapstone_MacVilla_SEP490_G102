@@ -1,12 +1,7 @@
 ﻿@page
-@model IndexModel
-@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor HttpContextAccessor
 @{
     Layout = null;
-    var token = HttpContextAccessor.HttpContext?.Session.GetString("JWToken");
 }
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>

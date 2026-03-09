@@ -1,82 +1,75 @@
 using System.Net.Http.Headers;
-using MacVilla_Web.DTOs;
+using MacVilla_Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MacVilla_Web.Pages.Admin.Categories;
-
-public class CreateModel : PageModel
+namespace MacVilla_Web.Pages.Admin.Categories
 {
-    private readonly IHttpClientFactory _clientFactory;
-
-    public CreateModel(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
-
-    [BindProperty]
-    public CreateCategoryRequest CreateRequest { get; set; } = new();
-
-    public List<Category>? ParentCategories { get; set; }
-    public string? ErrorMessage { get; set; }
-
-    public async Task OnGetAsync()
+    public class CreateModel : PageModel
     {
-        await LoadParentCategoriesAsync();
-    }
+        private readonly IHttpClientFactory _clientFactory;
+        public CreateModel(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (string.IsNullOrWhiteSpace(CreateRequest.CategoryName))
+        [BindProperty]
+        public CreateCategoryRequest CreateRequest { get; set; } = new();
+        public List<Category>? ParentCategories { get; set; }
+        public string? ErrorMessage { get; set; }
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            ModelState.AddModelError("CreateRequest.CategoryName", "Tên danh mục không được để trống.");
+            var token = GetToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
             await LoadParentCategoriesAsync();
             return Page();
         }
 
-        var client = CreateAuthenticatedClient();
-        var response = await client.PostAsJsonAsync("api/admin/Category", CreateRequest);
-
-        if (response.IsSuccessStatusCode)
+        public async Task<IActionResult> OnPostAsync()
         {
-            TempData["Message"] = "Thêm danh mục thành công.";
-            return RedirectToPage("Index");
+            var token = GetToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
+
+            if (string.IsNullOrWhiteSpace(CreateRequest.CategoryName))
+            {
+                ModelState.AddModelError("CreateRequest.CategoryName", "Tên danh mục không được để trống.");
+                await LoadParentCategoriesAsync();
+                return Page();
+            }
+
+            var client = CreateAuthenticatedClient(token);
+            var response = await client.PostAsJsonAsync("api/admin/category", CreateRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Message"] = "Thêm danh mục thành công.";
+                return RedirectToPage("Index");
+            }
+
+            ErrorMessage = "Không thể tạo danh mục. Vui lòng thử lại.";
+            await LoadParentCategoriesAsync();
+            return Page();
         }
 
-        // Cố gắng đọc thông báo lỗi chi tiết từ API (ví dụ: tên danh mục trùng)
-        var error = await response.Content.ReadFromJsonAsync<SimpleErrorResponse>();
-        ErrorMessage = !string.IsNullOrEmpty(error?.Message)
-            ? error!.Message
-            : "Không thể tạo danh mục. Vui lòng thử lại.";
-        await LoadParentCategoriesAsync();
-        return Page();
-    }
+        private async Task LoadParentCategoriesAsync()
+        {
+            var token = GetToken() ?? "";
+            var client = CreateAuthenticatedClient(token);
+            var response = await client.GetAsync("api/admin/category?pageNumber=1&pageSize=1000");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<MacVilla_Web.Models.PagedResponse<Category>>();
+                ParentCategories = result?.Data?.Where(c => !c.ParentCategoryId.HasValue).ToList() ?? new();
+            }
+            else ParentCategories = new List<Category>();
+        }
 
-    private async Task LoadParentCategoriesAsync()
-    {
-        var client = CreateAuthenticatedClient();
-        var response = await client.GetAsync("api/admin/Category?pageNumber=1&pageSize=1000");
-        if (response.IsSuccessStatusCode)
-        {
-            var result = await response.Content.ReadFromJsonAsync<PagedResponse<Category>>();
-            // Chỉ lấy các danh mục gốc (không có danh mục cha) để hiển thị trong dropdown "Danh mục cha"
-            ParentCategories = result?.Data?
-                .Where(c => !c.ParentCategoryId.HasValue)
-                .ToList()
-                ?? new List<Category>();
-        }
-        else
-        {
-            ParentCategories = new List<Category>();
-        }
-    }
+        private string? GetToken() => Request.Cookies["jwt"] ?? HttpContext.Session.GetString("JWToken");
 
-    private HttpClient CreateAuthenticatedClient()
-    {
-        var client = _clientFactory.CreateClient("MacVillaAPI");
-        var token = HttpContext.Session.GetString("JWToken");
-        if (!string.IsNullOrEmpty(token))
+        private HttpClient CreateAuthenticatedClient(string token)
         {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var client = _clientFactory.CreateClient("MacVillaAPI");
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return client;
         }
-        return client;
     }
 
     private class SimpleErrorResponse

@@ -7,7 +7,7 @@ namespace Presentation.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/[controller]")]
-//[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;

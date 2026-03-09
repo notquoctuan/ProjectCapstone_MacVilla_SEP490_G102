@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTOs;
 
 namespace Application.Interfaces
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserAdminResponse>> GetAllUsersAsync();
+        Task<PagedResponse<UserListResponse>> GetPagedUsersAsync(UserSearchRequest request);
+        Task<UserDetailResponse?> GetUserDetailAsync(long id);
+        Task<UserListResponse> CreateUserAsync(CreateUserRequest request);
+        Task UpdateUserAsync(long id, UpdateUserRequest request);
+        Task ChangeStatusAsync(long id, ChangeUserStatusRequest request);
+        Task ResetPasswordAsync(long id, ResetPasswordRequest request);
+        Task DeleteUserAsync(long id);
     }
 }

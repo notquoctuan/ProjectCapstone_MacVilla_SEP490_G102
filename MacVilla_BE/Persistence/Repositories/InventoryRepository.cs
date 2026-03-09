@@ -1,4 +1,4 @@
-using Domain.Entities;
+﻿using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
@@ -27,41 +27,45 @@ namespace Persistence.Repositories;
         return inventory;
     }
 
+    /// <summary>
+    /// Giảm tồn kho bằng atomic UPDATE để tránh race condition.
+    /// Dùng raw SQL: UPDATE inventory SET quantity = quantity - @qty
+    ///               WHERE product_id = @id AND quantity >= @qty
+    /// Kiểm tra rowsAffected > 0 để xác nhận thành công.
+    /// </summary>
     public async Task<bool> ReduceInventoryAsync(long productId, int quantity, string? reason = null)
     {
+        // Atomic UPDATE — tránh read-modify-write race condition
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE inventory SET quantity = quantity - {0} WHERE product_id = {1} AND quantity >= {0}",
+            quantity, productId);
+
+        if (rowsAffected == 0)
+            return false; // Không đủ hàng hoặc không tồn tại
+
+        // Ghi lịch sử sau khi update thành công
         var inventory = await GetInventoryByProductIdAsync(productId);
-        if (inventory == null)
-        {
-            return false;
-        }
-
-        if (inventory.Quantity < quantity)
-        {
-            return false; // Insufficient stock
-        }
-
-        inventory.Quantity -= quantity;
-        await UpdateInventoryAsync(inventory);
-
-        // Track inventory history
-        await AddInventoryHistoryAsync(inventory.InventoryId, -quantity, reason ?? "Order processing");
+        if (inventory != null)
+            await AddInventoryHistoryAsync(inventory.InventoryId, -quantity, reason ?? "Order processing");
 
         return true;
     }
 
+    /// <summary>
+    /// Khôi phục tồn kho khi huỷ đơn (cũng atomic để nhất quán).
+    /// </summary>
     public async Task<bool> RestoreInventoryAsync(long productId, int quantity, string? reason = null)
     {
-        var inventory = await GetInventoryByProductIdAsync(productId);
-        if (inventory == null)
-        {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE inventory SET quantity = quantity + {0} WHERE product_id = {1}",
+            quantity, productId);
+
+        if (rowsAffected == 0)
             return false;
-        }
 
-        inventory.Quantity += quantity;
-        await UpdateInventoryAsync(inventory);
-
-        // Track inventory history
-        await AddInventoryHistoryAsync(inventory.InventoryId, quantity, reason ?? "Order cancellation");
+        var inventory = await GetInventoryByProductIdAsync(productId);
+        if (inventory != null)
+            await AddInventoryHistoryAsync(inventory.InventoryId, quantity, reason ?? "Order cancellation");
 
         return true;
     }
@@ -123,7 +127,7 @@ namespace Persistence.Repositories;
             InventoryId = inventoryId,
             ChangeQty = changeQty,
             Reason = reason,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.InventoryHistories.Add(history);

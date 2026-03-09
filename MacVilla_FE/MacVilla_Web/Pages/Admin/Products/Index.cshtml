@@ -1,166 +1,204 @@
-@page
-@model MacVilla_Web.Pages.Admin.Products.IndexModel
+﻿@page "/Admin/Products"
 @{
-    Layout = "_AdminLayout";
-    ViewData["Title"] = "Quản lý sản phẩm";
+    Layout = "_AdminLayout"; ViewData["Title"] = "Sản phẩm";
 }
 
-@section Styles {
-    <style>
-        /* Button & Card Styles */
-        .btn-mv {
-            background-color: var(--mv-green-dark);
-            color: white;
-        }
-
-            .btn-mv:hover {
-                background-color: #6a8900;
-                color: white;
-            }
-
-        .product-card-item {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid #eee;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .product-thumb {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .text-mv-green {
-            color: var(--mv-green-dark) !important;
-        }
-
-        @@media (max-width: 992px) {
-            .admin-sidebar {
-                margin-left: -var(--sidebar-width);
-            }
-
-            .admin-wrapper, .admin-footer {
-                margin-left: 0;
-            }
-        }
-    </style>
-}
-
-<div>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 class="fw-bold m-0">Danh sách sản phẩm</h3>
-                <p class="text-muted small mb-0">Quản lý và cập nhật thông tin sản phẩm của hệ thống MacVilla</p>
-            </div>
-            <a class="btn btn-mv px-4 shadow-sm" asp-page="/Admin/Products/Create">
-                <i class="bi bi-plus-lg me-1"></i> Thêm mới
-            </a>
-        </div>
-
-        @* PHẦN NỘI DUNG LỌC VÀ DANH SÁCH GIỮ NGUYÊN NHƯ CODE CŨ CỦA BẠN NHƯNG ĐƯỢC BAO TRONG CLASS ĐÃ ĐỒNG BỘ *@
-        <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-end">
-                <form method="get" class="d-flex align-items-center bg-white px-3 py-2 rounded shadow-sm border" style="min-width: 300px;">
-                    <input type="hidden" name="Name" value="@Model.Name" />
-                    <input type="hidden" name="CategoryName" value="@Model.CategoryName" />
-                    <label class="small fw-bold text-muted me-2 mb-0" style="white-space:nowrap;">Sắp xếp:</label>
-                    <select asp-for="SortOrder" class="form-select form-select-sm border-0 fw-bold text-mv-green" onchange="this.form.submit()" style="box-shadow: none;">
-                        <option value="">Mặc định</option>
-                        <option value="price_asc">Giá từ thấp tới cao</option>
-                        <option value="price_desc">Giá từ cao tới thấp</option>
-                    </select>
-                </form>
-        </div>
+<div class="mv-page-header d-flex justify-content-between align-items-start">
+    <div><h1>Quản lý sản phẩm</h1><p>Thêm, chỉnh sửa và quản lý trạng thái sản phẩm</p></div>
+    <a href="/Admin/Products/Create" class="btn-primary-mv" style="display:flex;align-items:center;gap:6px;text-decoration:none;">
+        <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+    </a>
 </div>
 
-        <div class="row g-4">
-            <div class="col-lg-3">
-                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 90px; z-index: 100; border-radius: 12px;">
-                    <h6 class="fw-bold mb-3"><i class="bi bi-filter-left me-1"></i> Tùy chọn lọc</h6>
-                    <form method="get">
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted mb-1">Tên sản phẩm</label>
-                            <input type="text" asp-for="Name" class="form-control form-control-sm border-light bg-light" placeholder="Tìm kiếm nhanh...">
-                        </div>
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted mb-1">Danh mục sản phẩm</label>
-                            <select asp-for="CategoryName" class="form-select form-select-sm border-light bg-light">
-                                <option value="">-- Tất cả sản phẩm --</option>
-                                @foreach (var cat in Model.Categories)
-                                {
-                                    <option value="@cat.Name">@cat.Name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-dark btn-sm py-2">Áp dụng bộ lọc</button>
-                            <a asp-page="./Index" class="btn btn-outline-secondary btn-sm py-2">Thiết lập lại</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<!-- Search -->
+<div class="search-bar">
+    <div class="form-group" style="flex:2;min-width:180px;">
+        <label class="form-label-mv">Tên sản phẩm</label>
+        <input type="text" id="f-name" class="form-control-mv" placeholder="Tìm kiếm...">
+    </div>
+    <div class="form-group" style="flex:1;min-width:140px;">
+        <label class="form-label-mv">Danh mục</label>
+        <select id="f-catId" class="form-select-mv"><option value="">Tất cả</option></select>
+    </div>
+    <div class="form-group" style="flex:1;min-width:120px;">
+        <label class="form-label-mv">Trạng thái</label>
+        <select id="f-status" class="form-select-mv">
+            <option value="">Tất cả</option>
+            <option value="Enable">Enable</option>
+            <option value="Disable">Disable</option>
+            <option value="Pending">Pending</option>
+        </select>
+    </div>
+    <div class="form-group" style="flex:1;min-width:120px;">
+        <label class="form-label-mv">Sắp xếp</label>
+        <select id="f-sort" class="form-select-mv">
+            <option value="">Mới nhất</option>
+            <option value="price_asc">Giá tăng dần</option>
+            <option value="price_desc">Giá giảm dần</option>
+            <option value="oldest">Cũ nhất</option>
+        </select>
+    </div>
+    <div class="form-group" style="justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:8px;">
+        <button onclick="loadProducts(1)" class="btn-primary-mv"><i class="bi bi-search"></i> Tìm</button>
+        <button onclick="resetFilter()" class="btn-outline-mv">Đặt lại</button>
+    </div>
+</div>
 
-            <div class="col-lg-9">
-                @if (Model.PagedProducts?.Data != null && Model.PagedProducts.Data.Any())
-                {
-                    foreach (var item in Model.PagedProducts.Data)
-                    {
-                        <div class="product-card-item d-flex align-items-center shadow-sm">
-                            <img src="https://localhost:7262@(item.ImageUrl)" class="product-thumb me-4 shadow-sm" onerror="this.src='https://placehold.co/80x80?text=MacVilla'">
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center mb-1">
-                                    <span class="badge bg-light text-success border border-success-subtle fw-normal me-2" style="font-size: 0.75rem;">@item.CategoryName</span>
-                                </div>
-                                <h5 class="fw-bold mb-1 text-dark">@item.Name</h5>
-                                <div class="text-mv-green fw-bold fs-5">@item.Price.ToString("N0") đ</div>
-                            </div>
-                            <div class="text-end">
-                                <div class="mb-3">
-                                    <span class="badge @(item.Status == "Enable" ? "bg-success" : "bg-secondary") rounded-pill px-3">@item.Status</span>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <a asp-page="./Details" asp-route-id="@item.ProductId" class="btn btn-sm btn-outline-info me-1" title="Xem chi tiết">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a class="btn btn-outline-warning btn-sm px-3" asp-page="./Edit" asp-route-id="@item.ProductId">
-                                        <i class="bi bi-pencil-square me-1"></i> Sửa
-                                    </a>
-                                    <button class="btn btn-outline-danger btn-sm px-2">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
-                        <i class="bi bi-box2 text-muted" style="font-size: 3rem;"></i>
-                        <p class="mt-3 text-muted">Không tìm thấy sản phẩm nào.</p>
-                    </div>
-                }
+<!-- Table -->
+<div class="mv-card">
+    <div class="mv-card-header">
+        <h5 id="tableTitle">Danh sách sản phẩm</h5>
+        <span id="totalCount" style="font-size:.8rem;color:#6b7280;"></span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="mv-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;">Ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th style="width:140px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="productBody">
+                <tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid #f3f4f6;">
+        <div class="mv-pagination" id="pagination"></div>
+    </div>
+</div>
 
-                @* PAGINATION *@
-                <nav class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        @for (int i = 1; i <= (Model.PagedProducts?.TotalPages ?? 0); i++)
-                        {
-                            <li class="page-item @(i == Model.PageNumber ? "active" : "") mx-1">
-                                <a class="page-link rounded shadow-none border-0 px-3 py-2"
-                                   asp-route-PageNumber="@i"
-                                   asp-route-Name="@Model.Name"
-                                   asp-route-CategoryName="@Model.CategoryName"
-                                   asp-route-SortOrder="@Model.SortOrder"
-                                   style="@(i == Model.PageNumber ? "background-color: var(--mv-green-dark); color: white;" : "color: var(--mv-green-dark); background: white;")">@i</a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
+<!-- Modal đổi trạng thái -->
+<div class="mv-modal-overlay" id="statusModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Đổi trạng thái sản phẩm</h5><button class="btn-close-mv" onclick="closeModal('statusModal')">&times;</button></div>
+        <div class="mv-modal-body">
+            <input type="hidden" id="sm-id">
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label-mv">Trạng thái mới</label>
+                <select id="sm-status" class="form-select-mv">
+                    <option value="Enable">Enable</option>
+                    <option value="Disable">Disable</option>
+                    <option value="Pending">Pending</option>
+                </select>
             </div>
         </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('statusModal')">Huỷ</button>
+            <button class="btn btn-sm btn-primary-mv px-4" onclick="doChangeStatus()">Lưu</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        const API_BASE = 'https://localhost:7262';
+
+        async function loadCategories() {
+            try {
+                const r = await apiFetch('/api/admin/category/getall');
+                const cats = await r.json();
+                const sel = document.getElementById('f-catId');
+                cats.forEach(c => sel.innerHTML += `<option value="${c.CategoryId}">${c.Name}</option>`);
+            } catch(e) {}
+        }
+
+        async function loadProducts(page = 1) {
+            currentPage = page;
+            const name = document.getElementById('f-name').value;
+            const catId = document.getElementById('f-catId').value;
+            const status = document.getElementById('f-status').value;
+            const sort = document.getElementById('f-sort').value;
+            const params = new URLSearchParams({ PageNumber: page, PageSize: 12, ...(name&&{Name:name}), ...(catId&&{CategoryId:catId}), ...(status&&{Status:status}), ...(sort&&{SortOrder:sort}) });
+
+            document.getElementById('productBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr>';
+            try {
+                const r = await apiFetch('/api/admin/products?' + params);
+                const data = await r.json();
+                const items = data.Data || [];
+                document.getElementById('totalCount').textContent = `${data.TotalCount || 0} sản phẩm`;
+
+                if (!items.length) {
+                    document.getElementById('productBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;"><i class="bi bi-box2" style="font-size:2rem;display:block;margin-bottom:8px;"></i>Không tìm thấy sản phẩm</td></tr>';
+                } else {
+                    document.getElementById('productBody').innerHTML = items.map(p => {
+                        const img = p.ImageUrl ? `${API_BASE}${p.ImageUrl}` : 'https://placehold.co/56x56?text=N/A';
+                        const statusBadge = { Enable: 'badge-enable', Disable: 'badge-disable', Pending: 'badge-pending' };
+                        const date = p.CreatedAt ? new Date(p.CreatedAt).toLocaleDateString('vi-VN') : '---';
+                        return `<tr>
+                            <td><img src="${img}" class="img-thumb" onerror="this.src='https://placehold.co/56x56?text=N/A'"></td>
+                            <td><div style="font-weight:600;font-size:.875rem;">${p.Name||''}</div><div style="color:#9ca3af;font-size:.75rem;">#${p.ProductId}</div></td>
+                            <td><span style="font-size:.8rem;color:#6b7280;">${p.CategoryName||'---'}</span></td>
+                            <td style="font-weight:600;color:#2E7D32;">${(p.Price||0).toLocaleString('vi-VN')}đ</td>
+                            <td><span class="badge-status ${statusBadge[p.Status]||'badge-pending'}">${p.Status||''}</span></td>
+                            <td style="color:#9ca3af;font-size:.8rem;">${date}</td>
+                            <td>
+                                <div style="display:flex;gap:6px;">
+                                    <a href="/Admin/Products/Edit/${p.ProductId}" title="Sửa" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:6px;color:#374151;text-decoration:none;font-size:.85rem;"><i class="bi bi-pencil"></i></a>
+                                    <button title="Đổi trạng thái" onclick="openStatusModal(${p.ProductId},'${p.Status}')" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #dbeafe;border-radius:6px;background:transparent;color:#1d4ed8;cursor:pointer;font-size:.85rem;"><i class="bi bi-arrow-repeat"></i></button>
+                                    <button title="Xoá" onclick="deleteProduct(${p.ProductId},'${(p.Name||'').replace(/'/g,"\\'")}')" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #fee2e2;border-radius:6px;background:transparent;color:#dc2626;cursor:pointer;font-size:.85rem;"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                // Pagination
+                const total = data.TotalPages || 1;
+                let html = '';
+                if (page > 1) html += `<a onclick="loadProducts(${page-1})" href="#">‹</a>`;
+                for (let i = Math.max(1,page-2); i <= Math.min(total,page+2); i++) {
+                    html += i === page ? `<span class="active">${i}</span>` : `<a onclick="loadProducts(${i})" href="#">${i}</a>`;
+                }
+                if (page < total) html += `<a onclick="loadProducts(${page+1})" href="#">›</a>`;
+                document.getElementById('pagination').innerHTML = html;
+            } catch(e) { showToast('Lỗi tải sản phẩm: ' + e.message, 'error'); }
+        }
+
+        function resetFilter() {
+            document.getElementById('f-name').value = '';
+            document.getElementById('f-catId').value = '';
+            document.getElementById('f-status').value = '';
+            document.getElementById('f-sort').value = '';
+            loadProducts(1);
+        }
+
+        function openStatusModal(id, current) {
+            document.getElementById('sm-id').value = id;
+            document.getElementById('sm-status').value = current;
+            openModal('statusModal');
+        }
+
+        async function doChangeStatus() {
+            const id = document.getElementById('sm-id').value;
+            const status = document.getElementById('sm-status').value;
+            try {
+                const r = await apiFetch(`/api/admin/products/${id}/status`, { method: 'PATCH', body: JSON.stringify({ Status: status }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('statusModal');
+                showToast('Đã cập nhật trạng thái', 'success');
+                loadProducts(currentPage);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
+
+        async function deleteProduct(id, name) {
+            confirmModal('Xác nhận xoá', `Bạn chắc chắn muốn xoá sản phẩm <strong>${name}</strong>? Hành động này không thể hoàn tác.`, async () => {
+                try {
+                    const r = await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+                    if (!r.ok) throw new Error((await r.json()).message);
+                    showToast('Xoá sản phẩm thành công', 'success');
+                    loadProducts(currentPage);
+                } catch(e) { showToast(e.message, 'error'); }
+            });
+        }
+
+        loadCategories();
+        loadProducts(1);
+    </script>
+}

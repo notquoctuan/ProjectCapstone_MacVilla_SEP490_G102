@@ -1,264 +1,281 @@
-﻿@page
+﻿@page "/Auth/Login"
 @model MacVilla_Web.Pages.Auth.LoginModel
 @{
-    ViewData["Title"] = "MacVilla";
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>Đăng nhập - MacVilla Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            height: 100%;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
         }
 
-        /* 1. NỀN SLIDESHOW */
-        .full-slideshow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            background-color: #f8f9fa; /* Nền sáng dự phòng */
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 40%, #388E3C 100%);
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Giảm độ tối overlay để ảnh trông sáng hơn (0.2 thay vì 0.4) */
-            background: rgba(0, 0, 0, 0.2);
-            z-index: -1;
+        .login-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #fff;
         }
 
-        .slide-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            z-index: 1;
-            transition: opacity 2s ease-in-out, transform 8s linear;
-            transform: scale(1);
-        }
-
-            .slide-img.active {
-                opacity: 1;
-                z-index: 3;
-                transform: scale(1.1);
+            .login-left h1 {
+                font-size: 2.8rem;
+                font-weight: 700;
+                letter-spacing: -1px;
             }
 
-            .slide-img.last-active {
-                opacity: 1;
-                z-index: 2;
+            .login-left p {
+                font-size: 1rem;
+                opacity: .75;
+                margin-top: 10px;
+                max-width: 320px;
+                text-align: center;
             }
 
-        /* 2. LOGO TRANG CHỦ */
-        .logo-home {
-            position: absolute;
-            top: 30px;
-            left: 50px;
-            z-index: 1001;
-            background: none !important;
-            border: none !important;
+        .login-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: .9;
         }
 
-            .logo-home img {
-                height: 60px;
-                width: auto;
-                background-color: transparent !important;
-                filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-            }
-
-        /* 3. NỘI DUNG CHÍNH */
-        .main-content {
-            height: 100vh;
+        .login-right {
+            width: 480px;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 60px 48px;
         }
 
-        .login-container {
+        .login-form {
             width: 100%;
-            max-width: 1150px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
         }
 
-        .brand-section {
-            flex: 1.2;
-            padding-right: 80px;
-            color: white;
-            text-shadow: 2px 4px 12px rgba(0,0,0,0.6); /* Tăng shadow để chữ nổi trên nền sáng */
-        }
-
-            .brand-section h1 {
-                font-size: 5.5rem;
-                font-weight: 800;
-                margin-bottom: 10px;
+            .login-form h2 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1a1a2e;
+                margin-bottom: 6px;
             }
 
-            .brand-section p {
-                font-size: 2.2rem;
+            .login-form .subtitle {
+                color: #6b7280;
+                font-size: .875rem;
+                margin-bottom: 32px;
+            }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: .8rem;
                 font-weight: 600;
-                color: #90EE90;
+                color: #374151;
+                margin-bottom: 6px;
             }
 
-        .login-card {
-            background: rgba(255, 255, 255, 0.95); /* Thêm chút trong suốt cho card thêm sang */
-            padding: 45px 40px;
-            border-radius: 12px;
-            width: 420px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-            .login-card .form-control {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                border: 1px solid #ddd;
-                height: 45px;
+            .form-group input {
+                width: 100%;
+                padding: 11px 14px;
+                border: 1.5px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: .9rem;
+                font-family: inherit;
+                transition: border-color .15s, box-shadow .15s;
+                background: #fafafa;
             }
 
-        .btn-custom {
-            background-color: #cc0000;
-            color: white;
-            font-weight: bold;
+                .form-group input:focus {
+                    outline: none;
+                    border-color: #4CAF50;
+                    box-shadow: 0 0 0 3px rgba(76,175,80,.12);
+                    background: #fff;
+                }
+
+        .btn-login {
+            width: 100%;
             padding: 12px;
+            background: #2E7D32;
+            color: #fff;
             border: none;
-            transition: 0.3s;
+            border-radius: 8px;
+            font-size: .95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s;
+            font-family: inherit;
+            margin-top: 8px;
         }
 
-            .btn-custom:hover {
-                background-color: #a30000;
-                color: white;
+            .btn-login:hover {
+                background: #1B5E20;
             }
 
-        .btn-google-custom {
-            border: 1px solid #28a745;
-            color: #28a745;
-            background: transparent;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            padding: 10px;
-        }
-
-            .btn-google-custom:hover {
-                background-color: #28a745 !important;
-                color: white !important;
+            .btn-login:disabled {
+                background: #9e9e9e;
+                cursor: not-allowed;
             }
 
-        .link-signup {
-            color: #28a745 !important;
-            font-weight: bold;
-            text-decoration: none;
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: .85rem;
+            color: #dc2626;
+            margin-bottom: 16px;
+            display: none;
         }
 
-        .divider {
-            border-top: 1px solid #eee;
-            text-align: center;
-            margin: 25px 0;
+            .error-box.show {
+                display: block;
+            }
+
+        .input-wrap {
             position: relative;
         }
 
-            .divider span {
-                background: #fff;
-                padding: 0 15px;
-                color: #999;
-                font-size: 0.8rem;
-                position: relative;
-                top: -12px;
+            .input-wrap .eye-btn {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #9ca3af;
+                font-size: 1rem;
             }
+
+        @@media (max-width: 768px) {
+            .login-left {
+                display: none;
+            }
+
+            .login-right {
+                width: 100%;
+                padding: 40px 24px;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <a href="/" class="logo-home">
-        <img src="~/Image/Logo/logo-macvilla.png" alt="MacVilla Logo" />
-    </a>
-
-    <div class="full-slideshow">
-        <div class="slide-img active" style="background-image: url('https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=2070')"></div>
-        <div class="slide-img" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070')"></div>
-        <div class="slide-img" style="background-image: url('https://images.unsplash.com/photo-1620626011761-9963d7521576?q=80&w=2070')"></div>
-        <div class="slide-img" style="background-image: url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070')"></div>
-        <div class="slide-img" style="background-image: url('https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=2070')"></div>
-        <div class="slide-img" style="background-image: url('https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=2070')"></div>
+    <div class="login-left">
+        <div class="login-icon">🌿</div>
+        <h1>MacVilla</h1>
+        <p>Hệ thống quản trị thương mại điện tử — quản lý sản phẩm, đơn hàng, khách hàng và danh mục.</p>
     </div>
-
-    <div class="overlay"></div>
-
-    <div class="main-content">
-        <div class="login-container">
-            <div class="brand-section d-none d-md-block">
-                <h1>MacVilla</h1>
-                <p>Giải pháp thiết bị vệ sinh <br> & nhà bếp hàng đầu Việt Nam</p>
+    <div class="login-right">
+        <div class="login-form">
+            <h2>Chào mừng trở lại</h2>
+            <p class="subtitle">Đăng nhập để truy cập bảng điều khiển</p>
+            <div class="error-box" id="errBox"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="admin@macvilla.vn" autocomplete="email" />
             </div>
-
-            <div class="login-card">
-                <h3 class="text-center mb-4" style="color: #cc0000; font-weight: bold; letter-spacing: 1px;">ĐĂNG NHẬP</h3>
-
-                <form method="post">
-                    <div class="mb-3">
-                        <input asp-for="Input.Email" class="form-control" placeholder="Email của bạn" />
-                    </div>
-                    <div class="mb-4">
-                        <input asp-for="Input.Password" type="password" class="form-control" placeholder="Mật khẩu" />
-                    </div>
-
-                    <button type="submit" class="btn btn-custom w-100 shadow-sm">ĐĂNG NHẬP</button>
-
-                    <div class="text-center mt-3">
-                        <a href="#" style="color: #666; text-decoration: none; font-size: 0.9rem;">Quên mật khẩu?</a>
-                    </div>
-
-                    <div class="divider"><span>HOẶC</span></div>
-
-                    <button type="button" class="btn btn-google-custom w-100 mb-3">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" class="me-2">
-                        Tiếp tục với Google
-                    </button>
-
-                    <div class="text-center mt-4" style="font-size: 0.85rem; color: #555;">
-                        Bạn chưa có tài khoản? <a href="#" class="link-signup">Đăng ký ngay</a>
-                    </div>
-                </form>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+                    <button class="eye-btn" onclick="togglePwd()" type="button" id="eyeBtn">👁</button>
+                </div>
             </div>
+            <button class="btn-login" id="loginBtn" onclick="doLogin()">Đăng nhập</button>
         </div>
     </div>
 
     <script>
-        const slides = document.querySelectorAll('.slide-img');
-        let currentSlide = 0;
-
-        function nextSlide() {
-            if (slides.length < 2) return;
-            const oldSlide = slides[currentSlide];
-            currentSlide = (currentSlide + 1) % slides.length;
-            const newSlide = slides[currentSlide];
-
-            slides.forEach(s => s.classList.remove('last-active'));
-            oldSlide.classList.remove('active');
-            oldSlide.classList.add('last-active');
-            newSlide.classList.add('active');
+        // Lấy CSRF token từ antiforgery (cần cho POST handler)
+        function togglePwd() {
+            const inp = document.getElementById('password');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
         }
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-        // Đổi ảnh sau mỗi 4 giây để trải nghiệm mượt mà hơn với nhiều ảnh
-        setInterval(nextSlide, 4000);
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errBox = document.getElementById('errBox');
+            errBox.classList.remove('show');
+
+            if (!email || !password) {
+                errBox.textContent = 'Vui lòng nhập đầy đủ email và mật khẩu.';
+                errBox.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Đang đăng nhập...';
+
+            try {
+                // 1. Gọi BE để lấy JWT
+                const res = await fetch('https://localhost:7262/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errBox.textContent = data.message || 'Tài khoản hoặc mật khẩu không chính xác.';
+                    errBox.classList.add('show');
+                    return;
+                }
+
+                // BE trả về AccessToken (không phải Token)
+                const token = data.AccessToken;
+                if (!token) {
+                    errBox.textContent = 'Phản hồi không hợp lệ từ máy chủ.';
+                    errBox.classList.add('show');
+                    return;
+                }
+
+                // 2. Lưu vào sessionStorage để JS các trang khác dùng
+                sessionStorage.setItem('jwt', token);
+                sessionStorage.setItem('userName', data.FullName || data.Email || '');
+                sessionStorage.setItem('userRole', data.Role || '');
+
+                // 3. Lưu cookie để server-side Razor có thể đọc
+                document.cookie = `jwt=${token}; path=/; SameSite=Strict`;
+
+                // 4. Gọi server để set HttpContext.Session (cho server-side pages)
+                await fetch('/Auth/Login?handler=SetSession', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token, role: data.Role, name: data.FullName })
+                });
+
+                // 5. Redirect vào Dashboard
+                window.location.href = '/Admin/Dashboard';
+
+            } catch (e) {
+                errBox.textContent = 'Không kết nối được máy chủ. Kiểm tra lại backend (https://localhost:7262).';
+                errBox.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Đăng nhập';
+            }
+        }
     </script>
 </body>
 </html>

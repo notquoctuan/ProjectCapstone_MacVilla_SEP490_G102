@@ -1,48 +1,40 @@
 using System.Net.Http.Headers;
-using MacVilla_Web.DTOs;
+using MacVilla_Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MacVilla_Web.Pages.Admin.Orders;
-
-public class DetailModel : PageModel
+namespace MacVilla_Web.Pages.Admin.Orders
 {
-    private readonly IHttpClientFactory _clientFactory;
-
-    public DetailModel(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
-
-    [BindProperty(SupportsGet = true)]
-    public long Id { get; set; }
-
-    public OrderDetailResponse? Order { get; set; }
-
-    public async Task<IActionResult> OnGetAsync()
+    public class DetailModel : PageModel
     {
-        var client = CreateAuthenticatedClient();
-        var response = await client.GetAsync($"api/admin/Order/{Id}");
-        if (!response.IsSuccessStatusCode)
+        private readonly IHttpClientFactory _clientFactory;
+        public DetailModel(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
+
+        [BindProperty(SupportsGet = true)]
+        public long Id { get; set; }
+        public OrderDetailResponse? Order { get; set; }
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            return NotFound();
+            var token = GetToken();
+            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
+
+            var client = CreateAuthenticatedClient(token);
+            var response = await client.GetAsync($"api/admin/order/{Id}");
+            if (!response.IsSuccessStatusCode) return NotFound();
+
+            Order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>();
+            if (Order == null) return NotFound();
+            return Page();
         }
 
-        Order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>();
-        if (Order == null)
-        {
-            return NotFound();
-        }
+        private string? GetToken() => Request.Cookies["jwt"] ?? HttpContext.Session.GetString("JWToken");
 
-        return Page();
-    }
-
-    private HttpClient CreateAuthenticatedClient()
-    {
-        var client = _clientFactory.CreateClient("MacVillaAPI");
-        var token = HttpContext.Session.GetString("JWToken");
-        if (!string.IsNullOrEmpty(token))
+        private HttpClient CreateAuthenticatedClient(string token)
         {
+            var client = _clientFactory.CreateClient("MacVillaAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return client;
         }
-        return client;
     }
 }
-

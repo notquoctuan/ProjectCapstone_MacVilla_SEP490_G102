@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities;
+﻿using Domain.Entities;
 
 namespace Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllUsersWithRoleAsync();
-        Task<User?> GetByIdAsync(long id);
+        // Auth (giữ nguyên)
+        Task<User?> GetByEmailAsync(string email);
+        Task<UserCredential?> GetCredentialAsync(long userId);
+        Task<User> CreateUserAsync(User user, string passwordHash);
+
+        // User Management
         IQueryable<User> GetQueryable();
-        Task<User> AddAsync(User user); // Thêm mới
-        Task<bool> IsEmailExistsAsync(string email); // Kiểm tra trùng LoginId/Email
-        Task<bool> UpdateStatusAsync(long userId, string newStatus);
+        Task<User?> GetByIdAsync(long id);
+        Task<bool> ExistsByEmailAsync(string email, long? excludeId = null);
+        Task UpdateAsync(User user);
+        Task DeleteAsync(User user);
+        Task<bool> UpdateStatusAsync(long id, string status);
+        Task ResetPasswordAsync(long userId, string newPasswordHash);
     }
 }

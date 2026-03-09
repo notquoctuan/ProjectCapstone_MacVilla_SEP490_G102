@@ -1,157 +1,100 @@
-@page
-@model MacVilla_Web.Pages.Admin.Dashboard.IndexModel
+@page "/Admin/Dashboard"
 @{
-    Layout = "_AdminLayout";
-    ViewData["Title"] = "Bảng điều khiển";
+    Layout = "_AdminLayout"; ViewData["Title"] = "Tổng quan";
 }
 
-@section Styles {
-    <style>
-        /* DASHBOARD SPECIFIC CARDS */
-        .stat-card {
-            border: none;
-            border-radius: 12px;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
+<div class="mv-page-header">
+    <h1>Bảng điều khiển</h1>
+    <p>Tổng quan hệ thống MacVilla</p>
+</div>
 
-            .stat-card:hover {
-                transform: translateY(-5px);
-            }
+<!-- Stat Cards -->
+<div id="statCards" style="display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:28px;">
+    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#15803d;"><i class="bi bi-box-seam"></i></div><div><div class="stat-val" id="s-products">--</div><div class="stat-label">Tổng sản phẩm</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="bi bi-receipt-cutoff"></i></div><div><div class="stat-val" id="s-orders">--</div><div class="stat-label">Tổng đơn hàng</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="bi bi-people"></i></div><div><div class="stat-val" id="s-users">--</div><div class="stat-label">Khách hàng</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fef3c7;color:#d97706;"><i class="bi bi-tags"></i></div><div><div class="stat-val" id="s-cats">--</div><div class="stat-label">Danh mục</div></div></div>
+</div>
 
-    </style>
-}
-
-<div>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 class="fw-bold m-0">Bảng điều khiển tổng quan</h3>
-                <p class="text-muted small mb-0">Chào mừng bạn trở lại hệ thống quản trị MacVilla</p>
-            </div>
-            <span class="badge bg-white text-dark shadow-sm p-2 border">Hôm nay: @DateTime.Now.ToString("dd/MM/yyyy")</span>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+    <!-- Recent Orders -->
+    <div class="mv-card">
+        <div class="mv-card-header">
+            <h5><i class="bi bi-receipt-cutoff me-2" style="color:#2E7D32;"></i>Đơn hàng gần đây</h5>
+            <a href="/Admin/Orders" style="font-size:.8rem;color:#2E7D32;text-decoration:none;">Xem tất cả →</a>
         </div>
-
-        <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="card stat-card bg-mv-green text-white">
-                    <div class="card-body p-4 text-center">
-                        <i class="bi bi-box-seam fs-1 mb-2"></i>
-                        <h6 class="text-uppercase small fw-bold">Tổng sản phẩm</h6>
-                        <h2 class="mb-0 fw-bold">@Model.Data.TotalActiveProducts</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-white border-start border-4 border-warning">
-                    <div class="card-body p-4 text-center">
-                        <i class="bi bi-cart-check fs-1 text-warning mb-2"></i>
-                        <h6 class="text-uppercase small fw-bold text-muted">Đơn hàng mới</h6>
-                        <h2 class="mb-0 fw-bold">@Model.Data.NewOrdersToday</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-white border-start border-4 border-info">
-                    <div class="card-body p-4 text-center">
-                        <i class="bi bi-people fs-1 text-info mb-2"></i>
-                        <h6 class="text-uppercase small fw-bold text-muted">Khách hàng</h6>
-                        <h2 class="mb-0 fw-bold">@Model.Data.TotalCustomers.ToString("N0")</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-white border-start border-4 border-success">
-                    <div class="card-body p-4 text-center">
-                        <i class="bi bi-currency-dollar fs-1 text-success mb-2"></i>
-                        <h6 class="text-uppercase small fw-bold text-muted">Doanh thu tháng</h6>
-                        <h2 class="mb-0 fw-bold">@Model.Data.MonthlyRevenue.ToString("N0")đ</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-header bg-white py-3 fw-bold border-bottom">
-                        <i class="bi bi-graph-up-arrow me-2" style="color: var(--mv-green-dark)"></i> TĂNG TRƯỞNG DOANH THU (7 NGÀY GẦN NHẤT)
-                    </div>
-                    <div class="card-body" style="height: 350px;">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100">
-                    <div class="card-header bg-white py-3 fw-bold border-bottom">
-                        <i class="bi bi-lightning-charge me-2 text-warning"></i> TRẠNG THÁI HỆ THỐNG
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label class="small fw-bold text-muted d-block mb-1">Dung lượng bộ nhớ</label>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-success" style="width: 25%"></div>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="small fw-bold text-muted d-block mb-1">Tiến độ đơn hàng tháng</label>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-primary" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div class="alert alert-light border small">
-                            <i class="bi bi-info-circle me-2"></i> Hệ thống đang hoạt động ổn định.
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="recentOrders" style="padding:0;">
+            <div style="padding:24px;text-align:center;color:#9ca3af;font-size:.85rem;">Đang tải...</div>
         </div>
     </div>
+    <!-- Recent Users -->
+    <div class="mv-card">
+        <div class="mv-card-header">
+            <h5><i class="bi bi-person-plus me-2" style="color:#2E7D32;"></i>Người dùng mới</h5>
+            <a href="/Admin/Users" style="font-size:.8rem;color:#2E7D32;text-decoration:none;">Xem tất cả →</a>
+        </div>
+        <div id="recentUsers" style="padding:0;">
+            <div style="padding:24px;text-align:center;color:#9ca3af;font-size:.85rem;">Đang tải...</div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Lấy dữ liệu từ Backend gửi qua Model
-        const rawData = @Html.Raw(Json.Serialize(Model.Data.RevenueChart));
+        (async function() {
+            if (!getToken()) { window.location.href = '/Auth/Login'; return; }
+            const name = sessionStorage.getItem('userName') || 'Admin';
+            document.querySelectorAll('.admin-name').forEach(el => el.innerHTML = `<i class="bi bi-person-circle me-1"></i> ${name}`);
 
-        // Xử lý dữ liệu cho biểu đồ
-        const labels = rawData.map(item => item.Date);
-        const values = rawData.map(item => item.Value);
+            async function load() {
+                try {
+                    const [pRes, oRes, uRes, cRes] = await Promise.all([
+                        apiFetch('/api/admin/products?PageSize=1'),
+                        apiFetch('/api/admin/order?PageSize=1'),
+                        apiFetch('/api/admin/users?PageSize=1'),
+                        apiFetch('/api/admin/category?PageSize=1')
+                    ]);
+                    const [p, o, u, c] = await Promise.all([pRes.json(), oRes.json(), uRes.json(), cRes.json()]);
+                    document.getElementById('s-products').textContent = p.TotalCount ?? '--';
+                    document.getElementById('s-orders').textContent = o.TotalCount ?? '--';
+                    document.getElementById('s-users').textContent = u.TotalCount ?? '--';
+                    document.getElementById('s-cats').textContent = c.TotalCount ?? '--';
+                } catch(e) { console.error(e); }
 
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Doanh thu (VND)',
-                    data: values,
-                    borderColor: '#7DA100',
-                    backgroundColor: 'rgba(125, 161, 0, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#7DA100'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString('vi-VN') + ' đ';
-                            }
-                        }
-                    }
-                }
+                try {
+                    const oRes = await apiFetch('/api/admin/order?PageSize=8&SortOrder=newest');
+                    const oData = await oRes.json();
+                    const orders = oData.Data || [];
+                    const statusMap = { Pending:'badge-pending', Processing:'badge-processing', Shipped:'badge-shipped', Completed:'badge-completed', Cancelled:'badge-cancelled' };
+                    document.getElementById('recentOrders').innerHTML = orders.length ? `
+                        <table class="mv-table">
+                            <thead><tr><th>#ID</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th></tr></thead>
+                            <tbody>${orders.map(o => `<tr>
+                                <td><a href="/Admin/Orders/Detail/${o.OrderId}" style="color:#2E7D32;font-weight:600;">#${o.OrderId}</a></td>
+                                <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.CustomerName || '---'}</td>
+                                <td style="font-weight:600;">${(o.TotalAmount||0).toLocaleString('vi-VN')}đ</td>
+                                <td><span class="badge-status ${statusMap[o.Status]||'badge-pending'}">${o.Status}</span></td>
+                            </tr>`).join('')}</tbody>
+                        </table>` : '<div style="padding:24px;text-align:center;color:#9ca3af;">Chưa có đơn hàng</div>';
+                } catch(e) {}
+
+                try {
+                    const uRes = await apiFetch('/api/admin/users?PageSize=6');
+                    const uData = await uRes.json();
+                    const users = uData.Data || [];
+                    document.getElementById('recentUsers').innerHTML = users.length ? `
+                        <table class="mv-table">
+                            <thead><tr><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th></tr></thead>
+                            <tbody>${users.map(u => `<tr>
+                                <td style="font-weight:500;">${u.FullName || '---'}</td>
+                                <td style="font-size:.8rem;color:#6b7280;">${u.Email}</td>
+                                <td><span style="font-size:.75rem;">${u.Role||''}</span></td>
+                                <td><span class="badge-status ${u.Status==='Active'?'badge-active':'badge-disable'}">${u.Status}</span></td>
+                            </tr>`).join('')}</tbody>
+                        </table>` : '<div style="padding:24px;text-align:center;color:#9ca3af;">Chưa có người dùng</div>';
+                } catch(e) {}
             }
-        });
+            load();
+        })();
     </script>
 }

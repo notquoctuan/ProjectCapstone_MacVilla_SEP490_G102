@@ -1,0 +1,265 @@
+﻿@page "/Admin/Users"
+@{
+    Layout = "_AdminLayout"; ViewData["Title"] = "Người dùng";
+}
+
+<div class="mv-page-header d-flex justify-content-between align-items-start">
+    <div><h1>Quản lý người dùng</h1><p>Quản lý tài khoản và phân quyền người dùng</p></div>
+    <button onclick="openModal('createModal')" class="btn-primary-mv" style="display:flex;align-items:center;gap:6px;border:none;cursor:pointer;">
+        <i class="bi bi-person-plus"></i> Thêm người dùng
+    </button>
+</div>
+
+<div class="search-bar">
+    <div class="form-group" style="flex:2;">
+        <label class="form-label-mv">Tìm kiếm (Email hoặc họ tên)</label>
+        <input type="text" id="f-kw" class="form-control-mv" placeholder="Nhập email hoặc họ tên...">
+    </div>
+    <div class="form-group" style="flex:1;">
+        <label class="form-label-mv">Vai trò</label>
+        <select id="f-role" class="form-select-mv">
+            <option value="">Tất cả</option>
+            <option value="Admin">Admin</option>
+            <option value="Customer">Customer</option>
+            <option value="Employee">Employee</option>
+        </select>
+    </div>
+    <div class="form-group" style="flex:1;">
+        <label class="form-label-mv">Trạng thái</label>
+        <select id="f-status" class="form-select-mv">
+            <option value="">Tất cả</option>
+            <option value="Active">Active</option>
+            <option value="Disable">Disable</option>
+        </select>
+    </div>
+    <div class="form-group" style="flex-direction:row;align-items:flex-end;gap:8px;">
+        <button onclick="loadUsers(1)" class="btn-primary-mv"><i class="bi bi-search"></i> Tìm</button>
+        <button onclick="resetFilter()" class="btn-outline-mv">Đặt lại</button>
+    </div>
+</div>
+
+<div class="mv-card">
+    <div class="mv-card-header">
+        <h5>Danh sách người dùng</h5>
+        <span id="totalCount" style="font-size:.8rem;color:#6b7280;"></span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="mv-table">
+            <thead>
+                <tr><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Vai trò</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr>
+            </thead>
+            <tbody id="userBody"><tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr></tbody>
+        </table>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid #f3f4f6;">
+        <div class="mv-pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="mv-modal-overlay" id="createModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Thêm người dùng mới</h5><button class="btn-close-mv" onclick="closeModal('createModal')">&times;</button></div>
+        <div class="mv-modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <div><label class="form-label-mv">Họ tên <span style="color:red;">*</span></label><input type="text" id="c-name" class="form-control-mv"></div>
+            <div><label class="form-label-mv">Email <span style="color:red;">*</span></label><input type="email" id="c-email" class="form-control-mv"></div>
+            <div><label class="form-label-mv">Mật khẩu <span style="color:red;">*</span></label><input type="password" id="c-pw" class="form-control-mv" placeholder="Tối thiểu 6 ký tự"></div>
+            <div><label class="form-label-mv">Số điện thoại</label><input type="text" id="c-phone" class="form-control-mv"></div>
+            <div>
+                <label class="form-label-mv">Vai trò</label>
+                <select id="c-role" class="form-select-mv">
+                    <option value="Customer">Customer</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Employee">Employee</option>
+                </select>
+            </div>
+        </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('createModal')">Huỷ</button>
+            <button class="btn btn-sm btn-success px-4" onclick="doCreate()">Tạo tài khoản</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="mv-modal-overlay" id="editModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Chỉnh sửa thông tin</h5><button class="btn-close-mv" onclick="closeModal('editModal')">&times;</button></div>
+        <div class="mv-modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="e-id">
+            <div><label class="form-label-mv">Họ tên <span style="color:red;">*</span></label><input type="text" id="e-name" class="form-control-mv"></div>
+            <div><label class="form-label-mv">Số điện thoại</label><input type="text" id="e-phone" class="form-control-mv"></div>
+            <div>
+                <label class="form-label-mv">Vai trò</label>
+                <select id="e-role" class="form-select-mv">
+                    <option value="Customer">Customer</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Employee">Employee</option>
+                </select>
+            </div>
+        </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('editModal')">Huỷ</button>
+            <button class="btn btn-sm btn-success px-4" onclick="doEdit()">Lưu</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="mv-modal-overlay" id="pwModal">
+    <div class="mv-modal">
+        <div class="mv-modal-header"><h5>Đặt lại mật khẩu</h5><button class="btn-close-mv" onclick="closeModal('pwModal')">&times;</button></div>
+        <div class="mv-modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="pw-id">
+            <div><label class="form-label-mv">Mật khẩu mới <span style="color:red;">*</span></label><input type="password" id="pw-new" class="form-control-mv" placeholder="Tối thiểu 6 ký tự"></div>
+            <div><label class="form-label-mv">Xác nhận mật khẩu <span style="color:red;">*</span></label><input type="password" id="pw-confirm" class="form-control-mv"></div>
+        </div>
+        <div class="mv-modal-footer">
+            <button class="btn btn-sm btn-outline-secondary px-4" onclick="closeModal('pwModal')">Huỷ</button>
+            <button class="btn btn-sm btn-warning px-4" onclick="doResetPw()">Đặt lại</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        const roleColors = { Admin:'#ede9fe;color:#7c3aed', Customer:'#dcfce7;color:#15803d', Employee:'#dbeafe;color:#1d4ed8' };
+
+        async function loadUsers(page = 1) {
+            currentPage = page;
+            const kw = document.getElementById('f-kw').value;
+            const role = document.getElementById('f-role').value;
+            const status = document.getElementById('f-status').value;
+            const params = new URLSearchParams({ PageNumber: page, PageSize: 15, ...(kw&&{Keyword:kw}), ...(role&&{Role:role}), ...(status&&{Status:status}) });
+            document.getElementById('userBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;">Đang tải...</td></tr>';
+            try {
+                const r = await apiFetch('/api/admin/users?' + params);
+                const data = await r.json();
+                document.getElementById('totalCount').textContent = `${data.TotalCount||0} người dùng`;
+                const items = data.Data || [];
+                if (!items.length) {
+                    document.getElementById('userBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#9ca3af;">Không tìm thấy người dùng</td></tr>';
+                } else {
+                    document.getElementById('userBody').innerHTML = items.map(u => {
+                        const rc = roleColors[u.Role] || '#f3f4f6;color:#374151';
+                        const date = u.CreatedAt ? new Date(u.CreatedAt).toLocaleDateString('vi-VN') : '---';
+                        const avatar = u.Avatar ? `<img src="${u.Avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : `<div style="width:32px;height:32px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:#6b7280;">${(u.FullName||u.Email||'?')[0].toUpperCase()}</div>`;
+                        return `<tr>
+                            <td><div style="display:flex;align-items:center;gap:10px;">${avatar}<div style="font-weight:500;">${u.FullName||'---'}</div></div></td>
+                            <td style="font-size:.85rem;color:#6b7280;">${u.Email||''}</td>
+                            <td style="font-size:.85rem;">${u.Phone||'---'}</td>
+                            <td><span style="padding:3px 8px;border-radius:20px;font-size:.75rem;font-weight:500;background:${rc.split(';')[0]};${rc.split(';')[1]||''}">${u.Role||''}</span></td>
+                            <td><span class="badge-status ${u.Status==='Active'?'badge-active':'badge-disable'}">${u.Status}</span></td>
+                            <td style="color:#9ca3af;font-size:.8rem;">${date}</td>
+                            <td>
+                                <div style="display:flex;gap:5px;">
+                                    <button onclick="openEdit(${u.UserId},'${(u.FullName||'').replace(/'/g,"\\'")}','${u.Phone||''}','${u.Role||''}')" title="Sửa" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:6px;background:transparent;cursor:pointer;font-size:.8rem;"><i class="bi bi-pencil"></i></button>
+                                    <button onclick="openPwModal(${u.UserId})" title="Đặt lại mật khẩu" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #fef3c7;border-radius:6px;background:transparent;color:#d97706;cursor:pointer;font-size:.8rem;"><i class="bi bi-key"></i></button>
+                                    <button onclick="toggleStatus(${u.UserId},'${u.Status}')" title="${u.Status==='Active'?'Khoá':'Mở khoá'}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid ${u.Status==='Active'?'#fee2e2':'#dcfce7'};border-radius:6px;background:transparent;color:${u.Status==='Active'?'#dc2626':'#15803d'};cursor:pointer;font-size:.8rem;">
+                                        <i class="bi ${u.Status==='Active'?'bi-lock':'bi-unlock'}"></i>
+                                    </button>
+                                    <button onclick="deleteUser(${u.UserId},'${(u.FullName||u.Email||'').replace(/'/g,"\\'")}',${u.Status==='Active'})" title="Xoá" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #fee2e2;border-radius:6px;background:transparent;color:#dc2626;cursor:pointer;font-size:.8rem;"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
+                const total = data.TotalPages || 1;
+                let html = '';
+                if (page > 1) html += `<a onclick="loadUsers(${page-1})" href="#">‹</a>`;
+                for (let i = Math.max(1,page-2); i <= Math.min(total,page+2); i++) html += i===page ? `<span class="active">${i}</span>` : `<a onclick="loadUsers(${i})" href="#">${i}</a>`;
+                if (page < total) html += `<a onclick="loadUsers(${page+1})" href="#">›</a>`;
+                document.getElementById('pagination').innerHTML = html;
+            } catch(e) { showToast('Lỗi tải người dùng', 'error'); }
+        }
+
+        function resetFilter() { ['f-kw','f-role','f-status'].forEach(id => document.getElementById(id).value=''); loadUsers(1); }
+
+        async function doCreate() {
+            const name = document.getElementById('c-name').value.trim();
+            const email = document.getElementById('c-email').value.trim();
+            const pw = document.getElementById('c-pw').value;
+            const phone = document.getElementById('c-phone').value.trim();
+            const role = document.getElementById('c-role').value;
+            if (!name||!email||!pw) { showToast('Vui lòng điền đủ thông tin bắt buộc', 'error'); return; }
+            if (pw.length < 6) { showToast('Mật khẩu phải ít nhất 6 ký tự', 'error'); return; }
+            try {
+                const r = await apiFetch('/api/admin/users', { method:'POST', body: JSON.stringify({ FullName:name, Email:email, Password:pw, Phone:phone||null, Role:role }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('createModal');
+                ['c-name','c-email','c-pw','c-phone'].forEach(id => document.getElementById(id).value='');
+                showToast('Tạo tài khoản thành công', 'success');
+                loadUsers(1);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
+
+        function openEdit(id, name, phone, role) {
+            document.getElementById('e-id').value = id;
+            document.getElementById('e-name').value = name;
+            document.getElementById('e-phone').value = phone;
+            document.getElementById('e-role').value = role;
+            openModal('editModal');
+        }
+
+        async function doEdit() {
+            const id = document.getElementById('e-id').value;
+            const name = document.getElementById('e-name').value.trim();
+            const phone = document.getElementById('e-phone').value.trim();
+            const role = document.getElementById('e-role').value;
+            if (!name) { showToast('Vui lòng nhập họ tên', 'error'); return; }
+            try {
+                const r = await apiFetch(`/api/admin/users/${id}`, { method:'PUT', body: JSON.stringify({ FullName:name, Phone:phone||null, Role:role }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('editModal');
+                showToast('Cập nhật thành công', 'success');
+                loadUsers(currentPage);
+            } catch(e) { showToast(e.message, 'error'); }
+        }
+
+        function openPwModal(id) { document.getElementById('pw-id').value=id; document.getElementById('pw-new').value=''; document.getElementById('pw-confirm').value=''; openModal('pwModal'); }
+
+        async function doResetPw() {
+            const id = document.getElementById('pw-id').value;
+            const pw = document.getElementById('pw-new').value;
+            const confirm = document.getElementById('pw-confirm').value;
+            if (pw.length < 6) { showToast('Mật khẩu phải ít nhất 6 ký tự', 'error'); return; }
+            if (pw !== confirm) { showToast('Mật khẩu xác nhận không khớp', 'error'); return; }
+            try {
+                const r = await apiFetch(`/api/admin/users/${id}/reset-password`, { method:'PATCH', body: JSON.stringify({ NewPassword:pw, ConfirmPassword:confirm }) });
+                if (!r.ok) throw new Error((await r.json()).message);
+                closeModal('pwModal');
+                showToast('Đặt lại mật khẩu thành công', 'success');
+            } catch(e) { showToast(e.message, 'error'); }
+        }
+
+        async function toggleStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'Active' ? 'Disable' : 'Active';
+            const msg = newStatus === 'Disable' ? 'khoá' : 'mở khoá';
+            confirmModal(`${msg.charAt(0).toUpperCase()+msg.slice(1)} tài khoản`, `Bạn có chắc muốn ${msg} tài khoản này?`, async () => {
+                try {
+                    const r = await apiFetch(`/api/admin/users/${id}/status`, { method:'PATCH', body: JSON.stringify({ Status: newStatus }) });
+                    if (!r.ok) throw new Error((await r.json()).message);
+                    showToast(`Đã ${msg} tài khoản`, 'success');
+                    loadUsers(currentPage);
+                } catch(e) { showToast(e.message, 'error'); }
+            });
+        }
+
+        async function deleteUser(id, name, hasOrders) {
+            if (hasOrders) {
+                // Just try — API will block if has orders
+            }
+            confirmModal('Xoá tài khoản', `Bạn chắc chắn muốn xoá tài khoản <strong>${name}</strong>?`, async () => {
+                try {
+                    const r = await apiFetch(`/api/admin/users/${id}`, { method:'DELETE' });
+                    if (!r.ok) throw new Error((await r.json()).message);
+                    showToast('Đã xoá tài khoản', 'success');
+                    loadUsers(currentPage);
+                } catch(e) { showToast(e.message, 'error'); }
+            });
+        }
+
+        loadUsers(1);
+    </script>
+}
