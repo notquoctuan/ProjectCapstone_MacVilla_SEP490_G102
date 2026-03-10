@@ -53,10 +53,4 @@
         public string? ImageUrl { get; set; }
     }
 
-    public class ProductImageVM
-    {
-        public string ImageUrl { get; set; } = null!;
-        public bool IsMain { get; set; }
-    }
-
 }

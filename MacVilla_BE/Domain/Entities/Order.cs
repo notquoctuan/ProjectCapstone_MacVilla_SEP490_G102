@@ -11,8 +11,8 @@ public class Order
     public decimal? TotalAmount { get; set; }   // DB: DEFAULT NULL
     public string? Status { get; set; }
     public string? Note { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     public virtual User? User { get; set; }
     public virtual ShippingAddress? ShippingAddress { get; set; }

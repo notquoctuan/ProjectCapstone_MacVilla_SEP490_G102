@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
@@ -18,9 +18,8 @@ namespace Persistence.Repositories
             => await _context.Products.CountAsync(p => p.Status == "Enable");
 
         public async Task<int> CountNewOrdersTodayAsync()
-            // Fix: CreatedAt là DateTime (non-nullable), không cần .HasValue/.Value
             => await _context.Orders
-                .CountAsync(o => o.CreatedAt.Date == DateTime.Today);
+                .CountAsync(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Date == DateTime.Today);
 
         public async Task<int> CountTotalCustomersAsync()
             => await _context.Users.CountAsync(u => u.Role == "Customer");
@@ -29,8 +28,9 @@ namespace Persistence.Repositories
         {
             var now = DateTime.Now;
             return await _context.Orders
-                .Where(o => o.CreatedAt.Month == now.Month &&
-                            o.CreatedAt.Year == now.Year &&
+                .Where(o => o.CreatedAt.HasValue &&
+                            o.CreatedAt.Value.Month == now.Month &&
+                            o.CreatedAt.Value.Year == now.Year &&
                             o.Status != "Cancelled")
                 .SumAsync(o => o.TotalAmount ?? 0);
         }
@@ -41,8 +41,8 @@ namespace Persistence.Repositories
 
             // Bước 1: Lấy dữ liệu thô từ Database
             var rawData = await _context.Orders
-                .Where(o => o.CreatedAt >= startDate && o.Status != "Cancelled")
-                .GroupBy(o => o.CreatedAt.Date)
+                .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= startDate && o.Status != "Cancelled")
+                .GroupBy(o => o.CreatedAt!.Value.Date)
                 .Select(g => new
                 {
                     Date = g.Key,
