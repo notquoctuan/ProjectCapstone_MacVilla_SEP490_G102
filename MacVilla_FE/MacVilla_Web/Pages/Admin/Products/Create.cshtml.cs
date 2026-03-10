@@ -1,65 +1,66 @@
 ﻿using MacVilla_Web.Models;
+using MacVilla_Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MacVilla_Web.Pages.Admin.Products
 {
     public class CreateModel : PageModel
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public CreateModel(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
+        private readonly ProductApiService _productService;
 
-        [BindProperty]
-        public ProductCreateRequest Product { get; set; } = new();
-        public List<CategoryVM> Categories { get; set; } = new();
+        public CreateModel(ProductApiService productService)
+            => _productService = productService;
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            var token = GetToken();
-            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
-            var client = CreateAuthenticatedClient(token);
-            Categories = await client.GetFromJsonAsync<List<CategoryVM>>("api/admin/category/getall") ?? new();
-            return Page();
-        }
+        public List<SelectListItem> CategoryOptions { get; set; } = new();
+
+        [BindProperty] public string Name { get; set; } = string.Empty;
+        [BindProperty] public decimal Price { get; set; }
+        [BindProperty] public long CategoryId { get; set; }
+        [BindProperty] public string? Description { get; set; }
+        [BindProperty] public string Status { get; set; } = "Pending";
+        [BindProperty] public List<IFormFile>? ImageFiles { get; set; }
+
+        public string? ErrorMessage { get; set; }
+
+        public async Task OnGetAsync()
+            => await LoadCategoriesAsync();
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var token = GetToken();
-            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
-            var client = CreateAuthenticatedClient(token);
+            var (success, message) = await _productService.CreateProductAsync(
+                Name, Price, CategoryId, Description, Status, ImageFiles);
 
-            using var content = new MultipartFormDataContent();
-            content.Add(new StringContent(Product.Name ?? ""), "Name");
-            content.Add(new StringContent(Product.Price.ToString()), "Price");
-            content.Add(new StringContent(Product.CategoryId.ToString()), "CategoryId");
-            content.Add(new StringContent(Product.Description ?? ""), "Description");
-            content.Add(new StringContent(Product.Status ?? "Pending"), "Status");
-
-            if (Product.ImageFiles != null)
-                foreach (var file in Product.ImageFiles)
-                    content.Add(new StreamContent(file.OpenReadStream()), "ImageFiles", file.FileName);
-
-            var response = await client.PostAsync("api/admin/products", content);
-            if (response.IsSuccessStatusCode)
+            if (success)
             {
-                TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
-                return RedirectToPage("/Admin/Products/Index");
+                TempData["SuccessMessage"] = message;
+                return RedirectToPage("./Index");
             }
 
-            var errorResult = await response.Content.ReadAsStringAsync();
-            ModelState.AddModelError("", $"Lỗi: {errorResult}");
-            Categories = await client.GetFromJsonAsync<List<CategoryVM>>("api/admin/category/getall") ?? new();
+            ErrorMessage = message;
+            await LoadCategoriesAsync();
             return Page();
         }
 
-        private string? GetToken() => Request.Cookies["jwt"] ?? HttpContext.Session.GetString("JWToken");
-
-        private HttpClient CreateAuthenticatedClient(string token)
+        private async Task LoadCategoriesAsync()
         {
-            var client = _httpClientFactory.CreateClient("MacVillaAPI");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return client;
+            var categories = await _productService.GetCategoriesAsync();
+            CategoryOptions = FlattenCategories(categories, 0);
+        }
+
+        private static List<SelectListItem> FlattenCategories(
+            List<CategoryTreeResponse> items, int depth)
+        {
+            var list = new List<SelectListItem>();
+            foreach (var item in items)
+            {
+                list.Add(new SelectListItem(
+                    (depth > 0 ? new string('─', depth) + " " : "") + item.CategoryName,
+                    item.CategoryId.ToString()));
+                list.AddRange(FlattenCategories(item.Children, depth + 1));
+            }
+            return list;
         }
     }
 }

@@ -1,98 +1,90 @@
 ﻿using MacVilla_Web.Models;
+using MacVilla_Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MacVilla_Web.Pages.Admin.Products
 {
     public class EditModel : PageModel
     {
-        private readonly IHttpClientFactory _clientFactory;
-        public EditModel(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
+        private readonly ProductApiService _productService;
 
-        [BindProperty]
-        public ProductUpdateVM UpdateData { get; set; } = new();
-        public List<CategoryVM> Categories { get; set; } = new();
-        public List<ProductImageVM> Images { get; set; } = new();
+        public EditModel(ProductApiService productService)
+            => _productService = productService;
+
+        [BindProperty(SupportsGet = true)] public long Id { get; set; }
+
+        [BindProperty] public string Name { get; set; } = string.Empty;
+        [BindProperty] public decimal Price { get; set; }
+        [BindProperty] public long CategoryId { get; set; }
+        [BindProperty] public string? Description { get; set; }
+        [BindProperty] public string Status { get; set; } = "Pending";
+        [BindProperty] public List<IFormFile>? NewImageFiles { get; set; }
+        [BindProperty] public List<long> DeleteImageIds { get; set; } = new();
+        [BindProperty] public long? MainImageId { get; set; }
+
+        // Dùng ProductImageResponse đúng theo BE
+        public List<ProductImageResponse> ExistingImages { get; set; } = new();
+        public List<SelectListItem> CategoryOptions { get; set; } = new();
         public string? ErrorMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long id)
+        public async Task<IActionResult> OnGetAsync()
         {
-            var token = GetToken();
-            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
-            var client = CreateAuthenticatedClient(token);
+            var product = await _productService.GetProductDetailAsync(Id);
+            if (product is null) return NotFound();
 
-            var productRes = await client.GetAsync($"api/admin/products/{id}");
-            var categoryRes = await client.GetAsync("api/admin/category/getall");
+            Name = product.Name;
+            Price = product.Price;
+            CategoryId = product.CategoryId ?? 0;
+            Description = product.Description;
+            Status = product.Status;
+            ExistingImages = product.Images;
 
-            if (!productRes.IsSuccessStatusCode) return RedirectToPage("/Admin/Products/Index");
-
-            var productDetail = await productRes.Content.ReadFromJsonAsync<ProductDetailVM>();
-            if (productDetail != null)
-            {
-                UpdateData = new ProductUpdateVM
-                {
-                    ProductId = productDetail.ProductId,
-                    Name = productDetail.Name,
-                    Price = productDetail.Price,
-                    Description = productDetail.Description,
-                    Status = productDetail.Status,
-                    CategoryId = productDetail.CategoryId ?? 0,
-                    ImageUrl = productDetail.Images?.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? productDetail.Images?.FirstOrDefault()?.ImageUrl
-                };
-                Images = productDetail.Images ?? new();
-            }
-
-            if (categoryRes.IsSuccessStatusCode)
-                Categories = await categoryRes.Content.ReadFromJsonAsync<List<CategoryVM>>() ?? new();
-
+            await LoadCategoriesAsync();
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(List<IFormFile>? NewImageFiles, string? DeleteImageIds, long? MainImageId)
+        public async Task<IActionResult> OnPostAsync()
         {
-            var token = GetToken();
-            if (string.IsNullOrEmpty(token)) return RedirectToPage("/Auth/Login");
-            var client = CreateAuthenticatedClient(token);
+            var (success, message) = await _productService.UpdateProductAsync(
+                Id, Name, Price, CategoryId, Description, Status,
+                NewImageFiles,
+                DeleteImageIds.Any() ? DeleteImageIds : null,
+                MainImageId);
 
-            using var content = new MultipartFormDataContent();
-            content.Add(new StringContent(UpdateData.Name ?? ""), "Name");
-            content.Add(new StringContent(UpdateData.Price.ToString()), "Price");
-            content.Add(new StringContent(UpdateData.CategoryId.ToString()), "CategoryId");
-            content.Add(new StringContent(UpdateData.Status ?? "Pending"), "Status");
-            content.Add(new StringContent(UpdateData.Description ?? ""), "Description");
-
-            if (NewImageFiles != null)
-                foreach (var file in NewImageFiles)
-                    content.Add(new StreamContent(file.OpenReadStream()), "NewImageFiles", file.FileName);
-
-            if (!string.IsNullOrEmpty(DeleteImageIds))
-                foreach (var idStr in DeleteImageIds.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                    content.Add(new StringContent(idStr.Trim()), "DeleteImageIds");
-
-            if (MainImageId.HasValue)
-                content.Add(new StringContent(MainImageId.Value.ToString()), "MainImageId");
-
-            var response = await client.PutAsync($"api/admin/products/{UpdateData.ProductId}", content);
-            if (response.IsSuccessStatusCode)
+            if (success)
             {
-                TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
-                return RedirectToPage("/Admin/Products/Index");
+                TempData["SuccessMessage"] = message;
+                return RedirectToPage("./Index");
             }
 
-            ErrorMessage = $"Lỗi: {await response.Content.ReadAsStringAsync()}";
-            var categoryRes = await client.GetAsync("api/admin/category/getall");
-            Categories = await categoryRes.Content.ReadFromJsonAsync<List<CategoryVM>>() ?? new();
+            ErrorMessage = message;
+            var product = await _productService.GetProductDetailAsync(Id);
+            ExistingImages = product?.Images ?? new();
+            await LoadCategoriesAsync();
             return Page();
         }
 
-        private string? GetToken() => Request.Cookies["jwt"] ?? HttpContext.Session.GetString("JWToken");
-
-        private HttpClient CreateAuthenticatedClient(string token)
+        private async Task LoadCategoriesAsync()
         {
-            var client = _clientFactory.CreateClient("MacVillaAPI");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return client;
+            var cats = await _productService.GetCategoriesAsync();
+            CategoryOptions = FlattenCategories(cats, 0);
+        }
+
+        private List<SelectListItem> FlattenCategories(
+            List<CategoryTreeResponse> items, int depth)
+        {
+            var list = new List<SelectListItem>();
+            foreach (var item in items)
+            {
+                list.Add(new SelectListItem(
+                    (depth > 0 ? new string('─', depth) + " " : "") + item.CategoryName,
+                    item.CategoryId.ToString(),
+                    item.CategoryId == CategoryId));
+                list.AddRange(FlattenCategories(item.Children, depth + 1));
+            }
+            return list;
         }
     }
 }

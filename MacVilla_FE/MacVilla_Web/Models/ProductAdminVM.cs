@@ -1,7 +1,4 @@
-﻿// =================================================================
-//  MacVilla_Web — Product ViewModels / DTOs
-//  Mirror chính xác Application.DTOs từ BE
-// =================================================================
+﻿
 
 namespace MacVilla_Web.Models
 {
@@ -40,15 +37,6 @@ namespace MacVilla_Web.Models
         public bool IsMain { get; set; }
     }
 
-    // Generic paged response
-    public class PagedResponse<T>
-    {
-        public List<T> Data { get; set; } = new();
-        public int TotalCount { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int TotalPages { get; set; }
-    }
 
     // Danh mục dạng cây cho dropdown
     public class CategoryTreeResponse
