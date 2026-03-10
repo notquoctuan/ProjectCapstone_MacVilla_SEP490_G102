@@ -12,4 +12,3 @@ public interface IInventoryService
     Task<InventoryDetailResponse> UpdateInventoryAsync(long productId, UpdateInventoryRequest request);
     Task<InventoryDetailResponse> AdjustInventoryAsync(long productId, AdjustInventoryRequest request);
 }
-

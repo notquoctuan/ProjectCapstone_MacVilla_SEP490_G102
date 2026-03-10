@@ -37,8 +37,8 @@ public class OrderItemDetailDto
     public string? CategoryName { get; set; }
     public int? Quantity { get; set; }
     public decimal? UnitPrice { get; set; }
-    public decimal? SubTotal => Quantity.HasValue && UnitPrice.HasValue 
-        ? Quantity.Value * UnitPrice.Value 
+    public decimal? SubTotal => Quantity.HasValue && UnitPrice.HasValue
+        ? Quantity.Value * UnitPrice.Value
         : 0;
 }
 

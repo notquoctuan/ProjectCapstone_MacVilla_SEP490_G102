@@ -1,5 +1,4 @@
-﻿// File: Application/DTOs/DashboardSummaryResponse.cs
-using Domain.Entities; // ⭐ Tham chiếu trực tiếp đến Domain
+﻿using Domain.Entities; // ⭐ Tham chiếu trực tiếp đến Domain
 
 namespace Application.DTOs
 {
@@ -14,3 +13,5 @@ namespace Application.DTOs
         public List<RevenueChartData> RevenueChart { get; set; } = new();
     }
 }
+
+

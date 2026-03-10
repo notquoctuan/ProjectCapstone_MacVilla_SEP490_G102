@@ -267,4 +267,3 @@ public class InventoryService : IInventoryService
         return detail;
     }
 }
-

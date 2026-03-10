@@ -1,4 +1,8 @@
-﻿public class ApiErrorResponse
+﻿namespace MacVilla_Web
 {
-    public string message { get; set; }
+    public class ApiErrorResponse
+    {
+        public string? message { get; set; }
+        public string? Message { get; set; }
+    }
 }

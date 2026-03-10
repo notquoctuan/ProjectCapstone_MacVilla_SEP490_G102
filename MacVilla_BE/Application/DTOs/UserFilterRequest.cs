@@ -9,7 +9,7 @@ namespace Application.DTOs
 {
     public class UserFilterRequest
     {
-        public string? SearchTerm { get; set; } 
+        public string? SearchTerm { get; set; }
 
         [RegularExpression("Admin|Employee|Customer", ErrorMessage = "Vai trò không hợp lệ")]
         public string? Role { get; set; }

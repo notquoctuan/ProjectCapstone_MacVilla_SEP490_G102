@@ -95,7 +95,8 @@ public class HomeService : IHomeService
         var orders = await _orderRepository.GetAllOrdersAsync();
         var salesByProduct = orders
             .SelectMany(o => o.OrderItems)
-            .GroupBy(oi => oi.ProductId)
+            .Where(oi => oi.ProductId.HasValue)
+            .GroupBy(oi => oi.ProductId!.Value)
             .ToDictionary(g => g.Key, g => g.Sum(oi => oi.Quantity));
 
         var products = await productsQuery

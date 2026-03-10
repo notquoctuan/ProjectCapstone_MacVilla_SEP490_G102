@@ -2,7 +2,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers.Admin;
+namespace Presentation.Controllers.Inventory;
 
 [ApiController]
 [Route("api/admin/[controller]")]
@@ -122,4 +122,3 @@ public class InventoryController : ControllerBase
         }
     }
 }
-

@@ -20,19 +20,19 @@ public class OrderTimelineDto
 {
     public bool IsOrderPlaced { get; set; }
     public DateTime? OrderPlacedAt { get; set; }
-    
+
     public bool IsPaymentReceived { get; set; }
     public DateTime? PaymentReceivedAt { get; set; }
-    
+
     public bool IsProcessing { get; set; }
     public DateTime? ProcessingStartedAt { get; set; }
-    
+
     public bool IsShipped { get; set; }
     public DateTime? ShippedAt { get; set; }
-    
+
     public bool IsDelivered { get; set; }
     public DateTime? DeliveredAt { get; set; }
-    
+
     public bool IsCancelled { get; set; }
     public DateTime? CancelledAt { get; set; }
 }

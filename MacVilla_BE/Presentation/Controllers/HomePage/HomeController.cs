@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers.Public;
+namespace Presentation.Controllers.HomePage;
 
 [ApiController]
 [Route("api/home")]

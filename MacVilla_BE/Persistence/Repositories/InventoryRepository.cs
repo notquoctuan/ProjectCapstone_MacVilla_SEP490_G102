@@ -5,7 +5,7 @@ using Persistence.Context;
 
 namespace Persistence.Repositories;
 
-    public class InventoryRepository : IInventoryRepository
+public class InventoryRepository : IInventoryRepository
 {
     private readonly MacvilladbContext _context;
 

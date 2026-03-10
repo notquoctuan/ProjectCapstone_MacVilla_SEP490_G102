@@ -1,4 +1,5 @@
 ﻿using MacVilla_Web.Models;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace MacVilla_Web.Services
@@ -12,53 +13,75 @@ namespace MacVilla_Web.Services
             _httpClient = httpClient;
         }
 
-        // 1. Lấy danh sách và Filter
-        public async Task<List<UserAdminVM>> GetUsersAsync(string? searchTerm, string? role, string? status)
+        private void SetAuthHeader(string? token)
+        {
+            if (!string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        // Lấy danh sách paged - dùng đúng endpoint GET /api/admin/users
+        public async Task<PagedResponse<UserAdminVM>> GetPagedUsersAsync(
+            string? keyword, string? role, string? status,
+            int pageNumber = 1, int pageSize = 15, string? token = null)
         {
             try
             {
-                // Khớp với [HttpGet("filter")] của BE
-                var query = $"api/admin/users/filter?SearchTerm={searchTerm}&Role={role}&Status={status}";
-                var response = await _httpClient.GetFromJsonAsync<List<UserAdminVM>>(query);
-                return response ?? new List<UserAdminVM>();
+                SetAuthHeader(token);
+                var parts = new List<string> { $"PageNumber={pageNumber}", $"PageSize={pageSize}" };
+                if (!string.IsNullOrEmpty(keyword)) parts.Add($"Keyword={Uri.EscapeDataString(keyword)}");
+                if (!string.IsNullOrEmpty(role)) parts.Add($"Role={Uri.EscapeDataString(role)}");
+                if (!string.IsNullOrEmpty(status)) parts.Add($"Status={Uri.EscapeDataString(status)}");
+
+                var response = await _httpClient.GetFromJsonAsync<PagedResponse<UserAdminVM>>(
+                    $"api/admin/users?{string.Join("&", parts)}");
+                return response ?? new PagedResponse<UserAdminVM>();
             }
-            catch { return new List<UserAdminVM>(); }
+            catch { return new PagedResponse<UserAdminVM>(); }
         }
 
-        // 2. Toggle Status (Khóa/Mở khóa)
-        public async Task<bool> ToggleStatusAsync(long id)
+        // Tạo user - POST /api/admin/users
+        public async Task<(bool success, string message)> AddUserAsync(
+            CreateUserAdminRequest request, string? token = null)
         {
-            // Khớp với [HttpPatch("{id}/toggle-status")] của BE
-            var response = await _httpClient.PatchAsync($"api/admin/users/{id}/toggle-status", null);
-            return response.IsSuccessStatusCode;    
+            try
+            {
+                SetAuthHeader(token);
+                var response = await _httpClient.PostAsJsonAsync("api/admin/users", request);
+                if (response.IsSuccessStatusCode) return (true, "Thành công");
+                var err = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+                return (false, err?.message ?? err?.Message ?? "Lỗi không xác định");
+            }
+            catch (Exception ex) { return (false, "Lỗi kết nối: " + ex.Message); }
         }
 
-        // Thêm class này vào cuối file UserApiService.cs hoặc trong thư mục Models
+        // Cập nhật trạng thái - PATCH /api/admin/users/{id}/status
+        public async Task<bool> ChangeStatusAsync(long id, string newStatus, string? token = null)
+        {
+            try
+            {
+                SetAuthHeader(token);
+                var response = await _httpClient.PatchAsJsonAsync(
+                    $"api/admin/users/{id}/status", new { Status = newStatus });
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
         public class ApiErrorResponse
         {
             public string? message { get; set; }
+            public string? Message { get; set; }
         }
+    }
 
-        // Trong hàm AddUserAsync:
-        public async Task<(bool success, string message)> AddUserAsync(UserCreateRequest request)
-        {
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync("api/admin/users/add-user", request);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return (true, "Thành công");
-                }
-
-                // Đọc thông báo lỗi từ Backend (Ví dụ: "Tên đăng nhập đã tồn tại")
-                var errorData = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-                return (false, errorData?.message ?? "Lỗi không xác định từ máy chủ.");
-            }
-            catch (Exception ex)
-            {
-                return (false, "Lỗi kết nối: " + ex.Message);
-            }
-        }
+    // DTO khớp với BE CreateUserRequest
+    public class CreateUserAdminRequest
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+        public string Role { get; set; } = "Customer";
     }
 }

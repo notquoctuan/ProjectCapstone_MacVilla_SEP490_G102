@@ -163,22 +163,22 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-// builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
-// builder.Services.AddScoped<IOrderService, OrderService>();
-// builder.Services.AddScoped<IInventoryService, InventoryService>();
-// builder.Services.AddScoped<IProductRepository, ProductRepository>();
-// builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-// builder.Services.AddScoped<Domain.Interfaces.IBannerRepository, Persistence.Repositories.BannerRepository>();
-// builder.Services.AddScoped<ProductService>();
-// builder.Services.AddScoped<ICategoryService, CategoryService>();
-// builder.Services.AddScoped<AuthService>();
-// builder.Services.AddScoped<CategoryService>();
-// builder.Services.AddScoped<IUserRepository, UserRepository>();
-// builder.Services.AddScoped<UserService>();
-// builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
-// builder.Services.AddScoped<DashboardService>();
-// builder.Services.AddScoped<Application.Interfaces.IHomeService, Application.Services.HomeService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<Domain.Interfaces.IBannerRepository, Persistence.Repositories.BannerRepository>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<Application.Interfaces.IHomeService, Application.Services.HomeService>();
 
 // =======================
 // 9. BUILD & SEED

@@ -1,3 +1,6 @@
+// ============================================================
+// Application/DTOs/InventoryDtos.cs
+// ============================================================
 namespace Application.DTOs;
 
 public class InventorySearchRequest
@@ -52,4 +55,3 @@ public class InventoryStatisticsResponse
     public int LowStockCount { get; set; }
     public int OutOfStockCount { get; set; }
 }
-
