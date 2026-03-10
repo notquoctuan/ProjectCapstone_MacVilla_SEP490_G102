@@ -102,9 +102,4 @@ namespace MacVilla_Web.Pages.Admin.Categories
             }
         }
     }
-
-    private class SimpleErrorResponse
-    {
-        public string? Message { get; set; }
-    }
 }
