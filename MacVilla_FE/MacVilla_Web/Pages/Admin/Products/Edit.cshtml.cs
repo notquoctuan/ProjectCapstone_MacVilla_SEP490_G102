@@ -1,4 +1,4 @@
-﻿using MacVilla_Web.Models;
+using MacVilla_Web.Models;
 using MacVilla_Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

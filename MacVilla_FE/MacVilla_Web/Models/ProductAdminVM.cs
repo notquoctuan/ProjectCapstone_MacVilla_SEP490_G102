@@ -1,4 +1,4 @@
-﻿
+
 
 namespace MacVilla_Web.Models
 {
@@ -13,6 +13,11 @@ namespace MacVilla_Web.Models
         public string? Description { get; set; }
         public string? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
+    }
+
+    // Alias/VM dùng cho homepage + nơi khác (giữ tương thích với code cũ)
+    public class ProductAdminVM : ProductAdminResponse
+    {
     }
 
     // Chi tiết 1 sản phẩm — BE trả Images là List<ProductImageResponse>

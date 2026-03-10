@@ -1,4 +1,4 @@
-﻿using MacVilla_Web.Models;
+using MacVilla_Web.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -40,6 +40,22 @@ namespace MacVilla_Web.Services
             catch { return new PagedResponse<UserAdminVM>(); }
         }
 
+        // Wrapper: tương thích với PageModel cũ (không phân trang)
+        public async Task<List<UserAdminVM>> GetUsersAsync(string? keyword, string? role, string? status, string? token = null)
+        {
+            var paged = await GetPagedUsersAsync(keyword, role, status, pageNumber: 1, pageSize: 200, token: token);
+            return paged.Data ?? new List<UserAdminVM>();
+        }
+
+        // Wrapper: tương thích với PageModel cũ (toggle)
+        public async Task<bool> ToggleStatusAsync(long id, string? token = null)
+        {
+            // Không có endpoint toggle trực tiếp => thử Disable trước, nếu fail thì thử Active.
+            var disabled = await ChangeStatusAsync(id, "Disable", token);
+            if (disabled) return true;
+            return await ChangeStatusAsync(id, "Active", token);
+        }
+
         // Tạo user - POST /api/admin/users
         public async Task<(bool success, string message)> AddUserAsync(
             CreateUserAdminRequest request, string? token = null)
@@ -53,6 +69,21 @@ namespace MacVilla_Web.Services
                 return (false, err?.message ?? err?.Message ?? "Lỗi không xác định");
             }
             catch (Exception ex) { return (false, "Lỗi kết nối: " + ex.Message); }
+        }
+
+        // Wrapper: nhận UserCreateRequest (UI) rồi map sang CreateUserAdminRequest (API)
+        public async Task<(bool success, string message)> AddUserAsync(UserCreateRequest request, string? token = null)
+        {
+            var mapped = new CreateUserAdminRequest
+            {
+                FullName = request.FullName,
+                Email = request.LoginId,
+                Password = request.Password,
+                Phone = request.Phone,
+                Role = request.Role ?? "Customer"
+            };
+
+            return await AddUserAsync(mapped, token);
         }
 
         // Cập nhật trạng thái - PATCH /api/admin/users/{id}/status
