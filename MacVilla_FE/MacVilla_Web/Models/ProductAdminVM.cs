@@ -1,6 +1,12 @@
-﻿namespace MacVilla_Web.Models
+﻿// =================================================================
+//  MacVilla_Web — Product ViewModels / DTOs
+//  Mirror chính xác Application.DTOs từ BE
+// =================================================================
+
+namespace MacVilla_Web.Models
 {
-    public class ProductAdminVM
+    // Danh sách sản phẩm (admin table)
+    public class ProductAdminResponse
     {
         public long ProductId { get; set; }
         public string? ImageUrl { get; set; }
@@ -12,45 +18,43 @@
         public DateTime? CreatedAt { get; set; }
     }
 
-    public class ProductDetailVM
+    // Chi tiết 1 sản phẩm — BE trả Images là List<ProductImageResponse>
+    public class ProductDetailResponse
     {
         public long ProductId { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;
         public decimal Price { get; set; }
         public string? Description { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public long? CategoryId { get; set; }
         public string? CategoryName { get; set; }
-        public List<ProductImageVM> Images { get; set; } = new();
+        public List<ProductImageResponse> Images { get; set; } = new();
     }
 
-    public class ProductImageVM
+    // Ảnh sản phẩm — khớp với BE: class ProductImageResponse
+    public class ProductImageResponse
     {
         public long ImageId { get; set; }
-        public string ImageUrl { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = null!;
         public bool IsMain { get; set; }
     }
 
-    public class ProductCreateRequest
+    // Generic paged response
+    public class PagedResponse<T>
     {
-        public string Name { get; set; } = string.Empty;
-        public decimal Price { get; set; }
-        public long CategoryId { get; set; }
-        public string? Description { get; set; }
-        public string Status { get; set; } = "Pending";
-        public List<IFormFile>? ImageFiles { get; set; }
+        public List<T> Data { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
     }
 
-    public class ProductUpdateVM
+    // Danh mục dạng cây cho dropdown
+    public class CategoryTreeResponse
     {
-        public long ProductId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public decimal Price { get; set; }
         public long CategoryId { get; set; }
-        public string? Description { get; set; }
-        public string Status { get; set; } = "Pending";
-        public string? ImageUrl { get; set; }
+        public string? CategoryName { get; set; }
+        public List<CategoryTreeResponse> Children { get; set; } = new();
     }
-
 }
