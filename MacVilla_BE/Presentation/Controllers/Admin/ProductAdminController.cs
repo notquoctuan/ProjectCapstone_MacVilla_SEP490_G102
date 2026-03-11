@@ -10,7 +10,7 @@ namespace Presentation.Controllers.Admin
 {
     [ApiController]
     [Route("api/admin/products")]
-    [Authorize(Roles = "Admin,Employee")]
+    //[Authorize(Roles = "Admin,Employee")]
     public class ProductAdminController : ControllerBase
     {
         private readonly IProductService _productService;

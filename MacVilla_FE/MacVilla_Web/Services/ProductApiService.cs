@@ -1,7 +1,8 @@
-using MacVilla_Web.Models;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using MacVilla_Web.Models;
 
 namespace MacVilla_Web.Services
 {
@@ -19,9 +20,14 @@ namespace MacVilla_Web.Services
         private void AttachToken()
         {
             var token = _httpContextAccessor.HttpContext?.Session.GetString("JwtToken");
+
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+
             if (!string.IsNullOrEmpty(token))
+            {
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         // GET: danh sách có lọc + phân trang
@@ -122,7 +128,7 @@ namespace MacVilla_Web.Services
         {
             var form = new MultipartFormDataContent();
             form.Add(new StringContent(name), "Name");
-            form.Add(new StringContent(price.ToString()), "Price");
+            form.Add(new StringContent(price.ToString(CultureInfo.InvariantCulture)), "Price");
             form.Add(new StringContent(categoryId.ToString()), "CategoryId");
             form.Add(new StringContent(status), "Status");
             if (!string.IsNullOrWhiteSpace(description))

@@ -10,19 +10,35 @@ namespace MacVilla_Web.Pages.Admin.Products
         private readonly ProductApiService _productService;
 
         public IndexModel(ProductApiService productService)
-            => _productService = productService;
+        {
+            _productService = productService;
+        }
 
         public PagedResponse<ProductAdminResponse>? Products { get; set; }
 
-        [BindProperty(SupportsGet = true)] public string? SearchName { get; set; }
-        [BindProperty(SupportsGet = true)] public string? SearchCategory { get; set; }
-        [BindProperty(SupportsGet = true)] public string? SearchStatus { get; set; }
-        [BindProperty(SupportsGet = true)] public string SortOrder { get; set; } = "newest";
-        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)]
+        public string? SearchName { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SearchCategory { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SearchStatus { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string SortOrder { get; set; } = "newest";
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
         public const int PageSize = 10;
 
-        [TempData] public string? SuccessMessage { get; set; }
-        [TempData] public string? ErrorMessage { get; set; }
+        [TempData]
+        public string? SuccessMessage { get; set; }
+
+        [TempData]
+        public string? ErrorMessage { get; set; }
+
 
         public async Task OnGetAsync()
         {
@@ -35,20 +51,44 @@ namespace MacVilla_Web.Pages.Admin.Products
                 pageSize: PageSize);
         }
 
+
         public async Task<IActionResult> OnPostDeleteAsync(long id)
         {
             var (success, message) = await _productService.DeleteProductAsync(id);
-            if (success) SuccessMessage = message;
-            else ErrorMessage = message;
-            return RedirectToPage();
+
+            if (success)
+                SuccessMessage = message;
+            else
+                ErrorMessage = message;
+
+            return RedirectToPage(new
+            {
+                SearchName,
+                SearchCategory,
+                SearchStatus,
+                SortOrder,
+                PageNumber
+            });
         }
+
 
         public async Task<IActionResult> OnPostChangeStatusAsync(long id, string status)
         {
             var (success, message) = await _productService.ChangeStatusAsync(id, status);
-            if (success) SuccessMessage = message;
-            else ErrorMessage = message;
-            return RedirectToPage();
+
+            if (success)
+                SuccessMessage = message;
+            else
+                ErrorMessage = message;
+
+            return RedirectToPage(new
+            {
+                SearchName,
+                SearchCategory,
+                SearchStatus,
+                SortOrder,
+                PageNumber
+            });
         }
     }
 }

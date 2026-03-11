@@ -1,194 +1,137 @@
-﻿@page "/Admin/Products/Edit/{id:long}"
+﻿@page "{id:long}"
+@model MacVilla_Web.Pages.Admin.Products.EditModel
 @{
-    Layout = "_AdminLayout"; ViewData["Title"] = "Sửa sản phẩm";
+    ViewData["Title"] = "Edit Product";
 }
 
-<div class="mv-page-header d-flex justify-content-between align-items-start">
-    <div><h1>Chỉnh sửa sản phẩm</h1><p id="editSubtitle">Đang tải...</p></div>
-    <a href="/Admin/Products" class="btn-outline-mv" style="text-decoration:none;display:flex;align-items:center;gap:6px;"><i class="bi bi-arrow-left"></i> Quay lại</a>
-</div>
+<h2>Edit Product</h2>
 
-<div style="display:grid;grid-template-columns:1fr 380px;gap:20px;">
-    <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="mv-card">
-            <div class="mv-card-header"><h5>Thông tin cơ bản</h5></div>
-            <div class="mv-card-body" style="display:flex;flex-direction:column;gap:16px;">
-                <div>
-                    <label class="form-label-mv">Tên sản phẩm <span style="color:red;">*</span></label>
-                    <input type="text" id="f-name" class="form-control-mv">
-                </div>
-                <div>
-                    <label class="form-label-mv">Mô tả</label>
-                    <textarea id="f-desc" class="form-control-mv" rows="4"></textarea>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                    <div>
-                        <label class="form-label-mv">Giá (VNĐ) <span style="color:red;">*</span></label>
-                        <input type="number" id="f-price" class="form-control-mv" min="0">
-                    </div>
-                    <div>
-                        <label class="form-label-mv">Danh mục <span style="color:red;">*</span></label>
-                        <select id="f-cat" class="form-select-mv"><option value="">-- Chọn --</option></select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Existing images -->
-        <div class="mv-card">
-            <div class="mv-card-header"><h5>Ảnh hiện tại</h5><span id="imgCount" style="font-size:.8rem;color:#6b7280;"></span></div>
-            <div class="mv-card-body">
-                <div id="existingImgs" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
-            </div>
-        </div>
-
-        <!-- New images -->
-        <div class="mv-card">
-            <div class="mv-card-header"><h5>Thêm ảnh mới</h5></div>
-            <div class="mv-card-body">
-                <div onclick="document.getElementById('imgInput').click()" style="border:2px dashed #d1d5db;border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:#fafafa;">
-                    <i class="bi bi-cloud-upload" style="font-size:1.8rem;color:#9ca3af;"></i>
-                    <p style="margin-top:6px;color:#6b7280;font-size:.875rem;">Nhấn để chọn ảnh mới</p>
-                </div>
-                <input type="file" id="imgInput" multiple accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="previewNewImages(this)">
-                <div class="img-preview-grid" id="newImgPreview"></div>
-            </div>
-        </div>
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @Model.ErrorMessage
     </div>
-
-    <!-- Right panel -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="mv-card">
-            <div class="mv-card-header"><h5>Trạng thái</h5></div>
-            <div class="mv-card-body">
-                <select id="f-status" class="form-select-mv">
-                    <option value="Enable">Enable</option>
-                    <option value="Disable">Disable</option>
-                    <option value="Pending">Pending</option>
-                </select>
-            </div>
-        </div>
-        <div class="mv-card">
-            <div class="mv-card-header"><h5>Thao tác</h5></div>
-            <div class="mv-card-body" style="display:flex;flex-direction:column;gap:8px;">
-                <button onclick="doUpdate()" class="btn-primary-mv w-100" id="btnSave"><i class="bi bi-check-lg me-1"></i> Lưu thay đổi</button>
-                <a href="/Admin/Products" class="btn-outline-mv w-100 text-center" style="text-decoration:none;">Huỷ</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        const productId = parseInt(location.pathname.split('/').pop());
-        let newFiles = [];
-        let deleteIds = [];
-        let mainImageId = null;
-
-        async function loadProduct() {
-            const [pRes, cRes] = await Promise.all([
-                apiFetch(`/api/admin/products/${productId}`),
-                apiFetch('/api/admin/category/getall')
-            ]);
-            const p = await pRes.json();
-            const cats = await cRes.json();
-
-            document.getElementById('editSubtitle').textContent = 'Chỉnh sửa: ' + (p.Name || '');
-            document.getElementById('f-name').value = p.Name || '';
-            document.getElementById('f-desc').value = p.Description || '';
-            document.getElementById('f-price').value = p.Price || 0;
-            document.getElementById('f-status').value = p.Status || 'Pending';
-
-            const sel = document.getElementById('f-cat');
-            cats.forEach(c => sel.innerHTML += `<option value="${c.CategoryId}" ${c.CategoryId == p.CategoryId ? 'selected' : ''}>${c.Name}</option>`);
-
-            const imgs = p.Images || [];
-            mainImageId = imgs.find(i => i.IsMain)?.ImageId || imgs[0]?.ImageId || null;
-            document.getElementById('imgCount').textContent = `${imgs.length} ảnh`;
-            renderExistingImages(imgs);
-        }
-
-        function renderExistingImages(imgs) {
-            const el = document.getElementById('existingImgs');
-            if (!imgs.length) { el.innerHTML = '<p style="color:#9ca3af;font-size:.85rem;">Chưa có ảnh</p>'; return; }
-            el.innerHTML = imgs.map(img => {
-                const isMain = img.ImageId === mainImageId;
-                const isDeleted = deleteIds.includes(img.ImageId);
-                return `<div id="img-${img.ImageId}" style="position:relative;opacity:${isDeleted?0.3:1};">
-                    <img src="https://localhost:7262${img.ImageUrl}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid ${isMain?'#2E7D32':'#e5e7eb'};" onerror="this.src='https://placehold.co/80x80'">
-                    ${isMain ? '<span style="position:absolute;top:4px;left:4px;background:#2E7D32;color:#fff;font-size:.6rem;padding:1px 5px;border-radius:4px;font-weight:700;">CHÍNH</span>' : ''}
-                    ${!isDeleted ? `
-                    <div style="position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:4px;">
-                        ${!isMain ? `<button onclick="setMain(${img.ImageId})" title="Đặt ảnh chính" style="width:22px;height:22px;background:#2E7D32;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.7rem;">★</button>` : ''}
-                        <button onclick="toggleDelete(${img.ImageId})" title="Xoá ảnh" style="width:22px;height:22px;background:#dc2626;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.7rem;">×</button>
-                    </div>` : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><button onclick="toggleDelete(${img.ImageId})" style="background:#6b7280;color:#fff;border:none;border-radius:6px;font-size:.7rem;padding:3px 6px;cursor:pointer;">Khôi phục</button></div>`}
-                </div>`;
-            }).join('');
-        }
-
-        async function setMain(imageId) {
-            try {
-                const r = await apiFetch(`/api/admin/products/${productId}/images/${imageId}/set-main`, { method: 'PATCH' });
-                if (!r.ok) throw new Error((await r.json()).message);
-                mainImageId = imageId;
-                const pRes = await apiFetch(`/api/admin/products/${productId}`);
-                const p = await pRes.json();
-                renderExistingImages(p.Images || []);
-                showToast('Đã đặt ảnh chính', 'success');
-            } catch(e) { showToast(e.message, 'error'); }
-        }
-
-        function toggleDelete(imageId) {
-            if (deleteIds.includes(imageId)) deleteIds = deleteIds.filter(i => i !== imageId);
-            else deleteIds.push(imageId);
-            apiFetch(`/api/admin/products/${productId}`).then(r => r.json()).then(p => renderExistingImages(p.Images || []));
-        }
-
-        function previewNewImages(input) {
-            newFiles = [...newFiles, ...Array.from(input.files)];
-            const grid = document.getElementById('newImgPreview');
-            grid.innerHTML = newFiles.map((f, i) => {
-                const url = URL.createObjectURL(f);
-                return `<div class="img-preview-item"><img src="${url}"><button class="btn-del-img" onclick="removeNew(${i})">×</button></div>`;
-            }).join('');
-            input.value = '';
-        }
-
-        function removeNew(i) { newFiles.splice(i, 1); previewNewImages({files:[]}); }
-
-        async function doUpdate() {
-            const name = document.getElementById('f-name').value.trim();
-            const price = document.getElementById('f-price').value;
-            const catId = document.getElementById('f-cat').value;
-            if (!name || !price || !catId) { showToast('Vui lòng điền đủ thông tin bắt buộc', 'error'); return; }
-
-            const btn = document.getElementById('btnSave');
-            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass"></i> Đang lưu...';
-
-            const form = new FormData();
-            form.append('Name', name);
-            form.append('Price', price);
-            form.append('CategoryId', catId);
-            form.append('Status', document.getElementById('f-status').value);
-            const desc = document.getElementById('f-desc').value.trim();
-            if (desc) form.append('Description', desc);
-            deleteIds.forEach(id => form.append('DeleteImageIds', id));
-            newFiles.forEach(f => form.append('NewImageFiles', f));
-
-            try {
-                const r = await fetch(`https://localhost:7262/api/admin/products/${productId}`, {
-                    method: 'PUT', headers: { 'Authorization': 'Bearer ' + getToken() }, body: form
-                });
-                const data = await r.json();
-                if (!r.ok) throw new Error(data.message || 'Cập nhật thất bại');
-                showToast('Cập nhật thành công!', 'success');
-                setTimeout(() => window.location.href = '/Admin/Products', 1200);
-            } catch(e) {
-                showToast(e.message, 'error');
-                btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Lưu thay đổi';
-            }
-        }
-
-        loadProduct();
-    </script>
 }
+
+<form method="post" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+
+        <label>Name</label>
+
+        <input asp-for="Name" class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Price</label>
+
+        <input asp-for="Price" type="number" class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Category</label>
+
+        <select asp-for="CategoryId"
+                asp-items="Model.CategoryOptions"
+                class="form-control">
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Description</label>
+
+<textarea asp-for="Description"
+          class="form-control">
+</textarea>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Status</label>
+
+        <select asp-for="Status" class="form-control">
+
+            <option value="Enable">Enable</option>
+            <option value="Disable">Disable</option>
+            <option value="Pending">Pending</option>
+
+        </select>
+
+    </div>
+
+    <hr />
+
+    <h4>Existing Images</h4>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+        @foreach (var img in Model.ExistingImages)
+        {
+
+            <div style="border:1px solid #ccc;padding:5px;">
+
+                <img src="https://localhost:7262@img.ImageUrl"
+                     width="120" />
+
+                <br />
+
+                <label>
+
+                    <input type="checkbox"
+                           name="DeleteImageIds"
+                           value="@img.ImageId" />
+
+                    Delete
+
+                </label>
+
+                <br />
+
+                <label>
+
+                    <input type="radio"
+                           name="MainImageId"
+                           value="@img.ImageId"
+                           @(img.IsMain ? "checked" : "") />
+
+                    Main Image
+
+                </label>
+
+            </div>
+
+        }
+
+    </div>
+
+    <hr />
+
+    <div class="mb-3">
+
+        <label>Add New Images</label>
+
+        <input asp-for="NewImageFiles"
+               type="file"
+               multiple
+               class="form-control" />
+
+    </div>
+
+    <button class="btn btn-primary">
+        Update Product
+    </button>
+
+    <a asp-page="./Index" class="btn btn-secondary">
+        Cancel
+    </a>
+
+</form>
