@@ -73,23 +73,10 @@
                 <i class="fas fa-map-marker-alt me-1"></i>Hà Nội
             </button>
 
-            <!-- Cart -->
-            <div class="cart-wrapper position-relative">
-                <button class="cart-btn position-relative" type="button" onclick="toggleCartDropdown()">
-                    <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                    <span class="cart-badge">0</span>
-                </button>
-                <div id="cartDropdown" class="cart-dropdown">
-                    <div class="cart-empty">Giỏ hàng trống</div>
-                    <div class="cart-items d-none"></div>
-                    <div class="cart-footer d-none">
-                        <div class="cart-total">
-                            Tổng: <span id="cartTotal">0₫</span>
-                        </div>
-                        <button class="btn btn-sm btn-success w-100 mt-2" type="button">Thanh toán (demo)</button>
-                    </div>
-                </div>
-            </div>
+            <!-- Cart: link to dedicated page -->
+            <a href="/cart" class="cart-btn position-relative text-decoration-none">
+                <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+            </a>
         </div>
     </div>
 </div>
@@ -189,10 +176,9 @@
                                     <div class="product-price">
                                         <span class="price-new">@((p.Price ?? 0).ToString("N0"))₫</span>
                                     </div>
-                                    <button class="btn-add-cart"
-                                            onclick="addToCart(@p.ProductId, '@p.Name'.trim(), @((p.Price ?? 0)), '@(p.ImageUrl ?? "")')">
+                                    <a href="/cart" class="btn-add-cart text-decoration-none">
                                         <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -396,10 +382,9 @@
                                     <span class="price-new">@((product.Price ?? 0).ToString("N0"))₫</span>
                                     <span class="price-old">@((oldPrice ?? 0).ToString("N0"))₫</span>
                                 </div>
-                                <button class="btn-add-cart"
-                                        onclick="addToCart(@product.ProductId, '@product.Name'.trim(), @((product.Price ?? 0)), '@(product.ImageUrl ?? "")')">
+                                <a href="/cart" class="btn-add-cart text-decoration-none">
                                     <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -536,105 +521,7 @@
         this.classList.remove('is-invalid');
     });
 
-    // Simple client-side cart using localStorage
-    const CART_KEY = 'mv_cart';
-
-    function loadCart() {
-        try {
-            const raw = localStorage.getItem(CART_KEY);
-            return raw ? JSON.parse(raw) : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveCart(items) {
-        localStorage.setItem(CART_KEY, JSON.stringify(items));
-    }
-
-    function formatPrice(v) {
-        return (v || 0).toLocaleString('vi-VN') + '₫';
-    }
-
-    function renderCart() {
-        const items = loadCart();
-        const badge = document.querySelector('.cart-badge');
-        const dropdown = document.getElementById('cartDropdown');
-        const listEl = dropdown.querySelector('.cart-items');
-        const emptyEl = dropdown.querySelector('.cart-empty');
-        const footerEl = dropdown.querySelector('.cart-footer');
-
-        const totalQty = items.reduce((s, x) => s + x.qty, 0);
-        const totalPrice = items.reduce((s, x) => s + x.qty * x.price, 0);
-        badge.textContent = totalQty;
-
-        if (!items.length) {
-            emptyEl.classList.remove('d-none');
-            listEl.classList.add('d-none');
-            footerEl.classList.add('d-none');
-            return;
-        }
-
-        emptyEl.classList.add('d-none');
-        listEl.classList.remove('d-none');
-        footerEl.classList.remove('d-none');
-
-        listEl.innerHTML = items.map(i => `
-            <div class="cart-item">
-                <div class="cart-thumb">
-                    ${i.imageUrl ? `<img src="${i.imageUrl}" alt="${i.name}" />` : '<div class="cart-thumb-placeholder"><i class="fas fa-box"></i></div>'}
-                </div>
-                <div class="cart-info">
-                    <div class="cart-name">${i.name}</div>
-                    <div class="cart-meta">
-                        <span>${formatPrice(i.price)}</span>
-                        <span>x${i.qty}</span>
-                    </div>
-                </div>
-                <button type="button" class="cart-remove" onclick="removeFromCart(${i.id})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>`).join('');
-
-        document.getElementById('cartTotal').textContent = formatPrice(totalPrice);
-    }
-
-    function addToCart(id, name, price, imageUrl) {
-        const items = loadCart();
-        const existing = items.find(x => x.id === id);
-        if (existing) existing.qty += 1;
-        else items.push({ id, name, price, imageUrl, qty: 1 });
-        saveCart(items);
-        renderCart();
-
-        var badge = document.querySelector('.cart-badge');
-        badge.style.transition = 'transform 0.2s';
-        badge.style.transform = 'scale(1.4)';
-        setTimeout(function () { badge.style.transform = 'scale(1)'; }, 200);
-    }
-
-    function removeFromCart(id) {
-        let items = loadCart();
-        items = items.filter(x => x.id !== id);
-        saveCart(items);
-        renderCart();
-    }
-
-    function toggleCartDropdown() {
-        const dropdown = document.getElementById('cartDropdown');
-        dropdown.classList.toggle('show');
-    }
-
-    document.addEventListener('click', function (e) {
-        const wrapper = document.querySelector('.cart-wrapper');
-        const dropdown = document.getElementById('cartDropdown');
-        if (!wrapper.contains(e.target)) {
-            dropdown.classList.remove('show');
-        }
-    });
-
-    // initial render
-    renderCart();
+    // Không còn xử lý giỏ hàng trên homepage, chuyển sang trang /cart
 </script>
 </body>
 </html>

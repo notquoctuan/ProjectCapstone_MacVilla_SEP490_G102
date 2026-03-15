@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using MacVilla_Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +21,10 @@ builder.Services.AddHttpClient("MacVillaAPI", client =>
 
 // Typed HttpClient
 builder.Services.AddHttpClient<ProductApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
+builder.Services.AddHttpClient<CartApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 });
