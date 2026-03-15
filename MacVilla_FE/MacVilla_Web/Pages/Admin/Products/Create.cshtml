@@ -1,4 +1,4 @@
-﻿@page "/Admin/Products/Create"
+@page "/Admin/Products/Create"
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Thêm sản phẩm";
@@ -194,19 +194,24 @@
 
 
 
-        async function loadCategories(){
-
-            const r = await fetch("/api/admin/categories/tree");
-
-            const cats = await r.json();
-
+        async function loadCategories() {
             const sel = document.getElementById("f-cat");
+            sel.innerHTML = '<option value="">-- Chọn danh mục --</option>';
 
-            cats.forEach(c=>{
-                sel.innerHTML += `<option value="${c.categoryId}">
-                                    ${c.categoryName}
-                                  </option>`;
-            });
+            try {
+                const res = await apiFetch("/api/admin/category/getall");
+                if (!res.ok) throw new Error("Không tải được danh mục");
+                const cats = await res.json();
+
+                cats.forEach(c => {
+                    sel.innerHTML += `<option value="${c.CategoryId}">
+                                        ${c.Name}
+                                      </option>`;
+                });
+            } catch (e) {
+                console.error(e);
+                showToast(e.message || "Không thể tải danh mục", "error");
+            }
         }
 
 

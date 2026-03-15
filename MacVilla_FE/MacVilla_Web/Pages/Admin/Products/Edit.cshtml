@@ -1,4 +1,4 @@
-﻿@page "{id:long}"
+@page "{id:long}"
 @model MacVilla_Web.Pages.Admin.Products.EditModel
 @{
     ViewData["Title"] = "Edit Product";
@@ -79,7 +79,7 @@
 
             <div style="border:1px solid #ccc;padding:5px;">
 
-                <img src="https://localhost:7262@img.ImageUrl"
+                <img src="@($"https://localhost:7262{img.ImageUrl}")"
                      width="120" />
 
                 <br />
