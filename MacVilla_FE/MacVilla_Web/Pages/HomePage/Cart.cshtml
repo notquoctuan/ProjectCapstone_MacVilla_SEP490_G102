@@ -1,0 +1,165 @@
+@page "/cart"
+@model MacVilla_Web.Pages.HomePage.CartModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Macvilla</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/homepage.css" />
+</head>
+<body class="homepage-theme">
+
+    <div class="main-header">
+        <div class="container d-flex align-items-center justify-content-between py-2">
+            <a href="/" class="logo me-3">Macvilla</a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-arrow-left me-1"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-4" style="max-width: 1100px;">
+        <h2 class="mb-3">Giỏ hàng của bạn</h2>
+        <div id="cartEmpty" class="alert alert-info d-none">
+            <i class="fas fa-info-circle me-1"></i> Giỏ hàng hiện đang trống. Hãy quay lại trang chủ để thêm sản phẩm.
+        </div>
+
+        <div id="cartContent" class="row g-4 d-none">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div id="cartItems"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Tổng kết đơn hàng</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tạm tính</span>
+                            <strong id="cartSubtotal">0₫</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Phí vận chuyển (ước tính)</span>
+                            <span class="text-muted">Miễn phí</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Tổng cộng</span>
+                            <strong id="cartTotal">0₫</strong>
+                        </div>
+                        <button class="btn btn-success w-100 mb-2" type="button">
+                            <i class="fas fa-lock me-1"></i> Thanh toán (demo)
+                        </button>
+                        <small class="text-muted d-block">
+                            Đây chỉ là demo giao diện giỏ hàng. Phần thanh toán thực tế sẽ được tích hợp sau.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const CART_KEY = 'mv_cart';
+
+        function loadCart() {
+            try {
+                const raw = localStorage.getItem(CART_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveCart(items) {
+            localStorage.setItem(CART_KEY, JSON.stringify(items));
+        }
+
+        function formatPrice(v) {
+            return (v || 0).toLocaleString('vi-VN') + '₫';
+        }
+
+        function removeFromCart(id) {
+            let items = loadCart();
+            items = items.filter(x => x.id !== id);
+            saveCart(items);
+            renderCartPage();
+        }
+
+        function changeQty(id, delta) {
+            const items = loadCart();
+            const item = items.find(x => x.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                const filtered = items.filter(x => x.id !== id);
+                saveCart(filtered);
+            } else {
+                saveCart(items);
+            }
+            renderCartPage();
+        }
+
+        function renderCartPage() {
+            const items = loadCart();
+            const emptyEl = document.getElementById('cartEmpty');
+            const contentEl = document.getElementById('cartContent');
+            const listEl = document.getElementById('cartItems');
+
+            if (!items.length) {
+                emptyEl.classList.remove('d-none');
+                contentEl.classList.add('d-none');
+                return;
+            }
+
+            emptyEl.classList.add('d-none');
+            contentEl.classList.remove('d-none');
+
+            let subtotal = 0;
+            listEl.innerHTML = items.map(i => {
+                const line = i.qty * i.price;
+                subtotal += line;
+                return `
+                    <div class="d-flex align-items-center border-bottom py-2">
+                        <div style="width:70px;height:70px;border-radius:8px;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                            ${i.imageUrl ? `<img src="${i.imageUrl}" alt="${i.name}" style="width:100%;height:100%;object-fit:cover;">`
+                                          : '<i class="fas fa-box text-muted"></i>'}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">${i.name}</div>
+                            <div class="text-muted" style="font-size:13px;">${formatPrice(i.price)}</div>
+                            <div class="d-flex align-items-center mt-1" style="gap:6px;">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="changeQty(${i.id}, -1)">-</button>
+                                <span>${i.qty}</span>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="changeQty(${i.id}, 1)">+</button>
+                                <button class="btn btn-sm btn-link text-danger ms-2" type="button" onclick="removeFromCart(${i.id})">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fw-semibold" style="min-width:90px;text-align:right;">${formatPrice(line)}</div>
+                    </div>`;
+            }).join('');
+
+            document.getElementById('cartSubtotal').textContent = formatPrice(subtotal);
+            document.getElementById('cartTotal').textContent = formatPrice(subtotal);
+        }
+
+        renderCartPage();
+    </script>
+</body>
+</html>
+
