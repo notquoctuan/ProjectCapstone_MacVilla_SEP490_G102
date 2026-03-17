@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -44,9 +44,11 @@ public partial class MacvilladbContext : DbContext
     public virtual DbSet<ProductSpecification> ProductSpecifications { get; set; }
 
     public virtual DbSet<Quotation> Quotations { get; set; }
+    public virtual DbSet<QuotationItem> QuotationItems { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
     public virtual DbSet<CartItem> CartItems { get; set; }
     public virtual DbSet<Rfq> Rfqs { get; set; }
+    public virtual DbSet<RfqItem> RfqItems { get; set; }
 
     public virtual DbSet<RolePermission> RolePermissions { get; set; }
 
@@ -430,50 +432,132 @@ public partial class MacvilladbContext : DbContext
         modelBuilder.Entity<Quotation>(entity =>
         {
             entity.HasKey(e => e.QuotationId).HasName("PRIMARY");
-
             entity.ToTable("quotations");
-
             entity.HasIndex(e => e.RfqId, "rfq_id");
 
             entity.Property(e => e.QuotationId).HasColumnName("quotation_id");
-            entity.Property(e => e.Notes)
-                .HasColumnType("text")
-                .HasColumnName("notes");
-            entity.Property(e => e.Price)
-                .HasPrecision(12, 2)
-                .HasColumnName("price");
+            entity.Property(e => e.QuotationCode).HasMaxLength(50).HasColumnName("quotation_code");
             entity.Property(e => e.RfqId).HasColumnName("rfq_id");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
+            entity.Property(e => e.SubTotal).HasPrecision(15, 2).HasColumnName("sub_total");
+            entity.Property(e => e.DiscountTotal).HasPrecision(15, 2).HasColumnName("discount_total");
+            entity.Property(e => e.VatRate).HasPrecision(5, 2).HasColumnName("vat_rate");
+            entity.Property(e => e.VatAmount).HasPrecision(15, 2).HasColumnName("vat_amount");
+            entity.Property(e => e.TotalAmount).HasPrecision(15, 2).HasColumnName("total_amount");
             entity.Property(e => e.ValidUntil).HasColumnName("valid_until");
+            entity.Property(e => e.Notes).HasColumnType("text").HasColumnName("notes");
+            entity.Property(e => e.InternalNote).HasColumnType("text").HasColumnName("internal_note");
+            entity.Property(e => e.RejectReason).HasColumnType("text").HasColumnName("reject_reason");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime").HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime").HasColumnName("updated_at");
+            entity.Property(e => e.SentAt).HasColumnType("datetime").HasColumnName("sent_at");
 
             entity.HasOne(d => d.Rfq).WithMany(p => p.Quotations)
                 .HasForeignKey(d => d.RfqId)
                 .HasConstraintName("quotations_ibfk_1");
+
+            entity.HasOne(d => d.CreatedByUser).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("quotations_ibfk_2");
+        });
+
+        modelBuilder.Entity<QuotationItem>(entity =>
+        {
+            entity.HasKey(e => e.QuotationItemId).HasName("PRIMARY");
+            entity.ToTable("quotation_items");
+            entity.HasIndex(e => e.QuotationId, "quotation_id");
+            entity.HasIndex(e => e.ProductId, "product_id");
+
+            entity.Property(e => e.QuotationItemId).HasColumnName("quotation_item_id");
+            entity.Property(e => e.QuotationId).HasColumnName("quotation_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Sku).HasMaxLength(100).HasColumnName("sku");
+            entity.Property(e => e.ProductName).HasMaxLength(255).HasColumnName("product_name");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.Unit).HasMaxLength(50).HasColumnName("unit");
+            entity.Property(e => e.UnitPrice).HasPrecision(15, 2).HasColumnName("unit_price");
+            entity.Property(e => e.DiscountPercent).HasPrecision(5, 2).HasColumnName("discount_percent");
+            entity.Property(e => e.LineTotal).HasPrecision(15, 2).HasColumnName("line_total");
+
+            entity.HasOne(d => d.Quotation).WithMany(p => p.QuotationItems)
+                .HasForeignKey(d => d.QuotationId)
+                .HasConstraintName("quotation_items_ibfk_1");
+
+            entity.HasOne(d => d.Product).WithMany()
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("quotation_items_ibfk_2");
         });
 
         modelBuilder.Entity<Rfq>(entity =>
         {
             entity.HasKey(e => e.RfqId).HasName("PRIMARY");
-
             entity.ToTable("rfq");
-
             entity.HasIndex(e => e.UserId, "user_id");
+            entity.HasIndex(e => e.AssignedSaleId, "assigned_sale_id");
 
             entity.Property(e => e.RfqId).HasColumnName("rfq_id");
+            entity.Property(e => e.RfqCode).HasMaxLength(50).HasColumnName("rfq_code");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AssignedSaleId).HasColumnName("assigned_sale_id");
+            entity.Property(e => e.CustomerName).HasMaxLength(255).HasColumnName("customer_name");
+            entity.Property(e => e.CompanyName).HasMaxLength(255).HasColumnName("company_name");
+            entity.Property(e => e.Phone).HasMaxLength(50).HasColumnName("phone");
+            entity.Property(e => e.Email).HasMaxLength(255).HasColumnName("email");
+            entity.Property(e => e.Address).HasMaxLength(500).HasColumnName("address");
+            entity.Property(e => e.ProjectName).HasMaxLength(255).HasColumnName("project_name");
+            entity.Property(e => e.ExpectedDeliveryDate).HasColumnType("datetime").HasColumnName("expected_delivery_date");
+            entity.Property(e => e.Priority).HasMaxLength(20).HasColumnName("priority");
+            entity.Property(e => e.Description).HasColumnType("text").HasColumnName("description");
+            entity.Property(e => e.InternalNote).HasColumnType("text").HasColumnName("internal_note");
+            entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Description)
-                .HasColumnType("text")
-                .HasColumnName("description");
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasColumnName("status");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+                .HasColumnType("datetime").HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime").HasColumnName("updated_at");
 
             entity.HasOne(d => d.User).WithMany(p => p.Rfqs)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("rfq_ibfk_1");
+
+            entity.HasOne(d => d.AssignedSale).WithMany()
+                .HasForeignKey(d => d.AssignedSaleId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("rfq_ibfk_2");
+        });
+
+        modelBuilder.Entity<RfqItem>(entity =>
+        {
+            entity.HasKey(e => e.RfqItemId).HasName("PRIMARY");
+            entity.ToTable("rfq_items");
+            entity.HasIndex(e => e.RfqId, "rfq_id");
+            entity.HasIndex(e => e.ProductId, "product_id");
+
+            entity.Property(e => e.RfqItemId).HasColumnName("rfq_item_id");
+            entity.Property(e => e.RfqId).HasColumnName("rfq_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Sku).HasMaxLength(100).HasColumnName("sku");
+            entity.Property(e => e.ProductName).HasMaxLength(255).HasColumnName("product_name");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.Unit).HasMaxLength(50).HasColumnName("unit");
+            entity.Property(e => e.Note).HasColumnType("text").HasColumnName("note");
+
+            entity.HasOne(d => d.Rfq).WithMany(p => p.RfqItems)
+                .HasForeignKey(d => d.RfqId)
+                .HasConstraintName("rfq_items_ibfk_1");
+
+            entity.HasOne(d => d.Product).WithMany()
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("rfq_items_ibfk_2");
         });
 
         modelBuilder.Entity<RolePermission>(entity =>

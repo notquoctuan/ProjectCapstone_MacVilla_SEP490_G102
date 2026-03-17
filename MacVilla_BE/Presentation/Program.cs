@@ -180,6 +180,12 @@ builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<Application.Interfaces.IHomeService, Application.Services.HomeService>();
 
+// RFQ & Quotation
+builder.Services.AddScoped<Domain.Interfaces.IRfqRepository, Persistence.Repositories.RfqRepository>();
+builder.Services.AddScoped<Domain.Interfaces.IQuotationRepository, Persistence.Repositories.QuotationRepository>();
+builder.Services.AddScoped<Application.Interfaces.IRfqService, Application.Services.RfqService>();
+builder.Services.AddScoped<Application.Interfaces.IQuotationService, Application.Services.QuotationService>();
+
 // =======================
 // 9. BUILD & SEED
 // =======================
