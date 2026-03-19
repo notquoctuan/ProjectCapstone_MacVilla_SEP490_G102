@@ -1,81 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Application.DTOs;
 using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.Query;
+using MockQueryable;
+using MockQueryable.Moq;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace MacVilla.Tests
 {
     public class UserServiceTests
     {
-        #region EF Core Async Helpers
-        internal class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
-        {
-            private readonly IQueryProvider _inner;
-            public TestAsyncQueryProvider(IQueryProvider inner) => _inner = inner;
-
-            public IQueryable CreateQuery(Expression expression)
-                => new TestAsyncEnumerable<TEntity>(expression);
-
-            public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
-                => new TestAsyncEnumerable<TElement>(expression);
-
-            public object? Execute(Expression expression) => _inner.Execute(expression);
-
-            public TResult Execute<TResult>(Expression expression)
-                => _inner.Execute<TResult>(expression);
-
-            // Fix: EF Core CountAsync/ToListAsync gọi ExecuteAsync với TResult = Task<int>/Task<List<T>>
-            // phải wrap kết quả sync vào Task.FromResult
-            public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
-            {
-                var expectedResultType = typeof(TResult).GetGenericArguments()[0];
-
-                var executionResult = typeof(IQueryProvider)
-                    .GetMethod(
-                        name: nameof(IQueryProvider.Execute),
-                        genericParameterCount: 1,
-                        types: new[] { typeof(Expression) })!
-                    .MakeGenericMethod(expectedResultType)
-                    .Invoke(_inner, new object[] { expression });
-
-                return (TResult)typeof(Task)
-                    .GetMethod(nameof(Task.FromResult))!
-                    .MakeGenericMethod(expectedResultType)
-                    .Invoke(null, new[] { executionResult })!;
-            }
-        }
-
-        internal class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
-        {
-            public TestAsyncEnumerable(IEnumerable<T> enumerable) : base(enumerable) { }
-            public TestAsyncEnumerable(Expression expression) : base(expression) { }
-
-            public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-                => new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
-
-            IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(this);
-        }
-
-        internal class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
-        {
-            private readonly IEnumerator<T> _inner;
-            public TestAsyncEnumerator(IEnumerator<T> inner) => _inner = inner;
-            public ValueTask DisposeAsync() { _inner.Dispose(); return default; }
-            public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(_inner.MoveNext());
-            public T Current => _inner.Current;
-        }
-        #endregion
-
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly UserService _service;
 
@@ -85,64 +25,133 @@ namespace MacVilla.Tests
             _service = new UserService(_userRepoMock.Object);
         }
 
+        #region TC15 & TC21: GetPagedUsersAsync (Mapping & Filtering)
         [Fact]
-        public async Task GetPagedUsersAsync_ShouldReturnPagedData_WhenKeywordMatches()
+        public async Task GetPagedUsersAsync_ShouldReturnCorrectMapping_AndFilterByRole()
         {
-            // Fix: dùng TestAsyncEnumerable thay vì .AsQueryable() để hỗ trợ EF Core CountAsync
-            var users = new TestAsyncEnumerable<User>(new List<User>
+            var usersList = new List<User>
+    {
+        new User { UserId = 1, Email = "admin@test.com", FullName = "Admin User", Role = "Admin", CreatedAt = DateTime.UtcNow },
+        new User { UserId = 2, Email = "cust@test.com", FullName = "Customer User", Role = "Customer", CreatedAt = DateTime.UtcNow }
+    };
+
+            // SỬA TẠI ĐÂY: Gọi BuildMock trực tiếp trên List
+            var mockQueryable = usersList.BuildMock();
+
+            // Repository trả về mockQueryable này (nó đã bao gồm các Provider cho ToListAsync, CountAsync)
+            _userRepoMock.Setup(r => r.GetQueryable()).Returns(mockQueryable);
+
+            var request = new UserSearchRequest
             {
-                new User { UserId = 1, Email = "admin@macvilla.vn", FullName = "Nguyễn Admin" }
-            });
+                Role = "Admin",
+                PageNumber = 1,
+                PageSize = 10,
+                SortOrder = "latest"
+            };
 
-            _userRepoMock.Setup(r => r.GetQueryable()).Returns(users);
-
-            var request = new UserSearchRequest { Keyword = "Admin", PageNumber = 1, PageSize = 10 };
+            // Act
             var result = await _service.GetPagedUsersAsync(request);
 
+            // Assert
             result.Data.Should().HaveCount(1);
+            result.Data.First().Role.Should().Be("Admin");
         }
+        #endregion
 
+        #region TC16 & TC17: CreateUserAsync (AddInternalUser)
         [Fact]
-        public async Task CreateUserAsync_ShouldThrowException_WhenEmailAlreadyExists()
+        public async Task CreateUserAsync_ShouldThrowException_WhenEmailExists()
         {
+            // Arrange (TC16)
             _userRepoMock.Setup(r => r.ExistsByEmailAsync(It.IsAny<string>(), It.IsAny<long?>()))
                          .ReturnsAsync(true);
 
-            var request = new CreateUserRequest { Email = "test@mail.com", FullName = "Test", Password = "123" };
+            var request = new CreateUserRequest { Email = "exist@test.com", FullName = "Test", Password = "123" };
 
+            // Act
             Func<Task> act = async () => await _service.CreateUserAsync(request);
-            await act.Should().ThrowAsync<InvalidOperationException>();
+
+            // Assert
+            await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*đã được sử dụng*");
         }
 
         [Fact]
-        public async Task CreateUserAsync_ShouldReturnMappedResponse_WhenValid()
+        public async Task CreateUserAsync_ShouldReturnResponse_WhenValid()
         {
-            var request = new CreateUserRequest { Email = "new@macvilla.vn", FullName = "New User", Password = "password123" };
-            var createdUser = new User { UserId = 50, Email = request.Email };
+            // Arrange (TC17)
+            var request = new CreateUserRequest { Email = "new@test.com", FullName = "New User", Password = "Password123", Role = "Admin" };
 
-            _userRepoMock.Setup(r => r.ExistsByEmailAsync(It.IsAny<string>(), It.IsAny<long?>()))
-                         .ReturnsAsync(false);
-
+            _userRepoMock.Setup(r => r.ExistsByEmailAsync(It.IsAny<string>(), It.IsAny<long?>())).ReturnsAsync(false);
             _userRepoMock.Setup(r => r.CreateUserAsync(It.IsAny<User>(), It.IsAny<string>()))
-                         .ReturnsAsync(createdUser);
+                         .ReturnsAsync((User u, string h) => u);
 
+            // Act
             var result = await _service.CreateUserAsync(request);
 
-            result.UserId.Should().Be(50);
+            // Assert
+            result.Email.Should().Be("new@test.com");
+            _userRepoMock.Verify(r => r.CreateUserAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
+        }
+        #endregion
+
+        #region TC18, TC19, TC20: ChangeStatusAsync (ToggleStatus)
+        [Fact]
+        public async Task ChangeStatusAsync_ShouldThrowException_WhenIdInvalid()
+        {
+            // Arrange (TC18)
+            var invalidId = -1L;
+            var request = new ChangeUserStatusRequest { Status = "Disabled" };
+
+            // Act
+            Func<Task> act = async () => await _service.ChangeStatusAsync(invalidId, request);
+
+            // Assert
+            await act.Should().ThrowAsync<ArgumentException>();
         }
 
         [Fact]
-        public async Task ResetPasswordAsync_ShouldCallRepo()
+        public async Task ChangeStatusAsync_ShouldUpdateSuccessfully_WhenUserExists()
         {
-            var userId = 1L;
-            var user = new User { UserId = userId };
-            var request = new ResetPasswordRequest { NewPassword = "NewPassword123" };
+            // Arrange (TC19)
+            var userId = 10L;
+            var request = new ChangeUserStatusRequest { Status = "Disabled" };
+            _userRepoMock.Setup(r => r.UpdateStatusAsync(userId, "Disabled")).ReturnsAsync(true);
 
-            _userRepoMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(user);
+            // Act
+            await _service.ChangeStatusAsync(userId, request);
 
-            await _service.ResetPasswordAsync(userId, request);
-
-            _userRepoMock.Verify(r => r.ResetPasswordAsync(userId, It.IsAny<string>()), Times.Once);
+            // Assert
+            _userRepoMock.Verify(r => r.UpdateStatusAsync(userId, "Disabled"), Times.Once);
         }
+
+        [Fact]
+        public async Task ChangeStatusAsync_ShouldThrowKeyNotFound_WhenUpdateReturnsFalse()
+        {
+            // Arrange (TC20)
+            var userId = 99L;
+            var request = new ChangeUserStatusRequest { Status = "Active" };
+            _userRepoMock.Setup(r => r.UpdateStatusAsync(userId, It.IsAny<string>())).ReturnsAsync(false);
+
+            // Act
+            Func<Task> act = async () => await _service.ChangeStatusAsync(userId, request);
+
+            // Assert
+            await act.Should().ThrowAsync<KeyNotFoundException>();
+        }
+        #endregion
+
+        #region Additional: DeleteUserAsync
+        [Fact]
+        public async Task DeleteUserAsync_ShouldThrowException_WhenUserHasOrders()
+        {
+            // Mock user có đơn hàng
+            var user = new User { UserId = 1, Orders = new List<Order> { new Order() } };
+            _userRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(user);
+
+            Func<Task> act = async () => await _service.DeleteUserAsync(1);
+
+            await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*đã có đơn hàng*");
+        }
+        #endregion
     }
 }
