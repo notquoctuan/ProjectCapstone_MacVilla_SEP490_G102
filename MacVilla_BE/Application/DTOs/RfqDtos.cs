@@ -84,6 +84,18 @@ public class UpdateRfqInternalNoteRequest
     public string? InternalNote { get; set; }
 }
 
+public class RfqDashboardStatsResponse
+{
+    public int TotalRfqs { get; set; }
+    public int PendingRfqs { get; set; }
+    public int ProcessingRfqs { get; set; }
+    public int QuotedRfqs { get; set; }
+    public int TotalQuotations { get; set; }
+    public int ApprovedQuotations { get; set; }
+    public int RejectedQuotations { get; set; }
+    public decimal TotalRevenueFromApproved { get; set; }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // FILTER / SEARCH
 // ═══════════════════════════════════════════════════════════════════

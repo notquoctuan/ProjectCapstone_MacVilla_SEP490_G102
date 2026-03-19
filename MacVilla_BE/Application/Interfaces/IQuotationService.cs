@@ -24,6 +24,18 @@ public interface IQuotationService
     /// <summary>Xuất PDF báo giá</summary>
     Task<byte[]> ExportPdfAsync(long quotationId);
 
+    /// <summary>Thống kê hiệu quả báo giá và yêu cầu (Dashboard)</summary>
+    Task<RfqDashboardStatsResponse> GetDashboardStatsAsync();
+
+    /// <summary>Hủy báo giá (Draft/SentToCustomer) thay vì xóa bỏ</summary>
+    Task<bool> CancelQuotationAsync(long quotationId);
+
+    /// <summary>Tạo báo giá mới (Clone) từ một báo giá đã tồn tại để điều chỉnh</summary>
+    Task<QuotationDetailResponse> ReviseQuotationAsync(long quotationId, long createdByUserId);
+
+    /// <summary>Tạo đơn hàng từ báo giá đã được Approved</summary>
+    Task<long> CreateOrderFromQuotationAsync(long quotationId, long createdByUserId);
+
     // ── Customer ─────────────────────────────────────────────────────────────
 
     /// <summary>Khách hàng xem danh sách báo giá đã nhận</summary>

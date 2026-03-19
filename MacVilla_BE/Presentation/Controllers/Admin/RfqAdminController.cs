@@ -15,9 +15,22 @@ namespace Presentation.Controllers.Admin;
 public class RfqAdminController : ControllerBase
 {
     private readonly IRfqService _rfqService;
+    private readonly IQuotationService _quotationService;
 
-    public RfqAdminController(IRfqService rfqService)
-        => _rfqService = rfqService;
+    public RfqAdminController(IRfqService rfqService, IQuotationService quotationService)
+    {
+        _rfqService = rfqService;
+        _quotationService = quotationService;
+    }
+
+    /// <summary>Dashboard Thống kê (Số lượng RFQ, Quotations, Doanh thu)</summary>
+    /// <remarks>GET: /api/admin/rfq/dashboard</remarks>
+    [HttpGet("dashboard")]
+    public async Task<ActionResult<RfqDashboardStatsResponse>> GetDashboardStats()
+    {
+        var result = await _quotationService.GetDashboardStatsAsync();
+        return Ok(result);
+    }
 
     /// <summary>Danh sách RFQ — có filter (status, keyword, sale, ngày) và phân trang</summary>
     /// <remarks>GET: /api/admin/rfq?status=Pending&amp;keyword=Minh+Anh&amp;pageNumber=1&amp;pageSize=20</remarks>

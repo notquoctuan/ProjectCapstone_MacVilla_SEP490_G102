@@ -12,12 +12,16 @@ public class QuotationService : IQuotationService
 {
     private readonly IQuotationRepository _quotationRepository;
     private readonly IRfqRepository _rfqRepository;
+    private readonly IOrderRepository _orderRepository;
 
-    public QuotationService(IQuotationRepository quotationRepository, IRfqRepository rfqRepository)
+    public QuotationService(
+        IQuotationRepository quotationRepository, 
+        IRfqRepository rfqRepository,
+        IOrderRepository orderRepository)
     {
         _quotationRepository = quotationRepository;
         _rfqRepository = rfqRepository;
-        // QuestPDF Community license (miễn phí cho dự án open-source/commercial không doanh thu lớn)
+        _orderRepository = orderRepository;
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
@@ -236,6 +240,117 @@ public class QuotationService : IQuotationService
     }
 
     // ════════════════════════════════════════════════════════
+    // ADVANCED BUSINESS LOGICS (Cancel, Revise, Order Conversion, Stats)
+    // ════════════════════════════════════════════════════════
+
+    public async Task<bool> CancelQuotationAsync(long quotationId)
+    {
+        var quotation = await _quotationRepository.GetByIdAsync(quotationId);
+        if (quotation == null) return false;
+
+        if (quotation.Status == "Approved" || quotation.Status == "Rejected")
+            throw new InvalidOperationException($"Không thể hủy báo giá đã được phản hồi. Cần thu hồi trạng thái hiện tại: {quotation.Status}");
+
+        quotation.Status = "Cancelled";
+        quotation.UpdatedAt = DateTime.UtcNow;
+        await _quotationRepository.UpdateQuotationAsync(quotation);
+        return true;
+    }
+
+    public async Task<QuotationDetailResponse> ReviseQuotationAsync(long quotationId, long createdByUserId)
+    {
+        var oldQ = await _quotationRepository.GetQuotationDetailByIdAsync(quotationId);
+        if (oldQ == null) throw new KeyNotFoundException($"Không tìm thấy báo giá #{quotationId}.");
+
+        // Clone Items
+        var newItems = oldQ.QuotationItems.Select(i => new QuotationItemRequest
+        {
+            ProductId = i.ProductId,
+            Sku = i.Sku,
+            ProductName = i.ProductName ?? "",
+            Quantity = i.Quantity ?? 0,
+            Unit = i.Unit,
+            UnitPrice = i.UnitPrice ?? 0,
+            DiscountPercent = i.DiscountPercent ?? 0
+        }).ToList();
+
+        // Create new request mapping old data
+        var request = new CreateQuotationRequest
+        {
+            RfqId = oldQ.RfqId ?? 0,
+            VatRate = oldQ.VatRate ?? 10,
+            ValidDays = 30, // Default for revise
+            Notes = oldQ.Notes,
+            InternalNote = "Bản điều chỉnh từ báo giá: " + oldQ.QuotationCode,
+            Items = newItems
+        };
+
+        // Reuse CreateLogic
+        return await CreateQuotationAsync(request, createdByUserId);
+    }
+
+    public async Task<long> CreateOrderFromQuotationAsync(long quotationId, long createdByUserId)
+    {
+        var q = await _quotationRepository.GetQuotationDetailByIdAsync(quotationId);
+        if (q == null) throw new KeyNotFoundException($"Không tìm thấy báo giá #{quotationId}.");
+
+        if (q.Status != "Approved")
+            throw new InvalidOperationException($"Chỉ có thể tạo đơn từ báo giá đã được khách hàng duyệt (Approved). Hiện tại: {q.Status}");
+
+        var orderItems = q.QuotationItems.Select(qi => new OrderItem
+        {
+            ProductId = qi.ProductId,
+            Quantity = qi.Quantity,
+            UnitPrice = Math.Round((qi.UnitPrice ?? 0) * (1 - (qi.DiscountPercent ?? 0)/100), 0)
+        }).ToList();
+
+        var order = new Order
+        {
+            UserId = q.Rfq?.UserId, // Same customer as RFQ
+            TotalAmount = q.TotalAmount,
+            Status = "Pending", 
+            Note = $"Đơn hàng được sinh tự động từ Báo giá: {q.QuotationCode}",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            OrderItems = orderItems
+        };
+
+        var created = await _orderRepository.CreateOrderAsync(order);
+        return created.OrderId;
+    }
+
+    public async Task<RfqDashboardStatsResponse> GetDashboardStatsAsync()
+    {
+        // Tính năng này dùng count của repository bằng pageSize=1 trick
+        var (_, tRfq) = await _rfqRepository.SearchRfqsAsync(null, null, null, null, null, 1, 1);
+        var (_, pRfq) = await _rfqRepository.SearchRfqsAsync("Pending", null, null, null, null, 1, 1);
+        var (_, prRfq) = await _rfqRepository.SearchRfqsAsync("Processing", null, null, null, null, 1, 1);
+        var (_, qRfq) = await _rfqRepository.SearchRfqsAsync("Quoted", null, null, null, null, 1, 1);
+
+        var (_, tQT) = await _quotationRepository.SearchQuotationsAsync(null, null, null, null, null, 1, 1);
+        var (_, aQT) = await _quotationRepository.SearchQuotationsAsync("Approved", null, null, null, null, 1, 1);
+        var (_, rQT) = await _quotationRepository.SearchQuotationsAsync("Rejected", null, null, null, null, 1, 1);
+
+        // Fetch just the Approved ones accurately to calculate total revenue
+        // (If there are many, ideally this needs a custom aggregate in repository, but for standard scenarios, get all approved)
+        // Here we just pull first 1000 since it is generic
+        var (approvedList, _) = await _quotationRepository.SearchQuotationsAsync("Approved", null, null, null, null, 1, 1000);
+        decimal sumRevenue = approvedList.Sum(q => q.TotalAmount ?? 0);
+
+        return new RfqDashboardStatsResponse
+        {
+            TotalRfqs = tRfq,
+            PendingRfqs = pRfq,
+            ProcessingRfqs = prRfq,
+            QuotedRfqs = qRfq,
+            TotalQuotations = tQT,
+            ApprovedQuotations = aQT,
+            RejectedQuotations = rQT,
+            TotalRevenueFromApproved = sumRevenue
+        };
+    }
+
+    // ════════════════════════════════════════════════════════
     // PRIVATE HELPERS
     // ════════════════════════════════════════════════════════
 
@@ -447,7 +562,7 @@ public class QuotationService : IQuotationService
                         for (int idx = 0; idx < detail.Items.Count; idx++)
                         {
                             var item = detail.Items[idx];
-                            var bg = idx % 2 == 0 ? Colors.White : "#f5f7fa";
+                            string bg = idx % 2 == 0 ? "#FFFFFF" : "#f5f7fa";
 
                             static IContainer DataCell(IContainer c, string bg) =>
                                 c.Background(bg).BorderBottom(0.3f).BorderColor(Colors.Grey.Lighten2)

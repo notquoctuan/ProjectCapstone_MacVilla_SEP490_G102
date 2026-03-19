@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -62,6 +62,13 @@ public class OrderRepository : IOrderRepository
             .Include(o => o.Shippings).ThenInclude(s => s.ShippingMethod)
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+    public async Task<Order> CreateOrderAsync(Order order)
+    {
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+        return order;
+    }
 
     public async Task<Order> UpdateOrderAsync(Order order)
     {
