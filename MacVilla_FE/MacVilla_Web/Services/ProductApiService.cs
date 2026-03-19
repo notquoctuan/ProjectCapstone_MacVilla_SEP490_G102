@@ -19,7 +19,11 @@ namespace MacVilla_Web.Services
 
         private void AttachToken()
         {
-            var token = _httpContextAccessor.HttpContext?.Session.GetString("JwtToken");
+            var http = _httpContextAccessor.HttpContext;
+            var token =
+                http?.Session.GetString("JwtToken") ??
+                http?.Session.GetString("JWToken") ??
+                http?.Request.Cookies["jwt"];
 
             _httpClient.DefaultRequestHeaders.Authorization = null;
 
@@ -113,13 +117,31 @@ namespace MacVilla_Web.Services
                 "Xóa sản phẩm thành công!");
         }
 
-        // GET: danh mục dạng cây (cho dropdown)
+        // GET: danh mục (build cây từ danh sách phẳng /api/admin/category/getall)
         public async Task<List<CategoryTreeResponse>> GetCategoriesAsync()
         {
             AttachToken();
-            var resp = await _httpClient.GetAsync("api/admin/categories/tree");
+            var resp = await _httpClient.GetAsync("api/admin/category/getall");
             if (!resp.IsSuccessStatusCode) return new();
-            return Deserialize<List<CategoryTreeResponse>>(await resp.Content.ReadAsStringAsync()) ?? new();
+
+            var flat = Deserialize<List<CategoryVM>>(await resp.Content.ReadAsStringAsync()) ?? new();
+            var lookup = flat.ToDictionary(c => c.CategoryId, c => new CategoryTreeResponse
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.Name
+            });
+
+            foreach (var c in flat)
+            {
+                if (c.ParentCategoryId.HasValue && lookup.TryGetValue(c.ParentCategoryId.Value, out var parent))
+                {
+                    parent.Children.Add(lookup[c.CategoryId]);
+                }
+            }
+
+            // chỉ trả về các root
+            var rootIds = flat.Where(c => !c.ParentCategoryId.HasValue).Select(c => c.CategoryId).ToHashSet();
+            return lookup.Values.Where(v => rootIds.Contains(v.CategoryId)).OrderBy(v => v.CategoryName).ToList();
         }
 
         // ── Helpers ──────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-﻿@page "{id:long}"
+@page "{id:long}"
 @model MacVilla_Web.Pages.Admin.Products.DetailModel
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
@@ -30,7 +30,7 @@
             <div class="gal-main">
                 @if (main != null)
                 {
-                    <img src="@main.ImageUrl" alt="@p.Name" id="mainImg" class="gal-main__img" />
+                    <img src="@($"https://localhost:7262{main.ImageUrl}")" alt="@p.Name" id="mainImg" class="gal-main__img" />
                 }
                 else
                 {
@@ -46,8 +46,8 @@
                     @foreach (var img in p.Images)
                     {
                         <div class="gal-thumb @(img.IsMain ? "gal-thumb--on" : "")"
-                             onclick="switchImg('@img.ImageUrl', this)">
-                            <img src="@img.ImageUrl" alt="" />
+                             onclick="switchImg('@($"https://localhost:7262{img.ImageUrl}")', this)">
+                            <img src="@($"https://localhost:7262{img.ImageUrl}")" alt="" />
                         </div>
                     }
                 </div>
