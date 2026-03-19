@@ -1,0 +1,183 @@
+@page
+@model MacVilla_Web.Pages.Admin.Orders.IndexModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+@section Styles {
+    <style>
+        .admin-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        .btn-mv {
+            background-color: var(--mv-green-dark);
+            color: white;
+        }
+
+            .btn-mv:hover {
+                background-color: #6a8900;
+                color: white;
+            }
+
+    </style>
+}
+
+<div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold m-0">Đơn hàng</h3>
+                <p class="text-muted small mb-0">Theo dõi trạng thái, thanh toán và vận chuyển</p>
+            </div>
+        </div>
+
+        <div class="admin-card mb-4">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Trạng thái đơn</label>
+                    <select asp-for="SearchRequest.Status" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        <option value="Pending">Chờ xử lý</option>
+                        <option value="Processing">Đang xử lý</option>
+                        <option value="Shipped">Đã gửi hàng</option>
+                        <option value="Completed">Hoàn thành</option>
+                        <option value="Cancelled">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Mã khách hàng</label>
+                    <input asp-for="SearchRequest.UserId" class="form-control" placeholder="User Id" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Từ ngày</label>
+                    <input asp-for="SearchRequest.StartDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Đến ngày</label>
+                    <input asp-for="SearchRequest.EndDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label small fw-bold text-muted">Hiển thị</label>
+                    <select asp-for="SearchRequest.PageSize" class="form-select">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-mv w-100">Lọc</button>
+                    <a asp-page="Index" class="btn btn-light border w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="admin-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Mã đơn</th>
+                            <th>Ngày tạo</th>
+                            <th>Khách hàng</th>
+                            <th>Sản phẩm</th>
+                            <th>Tổng tiền</th>
+                            <th>Thanh toán</th>
+                            @* <th>Vận chuyển</th> *@
+                            <th>Trạng thái</th>
+                            <th class="text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PagedResult?.Data != null && Model.PagedResult.Data.Any())
+                        {
+                            @foreach (var order in Model.PagedResult.Data)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold">#@order.OrderId</td>
+                                    <td>@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="fw-semibold">@order.CustomerName</div>
+                                        <div class="text-muted small">@order.CustomerEmail</div>
+                                    </td>
+                                    <td>@order.ItemCount sản phẩm</td>
+                                    <td>@String.Format("{0:N0} đ", order.TotalAmount ?? 0)</td>
+                                    <td>@order.PaymentStatus</td>
+                                    @* <td>@order.ShippingStatus</td> *@
+                                    <td>@order.Status</td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a asp-page="Detail" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-page="Tracking" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-signpost-split"></i>
+                                            </a>
+                                            <form asp-page-handler="UpdateStatus" method="post" class="d-inline-flex align-items-center gap-1">
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <select name="newStatus" class="form-select form-select-sm">
+                                                    <option value="Pending" selected="@("Pending".Equals(order.Status))">Pending</option>
+                                                    <option value="Processing" selected="@("Processing".Equals(order.Status))">Processing</option>
+                                                    <option value="Shipped" selected="@("Shipped".Equals(order.Status))">Shipped</option>
+                                                    <option value="Completed" selected="@("Completed".Equals(order.Status))">Completed</option>
+                                                    <option value="Cancelled" selected="@("Cancelled".Equals(order.Status))">Cancelled</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-mv">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-page-handler="Cancel" method="post" class="d-inline" onsubmit="return confirm('Hủy đơn hàng này?');">
+                                                <input type="hidden" name="id" value="@order.OrderId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt-cutoff fs-1 d-block mb-2"></i>
+                                    Không có đơn hàng nào
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.PagedResult != null && Model.PagedResult.TotalPages > 1)
+            {
+                <div class="p-3 border-top bg-light">
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-center m-0">
+                            <li class="page-item @(Model.SearchRequest.PageNumber <= 1 ? "disabled" : "")">
+                                <a class="page-link" asp-page="Index" asp-all-route-data="Model.GetPageRouteData(Model.SearchRequest.PageNumber - 1)">Trước</a>
+                            </li>
+                            @for (var i = 1; i <= Model.PagedResult.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.SearchRequest.PageNumber ? "active" : "")">
+                                    <a class="page-link"
+                                       style="@(i == Model.SearchRequest.PageNumber ? "background-color: var(--mv-green-dark); border-color: var(--mv-green-dark);" : "")"
+                                       asp-page="Index" asp-all-route-data="Model.GetPageRouteData(i)">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.SearchRequest.PageNumber >= Model.PagedResult.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-page="Index" asp-all-route-data="Model.GetPageRouteData(Model.SearchRequest.PageNumber + 1)">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+</div>
+

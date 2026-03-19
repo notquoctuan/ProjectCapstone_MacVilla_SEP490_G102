@@ -99,7 +99,7 @@ namespace Presentation.Controllers.Admin
             try
             {
                 var result = await _productService.AddImagesAsync(id, files, _env.WebRootPath);
-                return Ok(new { message = $"Đã upload {result.Count} ảnh thành công.", images = result });
+                return Ok(new { message = $"Đã cập nhật {result.Count} ảnh thành công.", images = result });
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
             catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }

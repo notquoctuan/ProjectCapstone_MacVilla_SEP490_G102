@@ -53,7 +53,7 @@ public class OrderService : IOrderService
     {
         if (!ValidStatuses.Contains(request.Status))
             throw new ArgumentException(
-                $"Invalid status '{request.Status}'. Allowed: {string.Join(", ", ValidStatuses)}");
+                $"Trạng thái không hợp lệ '{request.Status}'. Cho phép: {string.Join(", ", ValidStatuses)}");
 
         // Transaction qua IOrderRepository — không cần inject DbContext vào Application layer
         await using var transaction = await _orderRepository.BeginTransactionAsync();
@@ -67,8 +67,8 @@ public class OrderService : IOrderService
 
             if (!IsValidStatusTransition(oldStatus, newStatus))
                 throw new InvalidOperationException(
-                    $"Cannot transition from '{oldStatus}' to '{newStatus}'. " +
-                    $"Valid transitions: {GetValidTransitions(oldStatus)}");
+                    $"Không thể chuyển đổi từ '{oldStatus}' to '{newStatus}'. " +
+                    $"Các chuyển đổi hợp lệ: {GetValidTransitions(oldStatus)}");
 
             await HandleInventoryOnStatusChange(order, oldStatus, newStatus);
 
@@ -95,7 +95,7 @@ public class OrderService : IOrderService
             if (order == null) return false;
 
             if (order.Status == "Completed")
-                throw new InvalidOperationException("Cannot cancel a completed order.");
+                throw new InvalidOperationException("Không thể hủy đơn hàng đã hoàn tất");
 
             if (order.Status == "Cancelled")
             {

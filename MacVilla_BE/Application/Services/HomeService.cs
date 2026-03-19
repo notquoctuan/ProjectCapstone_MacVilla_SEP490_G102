@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Application.DTOs;
@@ -47,10 +47,10 @@ public class HomeService : IHomeService
         var keyword = (request.Keyword ?? string.Empty).Trim();
 
         if (string.IsNullOrEmpty(keyword))
-            throw new ArgumentException("Keyword cannot be empty");
+            throw new ArgumentException("Từ khóa không được để trống.");
 
         if (keyword.Length > 100)
-            throw new ArgumentException("Keyword is too long");
+            throw new ArgumentException("Từ khóa quá dài.");
 
         // Basic sanitization: remove wildcard characters
         keyword = keyword.Replace("%", string.Empty).Replace("_", string.Empty);

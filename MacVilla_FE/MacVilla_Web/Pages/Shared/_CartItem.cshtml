@@ -1,0 +1,35 @@
+@model MacVilla_Web.Models.CartItemVM
+
+<div class="cart-item" data-cart-item-id="@Model.CartItemId">
+    <div class="cart-item-image">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="@Model.ProductName" />
+        }
+        else
+        {
+            <div class="no-image"><i class="fas fa-box"></i></div>
+        }
+    </div>
+    <div class="cart-item-details">
+        <div class="cart-item-name">@Model.ProductName</div>
+        <div class="cart-item-price">@Model.UnitPrice.ToString("N0") ₫</div>
+    </div>
+    <div class="cart-item-quantity">
+        <button class="qty-btn qty-minus" onclick="updateCartItem(@Model.CartItemId, @Model.Quantity - 1)">
+            <i class="fas fa-minus"></i>
+        </button>
+        <input type="number" class="qty-input" value="@Model.Quantity" 
+               min="1" max="99" 
+               onchange="updateCartItem(@Model.CartItemId, this.value)" />
+        <button class="qty-btn qty-plus" onclick="updateCartItem(@Model.CartItemId, @Model.Quantity + 1)">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    <div class="cart-item-subtotal">@Model.SubTotal.ToString("N0") ₫</div>
+    <div class="cart-item-actions">
+        <button class="btn-delete" onclick="deleteCartItem(@Model.CartItemId)" title="Xóa sản phẩm">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+@model MacVilla_Web.Models.ProductAdminVM
+@{
+    var discountPct = Random.Shared.Next(10, 40);
+    var oldPrice = Model.Price * (1 + discountPct / 100m);
+    var displayImage = !string.IsNullOrEmpty(Model.ImageUrl) 
+        ? Model.ImageUrl 
+        : (Model.Images.FirstOrDefault(x => x.IsMain)?.ImageUrl ?? "/img/no-image.png");
+}
+
+<div class="col">
+    <div class="product-card">
+        <div class="product-img-wrap">
+            @if (!string.IsNullOrEmpty(displayImage) && displayImage != "/img/no-image.png")
+            {
+                <img src="@displayImage" alt="@Model.Name" loading="lazy" />
+            }
+            else
+            {
+                <div class="product-img-placeholder"><i class="fas fa-box"></i></div>
+            }
+            <span class="discount-badge">-@discountPct%</span>
+        </div>
+        <div class="product-body">
+            <div class="product-name">@Model.Name</div>
+            <div class="product-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                <span style="color:#888;font-size:11px;margin-left:3px;">(4.0)</span>
+            </div>
+            <div class="product-price">
+                <span class="price-new">@Model.Price.ToString("N0")₫</span>
+                <span class="price-old">@oldPrice.ToString("N0")₫</span>
+            </div>
+            <button class="btn-add-cart" onclick="addToCart(@Model.ProductId)">
+                <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+@model MacVilla_Web.Models.ProductAdminVM
+
+<div class="col">
+    <div class="product-card">
+        <div class="product-img-wrap">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Name" loading="lazy" />
+            }
+            else
+            {
+                <div class="product-img-placeholder"><i class="fas fa-box"></i></div>
+            }
+            @if (Model.Price.HasValue && Model.Price > 0)
+            {
+                var discountPct = new Random().Next(10, 30);
+                <span class="discount-badge">-@discountPct%</span>
+            }
+        </div>
+        <div class="product-body">
+            <div class="product-name">@Model.Name</div>
+            <div class="product-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+            </div>
+            <div class="product-price">
+                @if (Model.Price.HasValue)
+                {
+                    var oldPrice = Model.Price.Value * 1.2m;
+                    <span class="price-new">@(((decimal)Model.Price).ToString("N0"))₫</span>
+                    <span class="price-old">@(((decimal)oldPrice).ToString("N0"))₫</span>
+                }
+                else
+                {
+                    <span class="price-new">Liên hệ</span>
+                }
+            </div>
+            <button class="btn-add-cart" onclick="addToCart(@Model.ProductId)">
+                <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
+            </button>
+        </div>
+    </div>
+</div>

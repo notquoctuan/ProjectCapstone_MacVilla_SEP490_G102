@@ -26,7 +26,7 @@ public class HomeController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Lỗi hiển thị banner", detail = ex.Message });
+            return StatusCode(500, new { message = "Lỗi hiển thị banner.", detail = ex.Message });
         }
     }
 
@@ -40,7 +40,7 @@ public class HomeController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Lỗi hiển thị sản phẩm", detail = ex.Message });
+            return StatusCode(500, new { message = "Lỗi hiển thị sản phẩm.", detail = ex.Message });
         }
     }
 
@@ -50,7 +50,7 @@ public class HomeController : ControllerBase
         try
         {
             if (request == null || string.IsNullOrWhiteSpace(request.Keyword))
-                return BadRequest(new { message = "Keyword cannot be empty." });
+                return BadRequest(new { message = "Từ khóa không được để trống." });
 
             var result = await _homeService.SearchProductsAsync(request);
             return Ok(result);
@@ -61,7 +61,7 @@ public class HomeController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Lỗi tìm kiếm", detail = ex.Message });
+            return StatusCode(500, new { message = "Lỗi tìm kiếm.", detail = ex.Message });
         }
     }
 
@@ -75,7 +75,7 @@ public class HomeController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Lỗi hiển thị danh mục", detail = ex.Message });
+            return StatusCode(500, new { message = "Lỗi hiển thị danh mục.", detail = ex.Message });
         }
     }
 }
