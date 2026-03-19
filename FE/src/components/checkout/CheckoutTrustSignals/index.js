@@ -1,0 +1,1 @@
+export { CheckoutTrustSignals } from './CheckoutTrustSignals'
