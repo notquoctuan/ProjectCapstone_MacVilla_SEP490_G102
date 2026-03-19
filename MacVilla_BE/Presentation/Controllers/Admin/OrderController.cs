@@ -1,4 +1,4 @@
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,13 +44,13 @@ public class OrderController : ControllerBase
     {
         if (id <= 0)
         {
-            return BadRequest(new { message = "Order ID must be greater than 0." });
+            return BadRequest(new { message = "Mã đơn hàng phải lớn hơn 0." });
         }
 
         var order = await _orderService.GetOrderDetailAsync(id);
         if (order == null)
         {
-            return NotFound(new { message = "Order not found." });
+            return NotFound(new { message = "Không tìm thấy đơn hàng." });
         }
 
         return Ok(order);
@@ -65,13 +65,13 @@ public class OrderController : ControllerBase
     {
         if (id <= 0)
         {
-            return BadRequest(new { message = "Order ID must be greater than 0." });
+            return BadRequest(new { message = "Mã đơn hàng phải lớn hơn 0." });
         }
 
         var tracking = await _orderService.GetOrderTrackingAsync(id);
         if (tracking == null)
         {
-            return NotFound(new { message = "Order not found." });
+            return NotFound(new { message = "Không tìm thấy đơn hàng." });
         }
 
         return Ok(tracking);
@@ -88,12 +88,12 @@ public class OrderController : ControllerBase
     {
         if (id <= 0)
         {
-            return BadRequest(new { message = "Order ID must be greater than 0." });
+            return BadRequest(new { message = "Mã đơn hàng phải lớn hơn 0." });
         }
 
         if (string.IsNullOrWhiteSpace(request.Status))
         {
-            return BadRequest(new { message = "Status is required." });
+            return BadRequest(new { message = "Cần có thông tin về trạng thái." });
         }
 
         try
@@ -101,10 +101,10 @@ public class OrderController : ControllerBase
             var success = await _orderService.UpdateOrderStatusAsync(id, request);
             if (!success)
             {
-                return NotFound(new { message = "Order not found." });
+                return NotFound(new { message = "Không tìm thấy đơn hàng." });
             }
 
-            return Ok(new { message = "Order status updated successfully." });
+            return Ok(new { message = "Trạng thái đơn hàng đã được cập nhật thành công." });
         }
         catch (ArgumentException ex)
         {
@@ -116,7 +116,7 @@ public class OrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An error occurred while updating order status.", error = ex.Message });
+            return StatusCode(500, new { message = "Đã xảy ra lỗi trong quá trình cập nhật trạng thái đơn hàng.", error = ex.Message });
         }
     }
 
@@ -131,7 +131,7 @@ public class OrderController : ControllerBase
     {
         if (id <= 0)
         {
-            return BadRequest(new { message = "Order ID must be greater than 0." });
+            return BadRequest(new { message = "Mã đơn hàng phải lớn hơn 0." });
         }
 
         try
@@ -140,10 +140,10 @@ public class OrderController : ControllerBase
             var success = await _orderService.CancelOrderAsync(id, reason);
             if (!success)
             {
-                return NotFound(new { message = "Order not found." });
+                return NotFound(new { message = "Không tìm thấy đơn hàng." });
             }
 
-            return Ok(new { message = "Order cancelled successfully." });
+            return Ok(new { message = "Đơn hàng đã được hủy thành công." });
         }
         catch (InvalidOperationException ex)
         {
@@ -151,7 +151,7 @@ public class OrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An error occurred while cancelling order.", error = ex.Message });
+            return StatusCode(500, new { message = "Đã xảy ra lỗi khi hủy đơn hàng.", error = ex.Message });
         }
     }
 }
