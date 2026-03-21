@@ -176,6 +176,7 @@
             }
         }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="login-left">
@@ -200,6 +201,34 @@
                 </div>
             </div>
             <button class="btn-login" id="loginBtn" onclick="doLogin()">Đăng nhập</button>
+            <div style="margin-top:16px; text-align:center;">
+                <div id="g_id_onload"
+                     data-client_id="1097961029321-aecsa2a8hfl4eiro7p7i0ertfi7vjj8o.apps.googleusercontent.com"
+                     data-callback="handleGoogleLogin">
+                </div>
+
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+            <div style="margin-top:14px; text-align:center;">
+                <a href="/Auth/SendOtp" style="
+                    display:inline-block;
+                    padding:10px 14px;
+                    border:1px solid #e5e7eb;
+                    border-radius:8px;
+                    font-size:.9rem;
+                    color:#374151;
+                    text-decoration:none;
+                    transition:.2s;">
+                    📧 Gửi OTP
+                </a>
+            </div>
         </div>
     </div>
 
@@ -274,6 +303,56 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Đăng nhập';
+            }
+        }
+        async function handleGoogleLogin(response) {
+            const errBox = document.getElementById('errBox');
+            errBox.classList.remove('show');
+
+            try {
+                const idToken = response.credential;
+
+                // 1. Gọi BE Google login
+                const res = await fetch('https://localhost:7262/api/auth/google-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken: idToken })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errBox.textContent = data.message || 'Đăng nhập Google thất bại.';
+                    errBox.classList.add('show');
+                    return;
+                }
+
+                const token = data.AccessToken;
+
+                // 2. Lưu giống login thường
+                sessionStorage.setItem('jwt', token);
+                sessionStorage.setItem('userName', data.FullName || data.Email || '');
+                sessionStorage.setItem('userRole', data.Role || '');
+
+                document.cookie = `jwt=${token}; path=/; SameSite=Strict`;
+
+                // 3. Set session server
+                await fetch('/Auth/Login?handler=SetSession', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        role: data.Role,
+                        name: data.FullName
+                    })
+                });
+
+                // 4. Redirect
+                window.location.href = '/Admin/Dashboard';
+
+            } catch (err) {
+                errBox.textContent = 'Lỗi đăng nhập Google.';
+                errBox.classList.add('show');
             }
         }
     </script>

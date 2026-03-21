@@ -76,4 +76,67 @@ public class AuthController : ControllerBase
             return Conflict(new { message = ex.Message });
         }
     }
+
+    [HttpPost("send-otp")]
+    public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { message = "Email không được để trống." });
+        try
+        {
+            await _authService.SendOtpAsync(request.Email);
+            return Ok(new { message = "OTP đã gửi" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("resend-otp")]
+    public async Task<IActionResult> ResendOtp([FromBody] SendOtpRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { message = "Email không được để trống." });
+        try
+        {
+            await _authService.ResendOtpAsync(request.Email);
+            return Ok(new { message = "OTP đã gửi lại" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        try
+        {
+            var result = await _authService.LoginWithGoogleAsync(request.IdToken);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("verify-otp")]
+    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Otp))
+        {
+            return BadRequest(new { message = "Thiếu email hoặc OTP" });
+        }
+
+        var isValid = await _authService.VerifyOtpAsync(request.Email, request.Otp);
+
+        if (!isValid)
+            return BadRequest(new { message = "OTP không đúng hoặc đã hết hạn" });
+
+        return Ok(new { message = "Xác minh OTP thành công" });
+    }
 }

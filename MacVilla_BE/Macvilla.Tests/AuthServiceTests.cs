@@ -1,12 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace MacVilla.Tests
@@ -16,12 +17,26 @@ namespace MacVilla.Tests
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly AuthService _authService;
+        private readonly Mock<IUserOauthRepository> _userOauthRepoMock;
+        private readonly Mock<IEmailService> _emailServiceMock;
+        private readonly IMemoryCache _memoryCache;
 
         public AuthServiceTests()
         {
             _userRepoMock = new Mock<IUserRepository>();
             _tokenServiceMock = new Mock<ITokenService>();
-            _authService = new AuthService(_userRepoMock.Object, _tokenServiceMock.Object);
+            _userOauthRepoMock = new Mock<IUserOauthRepository>();
+            _emailServiceMock = new Mock<IEmailService>();
+
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+
+            _authService = new AuthService(
+                _userRepoMock.Object,
+                _tokenServiceMock.Object,
+                _memoryCache,
+                _userOauthRepoMock.Object,
+                _emailServiceMock.Object
+            );
         }
 
         [Fact]
@@ -136,6 +151,84 @@ namespace MacVilla.Tests
             result.UserId.Should().Be(99);
             result.AccessToken.Should().Be("new-token");
             _userRepoMock.Verify(r => r.CreateUserAsync(It.Is<User>(u => u.Email == request.Email.ToLower()), It.IsAny<string>()), Times.Once);
+        }
+
+        //Case 1: Send OTP thành công
+        [Fact]
+        public async Task SendOtpAsync_ShouldSendEmail_WhenEmailExists()
+        {
+            // Arrange
+            var email = "test@example.com";
+            var user = new User { UserId = 1, Email = email };
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(email)).ReturnsAsync(user);
+
+            // Act
+            await _authService.SendOtpAsync(email);
+
+            // Assert
+            _emailServiceMock.Verify(
+                x => x.SendOtpEmailAsync(email, It.IsAny<string>()),
+                Times.Once
+            );
+        }
+
+        //Case 2: Email không tồn tại
+        [Fact]
+        public async Task SendOtpAsync_ShouldThrowException_WhenEmailNotFound()
+        {
+            // Arrange
+            var email = "notfound@example.com";
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(email)).ReturnsAsync((User?)null);
+
+            // Act
+            Func<Task> act = async () => await _authService.SendOtpAsync(email);
+
+            // Assert
+            await act.Should().ThrowAsync<Exception>()
+                .WithMessage("Email chưa đăng ký");
+        }
+
+        //Case 3: Resend trước 60s (cooldown)
+        [Fact]
+        public async Task SendOtpAsync_ShouldThrowException_WhenCooldownNotExpired()
+        {
+            // Arrange
+            var email = "test@example.com";
+            var user = new User { UserId = 1, Email = email };
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(email)).ReturnsAsync(user);
+
+            // Set cooldown trước
+            _memoryCache.Set($"otp_cd_{email}", true, TimeSpan.FromSeconds(60));
+
+            // Act
+            Func<Task> act = async () => await _authService.SendOtpAsync(email);
+
+            // Assert
+            await act.Should().ThrowAsync<Exception>()
+                .WithMessage("Vui lòng đợi 60 giây trước khi yêu cầu mã mới.");
+        }
+
+        //Case 4: Resend OTP (gọi lại SendOtp)
+        [Fact]
+        public async Task ResendOtpAsync_ShouldCallSendOtp()
+        {
+            // Arrange
+            var email = "test@example.com";
+            var user = new User { UserId = 1, Email = email };
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(email)).ReturnsAsync(user);
+
+            // Act
+            await _authService.ResendOtpAsync(email);
+
+            // Assert
+            _emailServiceMock.Verify(
+                x => x.SendOtpEmailAsync(email, It.IsAny<string>()),
+                Times.Once
+            );
         }
     }
 }

@@ -1,0 +1,149 @@
+﻿@page
+@model MacVilla_Web.Pages.Auth.VerifyOtpModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Xác minh OTP - MacVilla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 🔥 GIỮ NGUYÊN CSS CỦA BẠN */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #1B5E20, #388E3C);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            width: 380px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #1a1a2e;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e5e7eb;
+            font-size: 0.9rem;
+            background: #fafafa;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #4CAF50;
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(76,175,80,.12);
+            }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            background: #2E7D32;
+            color: #fff;
+        }
+
+            .btn:hover {
+                background: #1B5E20;
+            }
+
+        .msg {
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .back {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+            .back a {
+                font-size: 0.85rem;
+                color: #2E7D32;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .back a:hover {
+                    text-decoration: underline;
+                }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="title">Nhập OTP</div>
+        <div class="subtitle">OTP đã được gửi tới: <b>@Model.Email</b></div>
+
+        <form method="post">
+            <input type="hidden" asp-for="Email" />
+
+            <div class="form-group">
+                <input asp-for="Otp" placeholder="Nhập mã OTP" />
+            </div>
+
+            <button class="btn" type="submit">Xác nhận</button>
+        </form>
+        <!-- RESEND -->
+        <form method="post" asp-page-handler="Resend">
+            <input type="hidden" asp-for="Email" />
+            <button class="btn" type="submit" id="resendBtn" disabled style="background:#e5e7eb; color:#374151;">
+                Gửi lại OTP (60s)
+            </button>
+        </form>
+
+        @if (Model.Message != null)
+        {
+            <div class="msg error">
+                @Model.Message
+            </div>
+        }
+
+        <div class="back">
+            <a href="/Auth/Login">← Quay lại đăng nhập</a>
+        </div>
+    </div>
+</body>
+</html>
