@@ -1,0 +1,8 @@
+.footer {
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-text-muted);
+}

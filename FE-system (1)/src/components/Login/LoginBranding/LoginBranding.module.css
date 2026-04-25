@@ -1,0 +1,92 @@
+.branding {
+  position: relative;
+  display: none;
+  flex: 1 1 50%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  background-color: var(--color-primary);
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .branding {
+    display: flex;
+  }
+}
+
+.bgDecor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-size: cover;
+  background-position: center;
+  background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBrBNhUUP3167dXTWwCTA7Z6mrXlMResQlvj9uN7_EuNEdMn3T5uhWnVYrTwkoMEgtxp-NNLuZfzF0mSoHPsAzA8mNNMKs6bIIZFQcmC318yjzFbgnRxahURvNtLiUve2gk6deTgKNoSUXcfFRs4Fqx6Xf0R0XiJ7grSjWygkwMitPkeuLwk6w_6NanhYVKcJeVO7yKlm9uM1uDEVSLyw7DLNazLKA9DELkkYtMSHKNoCdvJRadBuQiKFngRzgkoPbDpUcc9Bl4-085");
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--color-text-inverse);
+}
+
+.logoWrap {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-2xl);
+}
+
+.logoImg {
+  display: block;
+  width: auto;
+  max-width: 14rem;
+  height: 6rem;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.title {
+  margin: 0 0 1rem;
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text-inverse-muted);
+  max-width: 28rem;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(0, 74, 153, 0.9);
+  background: white;
+  border-radius: var(--radius-full);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.badgeIcon {
+  font-size: 1.125rem;
+}
