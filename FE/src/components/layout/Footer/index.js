@@ -1,5 +1,0 @@
-export { Footer } from './Footer'
-export { FooterAbout } from './FooterAbout'
-export { FooterPolicies } from './FooterPolicies'
-export { FooterSupport } from './FooterSupport'
-export { FooterBadges } from './FooterBadges'

@@ -1,1 +1,0 @@
-export { TechnicalSpecs } from './TechnicalSpecs'

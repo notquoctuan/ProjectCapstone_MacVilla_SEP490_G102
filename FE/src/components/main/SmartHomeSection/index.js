@@ -1,1 +1,0 @@
-export { SmartHomeSection } from './SmartHomeSection'

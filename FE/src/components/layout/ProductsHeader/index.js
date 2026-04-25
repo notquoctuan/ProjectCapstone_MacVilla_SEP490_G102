@@ -1,1 +1,0 @@
-export { ProductsHeader } from './ProductsHeader'

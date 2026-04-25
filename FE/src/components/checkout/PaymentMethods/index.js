@@ -1,1 +1,0 @@
-export { PaymentMethods } from './PaymentMethods'

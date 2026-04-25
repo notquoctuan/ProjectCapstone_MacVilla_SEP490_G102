@@ -1,1 +1,0 @@
-export { OrderSuccessProgress } from './OrderSuccessProgress'

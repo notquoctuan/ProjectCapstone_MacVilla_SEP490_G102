@@ -1,1 +1,0 @@
-export { CheckoutOrderSummary } from './CheckoutOrderSummary'

@@ -1,1 +1,0 @@
-export { QASection } from './QASection'

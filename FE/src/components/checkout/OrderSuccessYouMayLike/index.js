@@ -1,1 +1,0 @@
-export { OrderSuccessYouMayLike } from './OrderSuccessYouMayLike'

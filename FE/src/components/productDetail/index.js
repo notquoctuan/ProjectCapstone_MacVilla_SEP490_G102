@@ -1,7 +1,0 @@
-export { ProductGallery } from './ProductGallery'
-export { ProductInfo } from './ProductInfo'
-export { ComboPromo } from './ComboPromo'
-export { ReviewsSection, StarRating } from './ReviewsSection'
-export { QASection } from './QASection'
-export { TechnicalSpecs } from './TechnicalSpecs'
-export { StoreServices } from './StoreServices'

@@ -1,1 +1,0 @@
-export { ShippingInfo } from './ShippingInfo'

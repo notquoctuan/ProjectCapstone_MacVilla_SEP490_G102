@@ -1,1 +1,0 @@
-export { FrequentlyBought } from './FrequentlyBought'
